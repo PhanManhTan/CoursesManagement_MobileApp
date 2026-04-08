@@ -53,7 +53,7 @@ fix: fix crash when user is null
 refactor: move adapter to separate class
 style: reformat LoginActivity
 ```
-2. Đặt Tên Class & File
+## 2. Đặt Tên Class & File
 Đặt tên file XML (Layout)
 ```
 Activity → login_activity.xml
