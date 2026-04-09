@@ -10,6 +10,30 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyApplication" />
+        android:theme="@style/Theme.MyApplication" >
+
+        <!-- Entry Point -->
+        <activity
+            android:name=".activities.SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Instructor Activities -->
+        <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.StudentListActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.RevenueActivity" android:exported="false" />
+
+        <!-- Admin Activities -->
+        <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".activities.admin.UserManageActivity" android:exported="false" />
+        <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="false" />
+        <activity android:name=".activities.admin.ReportActivity" android:exported="false" />
+
+    </application>
 
 </manifest>
