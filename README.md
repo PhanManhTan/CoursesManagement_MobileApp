@@ -34,7 +34,6 @@ git commit -m "feat: mô tả ngắn gọn"
 git push origin feature/ten-tinh-nang
 ```
 Sau khi push: Tạo Pull Request: feature/* → develop
-
 Khi chuẩn bị release: Tạo Pull Request: develop → main
 
 Lưu ý:
@@ -44,7 +43,6 @@ Mọi merge vào develop và main đều phải qua Pull Request, không merge t
 ```
 feature/login-screen
 feature/user-profile
-bugfix/crash-on-startup
 ```
 Commit message
 ```
@@ -53,6 +51,7 @@ fix: fix crash when user is null
 refactor: move adapter to separate class
 style: reformat LoginActivity
 ```
+
 ## 2. Đặt Tên Class & File
 Đặt tên file XML (Layout)
 ```
