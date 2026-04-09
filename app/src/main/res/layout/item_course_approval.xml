@@ -64,6 +64,15 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPreview"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="View Details &amp; Preview"
+            android:textColor="#A78BFA" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,6 +1,9 @@
 package com.example.myapplication.activities.instructor;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,6 +30,16 @@ public class StudentListActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(StudentListViewModel.class);
         viewModel.getStudents().observe(this, students -> adapter.setStudents(students));
+
+        // Search Logic
+        EditText etSearch = findViewById(R.id.etSearch);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.searchStudents(s.toString());
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }

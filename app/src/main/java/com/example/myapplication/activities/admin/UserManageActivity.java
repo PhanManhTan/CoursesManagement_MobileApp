@@ -1,6 +1,9 @@
 package com.example.myapplication.activities.admin;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,6 +30,21 @@ public class UserManageActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(UserManageViewModel.class);
         viewModel.getUsers().observe(this, users -> adapter.setUsers(users));
+
+        // Search Logic
+        EditText etSearchUser = findViewById(R.id.etSearchUser);
+        etSearchUser.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.searchUsers(s.toString());
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        // Role Filter Listeners
+        findViewById(R.id.tvFilterAll).setOnClickListener(v -> viewModel.filterUsers("All"));
+        findViewById(R.id.tvFilterStudent).setOnClickListener(v -> viewModel.filterUsers("Student"));
+        findViewById(R.id.tvFilterInstructor).setOnClickListener(v -> viewModel.filterUsers("Instructor"));
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
