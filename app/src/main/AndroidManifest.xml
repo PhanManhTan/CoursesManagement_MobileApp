@@ -22,11 +22,20 @@
             </intent-filter>
         </activity>
 
+        <!-- Student Activities -->
+        <activity android:name=".activities.student.CourseDetailActivity" android:exported="false" />
+        <activity android:name=".activities.student.LearningActivity" android:exported="false" />
+        <activity android:name=".activities.student.MyCoursesActivity" android:exported="false" />
+        <activity android:name=".activities.student.SearchActivity" android:exported="false" />
+        <activity android:name=".activities.student.CourseListActivity" android:exported="false" />
+
+
         <!-- Instructor Activities -->
         <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
         <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
         <activity android:name=".activities.instructor.StudentListActivity" android:exported="false" />
         <activity android:name=".activities.instructor.RevenueActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.ProfileInstructorActivity" android:exported="false" />
 
         <!-- Admin Activities -->
         <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="false" />

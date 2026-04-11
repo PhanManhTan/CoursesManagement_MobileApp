@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvTitle"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1C1D1F">
+
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="411dp"
+        android:layout_height="85dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="20dp"
+            android:layout_height="49dp"
+            android:layout_weight="1"
+            android:tint="#FFFFFF"
+            app:srcCompat="@drawable/outline_arrow_back_24" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="49dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="Write a Review"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ratingBar"
+        android:layout_width="408dp"
+        android:layout_height="211dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="86dp">
+
+        <TextView
+            android:id="@+id/ratingTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="How was your experience?"
+            android:textColor="#ffffff"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/ratingSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Tap to rate yout sastifaction"
+            android:textColor="#A49696" />
+
+        <RatingBar
+            android:id="@+id/ratingCourse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:isIndicator="false"
+            android:max="5"
+            android:numStars="5"
+            android:progressTint="#A78BFA"
+            android:rating="3"
+            android:stepSize="1" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="432dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="298dp">
+
+        <TextView
+            android:id="@+id/labelComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Feedback:"
+            android:textColor="#A78BFA" />
+
+        <EditText
+            android:id="@+id/etReview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="#2A2B2E"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="Write something..."
+            android:inputType="textMultiLine"
+            android:minHeight="120dp"
+            android:padding="6dp"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="#5A4FCF"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="SUBMIT REVIEW"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
