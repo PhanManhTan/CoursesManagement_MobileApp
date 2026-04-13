@@ -37,7 +37,7 @@ public class ProfileInstructorActivity extends AppCompatActivity {
             TextView price = itemView.findViewById(R.id.tvPrice);
             ImageView thumb = itemView.findViewById(R.id.ivCourseThumb);
 
-            title.setText(instructorCourses[i][0]);e
+            title.setText(instructorCourses[i][0]);
             instructor.setText(instructorCourses[i][1]);
             price.setText(instructorCourses[i][2]);
             thumb.setImageResource(R.drawable.ic_launcher_background);

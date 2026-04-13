@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="70.000đ"
-                    android:textColor="@color/purple_200"
+                    android:textColor="@color/accent_light"
                     android:textSize="26sp"
                     android:textStyle="bold" />
 
@@ -121,7 +121,7 @@
                         android:id="@+id/icCourseDuration"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:tint="@color/purple_200"
+                        app:tint="@color/accent_light"
                         app:srcCompat="@drawable/outline_alarm_smart_wake_24" />
 
                     <TextView
@@ -146,7 +146,7 @@
                         android:id="@+id/icRating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:tint="@color/purple_200"
+                        app:tint="@color/accent_light"
                         app:srcCompat="@android:drawable/btn_star" />
 
                     <TextView
@@ -171,7 +171,7 @@
                         android:id="@+id/icCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:tint="@color/purple_200"
+                        app:tint="@color/accent_light"
                         app:srcCompat="?attr/actionModePasteDrawable" />
 
                     <TextView

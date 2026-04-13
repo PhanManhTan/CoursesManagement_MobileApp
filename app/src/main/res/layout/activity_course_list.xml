@@ -20,7 +20,7 @@
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:tint="#FFFFFF"
+            app:tint="@color/white"
             app:srcCompat="@drawable/outline_arrow_back_24" />
 
         <TextView
@@ -72,7 +72,7 @@
             android:id="@+id/btnFilter"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:tint="#A78BFA"
+            app:tint="@color/accent_light"
             app:srcCompat="@drawable/ic_home" />
     </LinearLayout>
 

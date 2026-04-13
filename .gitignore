@@ -11,3 +11,5 @@ captures/
 *.jks
 Planning.xlsx
 .DS_Store
+*.jks
+*.keystore

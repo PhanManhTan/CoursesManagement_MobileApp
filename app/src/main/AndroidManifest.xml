@@ -10,9 +10,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyApplication" >
+        android:theme="@style/Theme.MyApplication">
 
-        <!-- Entry Point -->
+        <!-- ── Entry Point ── -->
         <activity
             android:name=".activities.SplashActivity"
             android:exported="true">
@@ -22,26 +22,36 @@
             </intent-filter>
         </activity>
 
-        <!-- Student Activities -->
+        <!-- ── Auth Flow ── -->
+        <activity android:name=".activities.auth.OnboardingActivity"   android:exported="false" />
+        <activity android:name=".activities.auth.LoginActivity"         android:exported="false" />
+        <activity android:name=".activities.auth.RegisterActivity"      android:exported="false" />
+        <activity android:name=".activities.auth.OtpVerifyActivity"     android:exported="false" />
+        <activity android:name=".activities.auth.ForgotPasswordActivity"   android:exported="false" />
+        <activity android:name=".activities.auth.SetNewPasswordActivity"  android:exported="false" />
+
+        <!-- ── Main ── -->
+        <activity android:name=".activities.HomeActivity" android:exported="false" />
+
+        <!-- ── Student Activities ── -->
         <activity android:name=".activities.student.CourseDetailActivity" android:exported="false" />
-        <activity android:name=".activities.student.LearningActivity" android:exported="false" />
-        <activity android:name=".activities.student.MyCoursesActivity" android:exported="false" />
-        <activity android:name=".activities.student.SearchActivity" android:exported="false" />
-        <activity android:name=".activities.student.CourseListActivity" android:exported="false" />
+        <activity android:name=".activities.student.LearningActivity"     android:exported="false" />
+        <activity android:name=".activities.student.MyCoursesActivity"    android:exported="false" />
+        <activity android:name=".activities.student.SearchActivity"       android:exported="false" />
+        <activity android:name=".activities.student.CourseListActivity"   android:exported="false" />
 
-
-        <!-- Instructor Activities -->
+        <!-- ── Instructor Activities ── -->
         <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.StudentListActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.RevenueActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.ProfileInstructorActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.EditCourseActivity"           android:exported="false" />
+        <activity android:name=".activities.instructor.StudentListActivity"          android:exported="false" />
+        <activity android:name=".activities.instructor.RevenueActivity"              android:exported="false" />
+        <activity android:name=".activities.instructor.ProfileInstructorActivity"    android:exported="false" />
 
-        <!-- Admin Activities -->
+        <!-- ── Admin Activities ── -->
         <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="false" />
-        <activity android:name=".activities.admin.UserManageActivity" android:exported="false" />
+        <activity android:name=".activities.admin.UserManageActivity"     android:exported="false" />
         <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="false" />
-        <activity android:name=".activities.admin.ReportActivity" android:exported="false" />
+        <activity android:name=".activities.admin.ReportActivity"         android:exported="false" />
 
     </application>
 
