@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <LinearLayout
         android:id="@+id/header"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="#1C1D1F"
+        android:background="@color/bg_primary"
         android:paddingHorizontal="16dp"
         android:paddingVertical="14dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Admin Dashboard"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -59,7 +59,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="System Statistics"
-                        android:textColor="#A78BFA"
+                        android:textColor="@color/accent_light"
                         android:textSize="14sp"
                         android:textStyle="bold" />
                     
@@ -78,15 +78,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="15.2k"
-                                android:textColor="@color/white"
+                                android:textColor="@color/text_primary"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Users"
-                                android:textColor="#6B7280"
-                                android:textSize="12sp" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="0dp"
@@ -98,15 +98,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="482"
-                                android:textColor="@color/white"
+                                android:textColor="@color/text_primary"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Courses"
-                                android:textColor="#6B7280"
-                                android:textSize="12sp" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="0dp"
@@ -118,15 +118,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="$124k"
-                                android:textColor="@color/white"
+                                android:textColor="@color/text_primary"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Revenue"
-                                android:textColor="#6B7280"
-                                android:textSize="12sp" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="0dp"
@@ -138,15 +138,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="12"
-                                android:textColor="#EF4444"
+                                android:textColor="@color/status_error"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Pending"
-                                android:textColor="#6B7280"
-                                android:textSize="12sp" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -159,7 +159,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="12dp"
                 android:text="System Management"
-                android:textColor="@color/white"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -169,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:text="Pending Course Approvals"
                 app:cornerRadius="8dp"
-                android:backgroundTint="#EF4444"
+                android:backgroundTint="@color/status_error"
                 android:padding="14dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -180,7 +180,7 @@
                 android:layout_marginTop="8dp"
                 android:text="User &amp; Role Management"
                 app:strokeColor="#5A4FCF"
-                android:textColor="#5A4FCF"
+                android:textColor="@color/accent_muted"
                 android:padding="14dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -190,7 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Content Reports &amp; Flags"
-                android:textColor="#A78BFA" />
+                android:textColor="@color/accent_light" />
 
         </LinearLayout>
     </ScrollView>

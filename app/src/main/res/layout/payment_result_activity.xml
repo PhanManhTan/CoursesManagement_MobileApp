@@ -6,17 +6,17 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="24dp"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:background="#10B981"
+        android:background="@color/status_success"
         android:src="@drawable/ic_check"
         android:padding="16dp"
         android:scaleType="centerInside"
         android:layout_marginBottom="24dp"
-        app:tint="#FFFFFF" />
+        app:tint="@color/text_primary" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,14 +24,14 @@
         android:text="Payment Successful!"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:layout_marginBottom="8dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="You have successfully enrolled in the courses."
-        android:textColor="#A7A7A7"
+        android:textColor="@color/text_secondary"
         android:gravity="center"
         android:layout_marginBottom="32dp"/>
 
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="BACK TO HOME"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#4F46E5"
+        android:textColor="@color/text_primary"
+        android:backgroundTint="@color/accent_pressed"
         android:textStyle="bold"/>
 </LinearLayout>

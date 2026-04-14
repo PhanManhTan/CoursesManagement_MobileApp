@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <LinearLayout
         android:id="@+id/header"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Revenue Analytics"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Monthly Earnings"
-                android:textColor="#A78BFA"
+                android:textColor="@color/accent_light"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -62,14 +62,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginTop="12dp"
-                android:background="#2A2B2E" />
+                android:background="@color/bg_tertiary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="Course Distribution"
-                android:textColor="#A78BFA"
+                android:textColor="@color/accent_light"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -78,14 +78,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginTop="12dp"
-                android:background="#2A2B2E" />
+                android:background="@color/bg_tertiary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="Transaction History"
-                android:textColor="#A78BFA"
+                android:textColor="@color/accent_light"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -104,13 +104,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="• Payment from John Doe: +$45.00"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:paddingVertical="4dp"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="• Payment from Jane Smith: +$50.00"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:paddingVertical="4dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

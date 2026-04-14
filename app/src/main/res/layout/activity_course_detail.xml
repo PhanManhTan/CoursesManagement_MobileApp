@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <LinearLayout
         android:id="@+id/headerBar"
@@ -22,7 +22,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="8dp"
-            app:tint="#FFFFFF"
+            app:tint="@color/text_primary"
             app:srcCompat="@drawable/outline_arrow_back_24" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="Course Details"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="26sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="Lập trình Android Java"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="100.000đ"
-                    android:textColor="#76739b"
+                    android:textColor="@color/text_secondary"
                     android:textSize="16sp" />
 
                 <TextView
@@ -99,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="30% OFF"
-                    android:textColor="#A78BFA" />
+                    android:textColor="@color/accent_light" />
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -130,7 +130,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="12 Hours Content"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="@color/text_primary" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -155,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="4.9 (2k Reviews)"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="@color/text_primary" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -180,7 +180,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="Category: IT"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="@color/text_primary" />
                 </LinearLayout>
 
                 <androidx.constraintlayout.helper.widget.Flow
@@ -210,7 +210,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="About the course"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_primary"
                     android:textSize="26sp"
                     android:textStyle="bold" />
 
@@ -220,7 +220,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Master the 2026 AI Toolstack: Expertly use Google Gemini, Grok, Sora 2, KLING AI, and Veo 3 for professional video production..."
-                    android:textColor="#FFFFFF" />
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
 
             <LinearLayout
@@ -251,7 +251,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Mohamed Sela"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -260,7 +260,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Senior Android Developer"
-                        android:textColor="#B3FFFFFF"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>

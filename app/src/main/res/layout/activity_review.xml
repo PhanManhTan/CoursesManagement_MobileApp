@@ -6,7 +6,7 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <LinearLayout
         android:id="@+id/headerBar"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Write a Review"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="How was your experience?"
-            android:textColor="#ffffff"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Tap to rate your satisfaction"
-            android:textColor="#A49696" />
+            android:textColor="@color/text_secondary" />
 
         <RatingBar
             android:id="@+id/ratingCourse"
@@ -87,26 +87,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Your Feedback:"
-            android:textColor="#A78BFA" />
+            android:textColor="@color/accent_light" />
 
         <EditText
             android:id="@+id/etReview"
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_marginTop="6dp"
-            android:background="#2A2B2E"
+            android:background="@color/bg_tertiary"
             android:gravity="top"
             android:hint="Write something..."
             android:inputType="textMultiLine"
             android:padding="8dp"
-            android:textColor="#FFFFFF" />
+            android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        />
 
         <Button
             android:id="@+id/btnSubmit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:backgroundTint="#5A4FCF"
+            android:backgroundTint="@color/accent_muted"
             android:text="SUBMIT REVIEW" />
     </LinearLayout>
 

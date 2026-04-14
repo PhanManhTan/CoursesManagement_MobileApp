@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <LinearLayout
         android:id="@+id/headerBar"
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Instructor Profile"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Dr. Sarah Jenkins"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -69,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Senior Software Architect"
-                android:textColor="#A78BFA"
+                android:textColor="@color/accent_light"
                 android:textSize="14sp" />
 
             <LinearLayout
@@ -88,15 +88,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="15,420"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Students"
-                        android:textColor="#A7A7A7"
-                        android:textSize="12sp" />
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="0dp"
@@ -109,15 +109,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="4.9 ★"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Rating"
-                        android:textColor="#A7A7A7"
-                        android:textSize="12sp" />
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="About Me"
-                android:textColor="#A78BFA"
+                android:textColor="@color/accent_light"
                 android:textStyle="bold" />
 
             <TextView
@@ -135,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Dr. Sarah Jenkins has over 15 years of experience in system architecture and UI design. She has led teams at top tech firms."
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:lineSpacingExtra="4dp" />
 
             <TextView
@@ -143,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="My Courses"
-                android:textColor="#A78BFA"
+                android:textColor="@color/accent_light"
                 android:textStyle="bold" />
 
             <LinearLayout

@@ -26,7 +26,7 @@
                 android:id="@+id/ivCourseThumb"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:background="#1C1D1F"
+                android:background="@color/bg_primary"
                 android:scaleType="centerCrop" />
 
             <LinearLayout
@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Course Title"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -50,8 +50,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Instructor Name"
-                    android:textColor="#A78BFA"
-                    android:textSize="13sp" />
+                    android:textColor="@color/accent_light"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$49.99"
-                android:textColor="@color/white"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="View Details &amp; Preview"
-            android:textColor="#A78BFA" />
+            android:textColor="@color/accent_light" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,7 +86,7 @@
                 android:layout_weight="1"
                 android:text="Approve"
                 app:cornerRadius="8dp"
-                android:backgroundTint="#10B981"
+                android:backgroundTint="@color/status_success"
                 android:layout_marginEnd="4dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -97,7 +97,7 @@
                 android:layout_weight="1"
                 android:text="Reject"
                 app:strokeColor="#EF4444"
-                android:textColor="#EF4444"
+                android:textColor="@color/status_error"
                 android:layout_marginStart="4dp" />
 
         </LinearLayout>

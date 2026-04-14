@@ -21,8 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Video Content Report"
-            android:textColor="#EF4444"
-            android:textSize="12sp"
+            android:textColor="@color/status_error"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Inappropriate content in Lecture 5 of Course ID: c1."
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
         <TextView
@@ -40,8 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Reporter: user_123 | 2 hours ago"
-            android:textColor="#6B7280"
-            android:textSize="12sp" />
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                 android:layout_weight="1"
                 android:text="Take Action"
                 app:cornerRadius="8dp"
-                android:backgroundTint="#EF4444"
+                android:backgroundTint="@color/status_error"
                 android:layout_marginEnd="4dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -67,7 +67,7 @@
                 android:layout_weight="1"
                 android:text="Dismiss"
                 app:strokeColor="#10B981"
-                android:textColor="#10B981"
+                android:textColor="@color/status_success"
                 android:layout_marginStart="4dp" />
 
         </LinearLayout>

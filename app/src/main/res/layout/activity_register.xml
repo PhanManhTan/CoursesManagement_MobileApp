@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="Create Account"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Fill in your details to get started"
-        android:textColor="#6B7280"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,7 +52,10 @@
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSubtitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvSubtitle"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        />
 
     <EditText
         android:id="@+id/etEmail"
@@ -65,7 +68,10 @@
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etFullName" />
+        app:layout_constraintTop_toBottomOf="@+id/etFullName"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        />
 
     <EditText
         android:id="@+id/etPhone"
@@ -78,7 +84,10 @@
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/etEmail"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        />
 
     <EditText
         android:id="@+id/etPassword"
@@ -91,7 +100,10 @@
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPhone" />
+        app:layout_constraintTop_toBottomOf="@+id/etPhone"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        />
 
     <EditText
         android:id="@+id/etConfirmPassword"
@@ -104,14 +116,17 @@
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/etPassword"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        />
 
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="0dp"
         android:layout_height="52dp"
         android:layout_marginTop="24dp"
-        android:backgroundTint="#4F46E5"
+        android:backgroundTint="@color/accent_pressed"
         android:text="Create Account"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -124,7 +139,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Already have an account? "
-        android:textColor="#6B7280"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/tvLogin"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -137,7 +152,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Login"
-        android:textColor="#4F46E5"
+        android:textColor="@color/accent_pressed"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:padding="12dp"
     android:gravity="center_vertical"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <androidx.cardview.widget.CardView
         android:layout_width="80dp"
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Course Title"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -45,8 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Instructor Name"
-            android:textColor="#A7A7A7"
-            android:textSize="13sp" />
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvPrice"
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="$0.00"
-            android:textColor="#A78BFA"
+            android:textColor="@color/accent_light"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>

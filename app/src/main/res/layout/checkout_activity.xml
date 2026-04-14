@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <TextView
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:text="Checkout"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:gravity="center"
         android:layout_marginBottom="32dp"/>
 
@@ -22,7 +22,7 @@
         android:text="Payment Method"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:layout_marginBottom="16dp"/>
 
     <RadioGroup
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="VNPay"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:checked="true"
             android:padding="12dp"/>
 
@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Momo"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:padding="12dp"/>
     </RadioGroup>
 
@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="PAY NOW"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#4F46E5"
+        android:textColor="@color/text_primary"
+        android:backgroundTint="@color/accent_pressed"
         android:textStyle="bold"/>
 </LinearLayout>

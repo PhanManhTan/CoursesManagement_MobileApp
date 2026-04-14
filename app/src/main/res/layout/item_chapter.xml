@@ -10,7 +10,7 @@
         android:id="@+id/layoutChapterHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#2B2C2E"
+        android:background="@color/bg_secondary"
         android:padding="16dp">
 
         <TextView
@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chapter 1: Introduction"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textStyle="bold"
             android:textSize="18sp" />
 
@@ -29,7 +29,7 @@
             android:layout_alignParentEnd="true"
             android:src="@drawable/outline_arrow_back_24"
             android:rotation="-90"
-            app:tint="#FFFFFF" />
+            app:tint="@color/text_primary" />
     </RelativeLayout>
 
     <LinearLayout

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <LinearLayout
         android:id="@+id/headerBar"
@@ -20,13 +20,13 @@
             android:layout_height="40dp"
             android:padding="8dp"
             app:srcCompat="@drawable/outline_arrow_back_24"
-            app:tint="#FFFFFF" />
+            app:tint="@color/text_primary" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="My Courses"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="26sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -42,9 +42,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" android:textAllCaps="false" android:backgroundTint="#5E5CE6" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ongoing" android:textAllCaps="false" android:backgroundTint="#2C2C2E" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Completed" android:textAllCaps="false" android:backgroundTint="#2C2C2E"/>
+            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" android:textAllCaps="false" android:backgroundTint="@color/accent" android:layout_marginEnd="10dp"/>
+            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ongoing" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary" android:layout_marginEnd="10dp"/>
+            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Completed" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary"/>
         </LinearLayout>
     </HorizontalScrollView>
 

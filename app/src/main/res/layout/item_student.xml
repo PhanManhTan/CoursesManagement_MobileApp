@@ -20,10 +20,10 @@
             android:id="@+id/tvStudentAvatar"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="#5A4FCF"
+            android:background="@color/accent_muted"
             android:gravity="center"
             android:text="S"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Student Name"
-                android:textColor="@color/white"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -48,8 +48,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="email@example.com"
-                android:textColor="#6B7280"
-                android:textSize="13sp" />
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
 
             <ProgressBar
                 android:id="@+id/pbStudentProgress"

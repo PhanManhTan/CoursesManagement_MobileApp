@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Course Title"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="by Author"
-            android:textColor="#8E8E93"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
         <RelativeLayout
@@ -52,8 +52,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="65% COMPLETE"
-                android:textColor="#A78BFA"
-                android:textSize="12sp"
+                android:textColor="@color/accent_light"
+                android:textSize="13sp"
                 android:textStyle="bold" />
             <TextView
                 android:id="@+id/tvLessonCount"
@@ -61,8 +61,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:text="12/24 Lessons"
-                android:textColor="#8E8E93"
-                android:textSize="12sp" />
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
         </RelativeLayout>
 
         <ProgressBar

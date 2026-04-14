@@ -21,6 +21,16 @@
         <!-- Font chung toàn app -->
         <item name="android:fontFamily">sans-serif</item>
         <item name="fontFamily">sans-serif</item>
+        <!-- EditText mặc định: chữ trắng, hint xám nhạt -->
+        <item name="android:editTextStyle">@style/Widget.App.EditText</item>
+    </style>
+
+    <!-- ============================================================
+         EDITTEXT DEFAULT — áp dụng cho mọi EditText trong app
+    ============================================================ -->
+    <style name="Widget.App.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
     </style>
 
     <!-- ============================================================

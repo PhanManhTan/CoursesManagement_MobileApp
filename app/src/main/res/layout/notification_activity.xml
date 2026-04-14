@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#1C1D1F">
+    android:background="@color/bg_primary">
 
     <TextView
         android:layout_width="match_parent"
@@ -11,10 +11,10 @@
         android:text="Notifications"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:gravity="center"
         android:padding="16dp"
-        android:background="#1C1D1F"/>
+        android:background="@color/bg_primary"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvNotifications"

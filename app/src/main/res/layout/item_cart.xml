@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="12dp"
     android:layout_marginBottom="8dp"
-    android:background="#2C2C2E">
+    android:background="@color/bg_secondary">
 
     <TextView
         android:id="@+id/tvCourseTitle"
@@ -14,14 +14,14 @@
         android:text="Course Title"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"/>
+        android:textColor="@color/text_primary"/>
     <TextView
         android:id="@+id/tvInstructor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Instructor Name"
         android:textSize="14sp"
-        android:textColor="#A7A7A7"/>
+        android:textColor="@color/text_secondary"/>
     <TextView
         android:id="@+id/tvPrice"
         android:layout_width="match_parent"
@@ -29,5 +29,5 @@
         android:text="$0.00"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="#A78BFA"/>
+        android:textColor="@color/accent_light"/>
 </LinearLayout>
