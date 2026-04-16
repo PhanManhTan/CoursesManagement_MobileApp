@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.myapplication.R;
@@ -32,15 +33,16 @@ public class OnboardingActivity extends AppCompatActivity {
     };
 
     private final int[] images = {
-            R.mipmap.ic_app,
-            R.mipmap.ic_app,
-            R.mipmap.ic_app
+            R.mipmap.icon_app,
+            R.mipmap.icon_app,
+            R.mipmap.icon_app
     };
 
     private final String[] dots = {"● ○ ○", "○ ● ○", "○ ○ ●"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
 

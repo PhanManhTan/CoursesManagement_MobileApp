@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
-import com.example.myapplication.activities.HomeActivity;
+import com.example.myapplication.activities.common.HomeActivity;
 
 public class LoginActivity extends AppCompatActivity {
 

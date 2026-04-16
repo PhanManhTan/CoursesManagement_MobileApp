@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /d/References/3/HK6/NT118/Project-NT118/app/src/main/java/com/example/myapplication/activities/*/*.java)"
+    ]
+  }
+}
