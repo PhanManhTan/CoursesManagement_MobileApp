@@ -2,6 +2,7 @@
 build/
 .idea/
 local.properties
+.claude/
 *.iml
 captures/
 .externalNativeBuild/
