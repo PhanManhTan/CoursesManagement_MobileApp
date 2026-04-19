@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- ===================== BACKGROUND ===================== -->
+    <!-- ===================== BACKGROUND /// ===================== -->
     <color name="bg_primary">#1C1D1F</color>
     <color name="bg_secondary">#2C2C2E</color>
     <color name="bg_tertiary">#2A2B2E</color>
@@ -33,6 +33,7 @@
     <!-- ===================== DIVIDER / BORDER ===================== -->
     <color name="divider">#3A3B3E</color>
     <color name="border">#3A3B3E</color>
+
 
     <!-- ===================== LEGACY & MISSING ===================== -->
     <color name="black">#FF000000</color>
