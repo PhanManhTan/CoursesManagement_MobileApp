@@ -1,4 +1,4 @@
-package com.example.myapplication.Utils;
+package com.example.myapplication.utils;
 
 import com.example.myapplication.models.AuthResponse;
 import com.example.myapplication.models.LoginRequest;

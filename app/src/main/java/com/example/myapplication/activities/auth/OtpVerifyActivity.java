@@ -14,7 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
-import com.example.myapplication.Utils.AuthRepository;
+import com.example.myapplication.utils.AuthRepository;
 import com.example.myapplication.activities.common.HomeActivity;
 import com.example.myapplication.models.AuthResponse;
 

@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
-import com.example.myapplication.Utils.SessionManager;
+import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.activities.student.MyCoursesActivity;
 import com.example.myapplication.activities.student.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;

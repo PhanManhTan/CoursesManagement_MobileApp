@@ -9,7 +9,7 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
-import com.example.myapplication.Utils.SessionManager;
+import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.activities.admin.AdminDashboardActivity;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.activities.auth.OnboardingActivity;

@@ -1,4 +1,4 @@
-package com.example.myapplication.Utils;
+package com.example.myapplication.utils;
 
 public class Constants {
     public static final String SUPABASE_BASE_URL = "https://wnwjfhdcpcvwoenyepzo.supabase.co/";
