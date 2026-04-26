@@ -4,22 +4,21 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:layout_marginBottom="8dp"
-    android:background="@color/bg_secondary">
-
+    android:layout_marginBottom="12dp"
+    android:layout_marginHorizontal="16dp"
+    android:background="@drawable/bg_rounded_dark">
     <TextView
-        android:id="@+id/tvNotifTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary"/>
-
+    android:id="@+id/tvNotifTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="16sp"
+    android:textStyle="bold"
+    android:textColor="#FFFFFF"/>
     <TextView
-        android:id="@+id/tvNotifMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary"/>
+    android:id="@+id/tvNotifMessage"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:textSize="14sp"
+    android:textColor="#9CA3AF"/>
 </LinearLayout>

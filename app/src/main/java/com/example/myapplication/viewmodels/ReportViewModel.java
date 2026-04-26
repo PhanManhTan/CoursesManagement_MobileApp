@@ -13,9 +13,9 @@ public class ReportViewModel extends ViewModel {
     public ReportViewModel() {
         // Mock reports
         List<Report> mockList = new ArrayList<>();
-        mockList.add(new Report("r1", "c1", "Course", "user_1", "Inappropriate content."));
-        mockList.add(new Report("r2", "l5", "Lecture", "user_2", "Audio quality is terrible."));
-        mockList.add(new Report("r3", "u10", "User", "user_3", "Spamming in comments."));
+        mockList.add(new Report("r1", "user_1", "c1", "Inappropriate content.", "pending", "2023-11-01"));
+        mockList.add(new Report("r2", "user_2", "c2", "Copyright violation.", "pending", "2023-11-05"));
+        mockList.add(new Report("r3", "user_3", "c3", "Spamming in comments.", "resolved", "2023-11-10"));
         reports.setValue(mockList);
     }
 

@@ -30,9 +30,9 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     @Override
     public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
         User student = students.get(position);
-        holder.tvName.setText(student.getName());
+        holder.tvName.setText(student.getFullName());
         holder.tvEmail.setText(student.getEmail());
-        holder.tvAvatar.setText(student.getName().substring(0, 1).toUpperCase());
+        holder.tvAvatar.setText(student.getFullName().substring(0, 1).toUpperCase());
     }
 
     @Override

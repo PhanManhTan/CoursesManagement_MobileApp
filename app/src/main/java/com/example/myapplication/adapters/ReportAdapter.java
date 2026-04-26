@@ -30,9 +30,10 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     @Override
     public void onBindViewHolder(@NonNull ReportViewHolder holder, int position) {
         Report report = reports.get(position);
-        holder.tvType.setText(report.getContentType() + " Report");
+        // Updated to use fields from Report model: courseId, reason, userId, createdAt
+        holder.tvType.setText("Course ID: " + report.getCourseId());
         holder.tvReason.setText(report.getReason());
-        holder.tvMeta.setText("Reporter: " + report.getReporterId());
+        holder.tvMeta.setText("Reporter: " + report.getUserId() + " • " + report.getCreatedAt());
     }
 
     @Override

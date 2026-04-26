@@ -32,19 +32,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = users.get(position);
-        holder.tvName.setText(user.getName());
+        holder.tvName.setText(user.getFullName());
         holder.tvEmail.setText(user.getEmail());
         holder.tvRole.setText(user.getRole());
 
-        if (user.isBanned()) {
-            holder.btnBan.setText("Unban");
-            holder.btnBan.setTextColor(Color.GREEN);
-            holder.btnBan.setStrokeColorResource(android.R.color.holo_green_dark);
-        } else {
-            holder.btnBan.setText("Ban");
-            holder.btnBan.setTextColor(Color.RED);
-            holder.btnBan.setStrokeColorResource(android.R.color.holo_red_dark);
-        }
+//        if (user.isBanned()) {
+//            holder.btnBan.setText("Unban");
+//            holder.btnBan.setTextColor(Color.GREEN);
+//            holder.btnBan.setStrokeColorResource(android.R.color.holo_green_dark);
+//        } else {
+//            holder.btnBan.setText("Ban");
+//            holder.btnBan.setTextColor(Color.RED);
+//            holder.btnBan.setStrokeColorResource(android.R.color.holo_red_dark);
+//        }
     }
 
     @Override

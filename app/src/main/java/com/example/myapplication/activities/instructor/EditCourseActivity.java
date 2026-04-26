@@ -31,7 +31,8 @@ public class EditCourseActivity extends AppCompatActivity {
             viewModel.setCourse(existingCourse);
         } else {
             // New course scenario (mocked)
-            viewModel.setCourse(new Course("tmp", "", "inst_1", "", 0.0));
+            // Updated to use the 10-argument Course constructor: id, instructorId, title, description, thumbnailUrl, price, discountPrice, status, categoryId, createdAt
+            viewModel.setCourse(new Course("tmp", "inst_1", "New Course Title", "Description here", "", 0.0, 0.0, "draft", "cat_1", "2023-11-20"));
         }
 
         viewModel.getCourse().observe(this, course -> {

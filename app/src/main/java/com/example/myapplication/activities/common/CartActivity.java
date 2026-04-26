@@ -3,6 +3,7 @@ package com.example.myapplication.activities.common;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,24 +21,38 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cart_activity);
 
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
         RecyclerView rvCart = findViewById(R.id.rvCart);
         TextView tvTotalPrice = findViewById(R.id.tvTotalPrice);
         Button btnCheckout = findViewById(R.id.btnCheckout);
 
         List<Course> mockCart = new ArrayList<>();
+        // Updated to use the 10-argument Course constructor
         mockCart.add(new Course(
                 "course_01",
-                "Advanced Android Development",
                 "instructor_123",
+                "Advanced Android Development",
                 "Khóa học Android nâng cao với Java",
-                49.99
+                "https://via.placeholder.com/150",
+                49.99,
+                39.99,
+                "published",
+                "cat_android",
+                "2023-10-01"
         ));
         mockCart.add(new Course(
                 "course_02",
-                "UI/UX Design for Beginners",
                 "instructor_456",
+                "UI/UX Design for Beginners",
                 "Thiết kế giao diện cơ bản",
-                29.99
+                "https://via.placeholder.com/150",
+                29.99,
+                19.99,
+                "published",
+                "cat_design",
+                "2023-10-05"
         ));
 
         double total = 0;

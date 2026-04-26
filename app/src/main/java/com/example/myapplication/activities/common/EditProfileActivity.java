@@ -3,6 +3,8 @@ package com.example.myapplication.activities.common;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 
@@ -11,7 +13,8 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile_activity);
-
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
         EditText etFullName = findViewById(R.id.etFullName);
         EditText etBio = findViewById(R.id.etBio);
         Button btnSave = findViewById(R.id.btnSave);

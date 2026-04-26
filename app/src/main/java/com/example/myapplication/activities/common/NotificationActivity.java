@@ -9,6 +9,7 @@ import com.example.myapplication.adapters.NotificationAdapter;
 import com.example.myapplication.models.Notification;
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.ImageView;
 
 public class NotificationActivity extends AppCompatActivity {
     @Override
@@ -16,12 +17,18 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_activity);
 
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
+
         RecyclerView rvNotifications = findViewById(R.id.rvNotifications);
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
 
         List<Notification> mockNotifications = new ArrayList<>();
-        mockNotifications.add(new Notification("Payment Successful", "Your payment for 'Advanced Android' was successful.", false));
-        mockNotifications.add(new Notification("New Course Available", "Check out the new UI/UX Design course by Huy.", true));
+        // Updated to use the 6-argument Notification constructor: id, userId, title, message, isRead, createdAt
+        mockNotifications.add(new Notification("n1", "user123", "Payment Successful", "Your payment for 'Advanced Android' was successful.", false, "2023-10-25"));
+        mockNotifications.add(new Notification("n2", "user123", "New Course Available", "Check out the new UI/UX Design course by Huy.", true, "2023-10-26"));
 
         NotificationAdapter adapter = new NotificationAdapter(mockNotifications);
         rvNotifications.setAdapter(adapter);

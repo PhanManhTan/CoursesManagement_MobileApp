@@ -13,11 +13,11 @@ public class UserManageViewModel extends ViewModel {
 
     public UserManageViewModel() {
         // Mock data
-        allUsers.add(new User("u1", "Phan Manh Tan", "tan@example.com", "Admin"));
-        allUsers.add(new User("u2", "Nguyen Van Son", "son@example.com", "Instructor"));
-        allUsers.add(new User("u3", "Huynh Minh Qui", "qui@example.com", "Instructor"));
-        allUsers.add(new User("u4", "Quang Pham", "quang@example.com", "Student"));
-        allUsers.add(new User("u5", "Le Van A", "a@example.com", "Student"));
+        allUsers.add(new User("u1", "Phan Manh Tan", "tan@example.com", "hash1", "https://via.placeholder.com/150", "Admin", "Bio for Tan", "2023-01-01"));
+        allUsers.add(new User("u2", "Nguyen Van Son", "son@example.com", "hash2", "https://via.placeholder.com/150", "Instructor", "Bio for Son", "2023-02-01"));
+        allUsers.add(new User("u3", "Huynh Minh Qui", "qui@example.com", "hash3", "https://via.placeholder.com/150", "Instructor", "Bio for Qui", "2023-03-01"));
+        allUsers.add(new User("u4", "Quang Pham", "quang@example.com", "hash4", "https://via.placeholder.com/150", "Student", "Bio for Quang", "2023-04-01"));
+        allUsers.add(new User("u5", "Le Van A", "a@example.com", "hash5", "https://via.placeholder.com/150", "Student", "Bio for A", "2023-05-01"));
         users.setValue(new ArrayList<>(allUsers));
     }
 
@@ -48,7 +48,7 @@ public class UserManageViewModel extends ViewModel {
             List<User> filtered = new ArrayList<>();
             String lowerQuery = query.toLowerCase();
             for (User user : allUsers) {
-                if (user.getName().toLowerCase().contains(lowerQuery) || 
+                if (user.getFullName().toLowerCase().contains(lowerQuery) || 
                     user.getEmail().toLowerCase().contains(lowerQuery)) {
                     filtered.add(user);
                 }

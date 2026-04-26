@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.student.MyCoursesActivity;
 import com.example.myapplication.activities.student.SearchActivity;
+import com.example.myapplication.activities.common.AccountActivity;
+import com.example.myapplication.activities.common.NotificationActivity;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -42,10 +45,10 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MyCoursesActivity.class));
                 return true;
             } else if (id == R.id.nav_notification) {
-                // TODO: NotificationActivity
+                startActivity(new Intent(this, NotificationActivity.class));
                 return true;
             } else if (id == R.id.nav_account) {
-                // TODO: ProfileActivity
+                startActivity(new Intent(this, AccountActivity.class));
                 return true;
             }
             return false;

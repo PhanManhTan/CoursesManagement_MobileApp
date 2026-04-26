@@ -33,9 +33,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvMessage.setText(notification.getMessage());
 
         if (!notification.isRead()) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#EEF2FF"));
+            holder.tvTitle.setAlpha(1.0f);
         } else {
-            holder.itemView.setBackgroundColor(Color.parseColor("#F9FAFB"));
+            holder.tvTitle.setAlpha(0.6f);
         }
     }
 
