@@ -15,17 +15,21 @@ public class Category {
     @SerializedName("parent_id")
     private String parentId;
 
+    @SerializedName("image_url")
+    private String imageUrl;
+
     @SerializedName("created_at")
     private String createdAt;
 
     public Category() {
     }
 
-    public Category(String id, String name, String slug, String parentId, String createdAt) {
+    public Category(String id, String name, String slug, String parentId, String imageUrl, String createdAt) {
         this.id = id;
         this.name = name;
         this.slug = slug;
         this.parentId = parentId;
+        this.imageUrl = imageUrl;
         this.createdAt = createdAt;
     }
 
@@ -59,6 +63,14 @@ public class Category {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getCreatedAt() {

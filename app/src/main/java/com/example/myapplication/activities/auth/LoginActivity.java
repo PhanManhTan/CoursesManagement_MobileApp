@@ -14,6 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.common.HomeActivity;
 
+import com.example.myapplication.activities.admin.AdminDashboardActivity;
+import com.example.myapplication.activities.instructor.InstructorDashboardActivity;
+import com.example.myapplication.models.User;
+import com.example.myapplication.utils.MockData;
+
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
@@ -59,17 +66,36 @@ public class LoginActivity extends AppCompatActivity {
             etPassword.requestFocus();
             return;
         }
-        if (password.length() < 6) {
-            etPassword.setError("Password must be at least 6 characters");
-            etPassword.requestFocus();
-            return;
+
+        // Validate against MockData
+        List<User> users = MockData.getUsers();
+        User loggedInUser = null;
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPasswordHash().equals(password)) {
+                loggedInUser = user;
+                break;
+            }
         }
 
-        // TODO: replace with real API call
-        Toast.makeText(this, "Logging in…", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, HomeActivity.class);
-        intent.putExtra("email", email);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        if (loggedInUser != null) {
+            Toast.makeText(this, "Welcome " + loggedInUser.getFullName(), Toast.LENGTH_SHORT).show();
+            Intent intent;
+            
+            String role = loggedInUser.getRole();
+            if ("Admin".equalsIgnoreCase(role)) {
+                intent = new Intent(this, AdminDashboardActivity.class);
+            } else if ("Instructor".equalsIgnoreCase(role)) {
+                intent = new Intent(this, InstructorDashboardActivity.class);
+            } else {
+                intent = new Intent(this, HomeActivity.class);
+            }
+
+            intent.putExtra("email", email);
+            intent.putExtra("role", role);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -50,7 +50,8 @@ public class ContentLearningAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof LessonViewHolder) {
-            ((LessonViewHolder) holder).tvTitle.setText("Lesson " + (position + 1) + ": Overview");
+            String[] titles = {"Introduction", "Core Concepts", "Advanced Patterns", "Best Practices", "Final Project"};
+            ((LessonViewHolder) holder).tvTitle.setText("Lesson " + (position + 1) + ": " + titles[position % titles.length]);
         } else if (holder instanceof DiscussionViewHolder) {
             ((DiscussionViewHolder) holder).tvUser.setText("User " + (position + 1));
         } else if (holder instanceof FileViewHolder) {

@@ -5,7 +5,8 @@
     android:orientation="vertical"
     android:padding="32dp"
     android:background="@color/bg_primary"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"

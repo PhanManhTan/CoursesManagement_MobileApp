@@ -1,5 +1,6 @@
 package com.example.myapplication.activities.student;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +38,11 @@ public class MyCoursesActivity extends AppCompatActivity {
 
         // Khởi tạo và gắn adapter
         myCourseAdapter = new MyCourseAdapter();
+        myCourseAdapter.setOnItemClickListener(title -> {
+            Intent intent = new Intent(this, LearningActivity.class);
+            intent.putExtra("course_title", title);
+            startActivity(intent);
+        });
         rvMyCourses.setAdapter(myCourseAdapter);
 
         // Tối ưu hóa hiệu năng nếu kích thước item không đổi

@@ -7,16 +7,20 @@ import com.example.myapplication.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.myapplication.utils.MockData;
+
 public class StudentListViewModel extends ViewModel {
     private final MutableLiveData<List<User>> students = new MutableLiveData<>();
     private final List<User> allStudents = new ArrayList<>();
 
     public StudentListViewModel() {
-        // Mock data
-        allStudents.add(new User("s1", "Nguyen Van A", "a@example.com", null, null, "student", null, null));
-        allStudents.add(new User("s2", "Tran Thi B", "b@example.com", null, null, "student", null, null));
-        allStudents.add(new User("s3", "Le Van C", "c@example.com", null, null, "student", null, null));
-        allStudents.add(new User("s4", "Phan Thi D", "d@example.com", null, null, "student", null, null));
+        // Use MockData and filter by Student role
+        List<User> users = MockData.getUsers();
+        for (User u : users) {
+            if ("Student".equalsIgnoreCase(u.getRole())) {
+                allStudents.add(u);
+            }
+        }
         students.setValue(new ArrayList<>(allStudents));
     }
 

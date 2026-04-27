@@ -1,7 +1,8 @@
 package com.example.myapplication.utils;
 
+import com.example.myapplication.BuildConfig;
+
 public class Constants {
-    // Supabase API KEY
-    public static final String SUPABASE_URL = "https://wnwjfhdcpcvwoenyepzo.supabase.co/rest/v1/";
-    public static final String SUPABASE_API_KEY = "sb_publishable_jUUJ_rKfMlkX28hCQvA8XA_pHMLxJbG";
+    public static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
+    public static final String SUPABASE_API_KEY = BuildConfig.SUPABASE_API_KEY;
 }

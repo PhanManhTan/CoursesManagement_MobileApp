@@ -28,7 +28,8 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
     @Override
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
-        holder.tvChapterTitle.setText("Chapter " + (position + 1) + ": Getting Started");
+        String[] chapterNames = {"Getting Started", "Core Principles", "Deep Dive", "Conclusion"};
+        holder.tvChapterTitle.setText("Chapter " + (position + 1) + ": " + chapterNames[position % chapterNames.length]);
 
         boolean isExpanded = expandedPositions.contains(position);
         holder.layoutLessonsContainer.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -51,8 +52,8 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
     private void addDummyLessons(LinearLayout container) {
         container.removeAllViews();
-        String[] titles = {"Introduction to Obsidian", "Working with Components", "Final Project"};
-        String[] times = {"12:45 mins", "24:20 mins", "05:00 mins"};
+        String[] titles = {"Introduction to Course", "Setting up Environment", "First Practical Steps"};
+        String[] times = {"12:45 mins", "24:20 mins", "15:00 mins"};
 
         for (int i = 0; i < titles.length; i++) {
             View lessonView = LayoutInflater.from(container.getContext()).inflate(R.layout.item_lesson, container, false);

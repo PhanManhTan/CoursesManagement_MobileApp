@@ -11,6 +11,16 @@ import com.example.myapplication.R;
 
 public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(String title);
+    }
+
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -20,8 +30,13 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String[] titles = {"Advanced UI Development", "Mastering Obsidian", "React Architecture"};
-        holder.tvName.setText(titles[position % 3]);
+        String[] titles = {"Advanced UI Architecture", "Mastering Productivity Tools", "React Design Patterns"};
+        String title = titles[position % 3];
+        holder.tvName.setText(title);
+        
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(title);
+        });
         
         int progress = (position % 2 == 0 ? 65 : 32);
         holder.pb.setProgress(progress);

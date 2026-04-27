@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.myapplication.R;
 import com.example.myapplication.viewmodels.AdminViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
     private AdminViewModel viewModel;
     private TextView tvTotalUsers, tvActiveCourses, tvTotalRevenue;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +22,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
         tvTotalUsers = findViewById(R.id.tvTotalUsers);
         tvActiveCourses = findViewById(R.id.tvActiveCourses);
         tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
+        bottomNav = findViewById(R.id.bottomNav);
+
+        setupBottomNav();
 
         viewModel = new ViewModelProvider(this).get(AdminViewModel.class);
 
@@ -43,6 +48,31 @@ public class AdminDashboardActivity extends AppCompatActivity {
         findViewById(R.id.header).setOnLongClickListener(v -> {
             startActivity(new android.content.Intent(this, com.example.myapplication.activities.instructor.InstructorDashboardActivity.class));
             return true;
+        });
+    }
+
+    private void setupBottomNav() {
+        bottomNav.setSelectedItemId(R.id.nav_admin_home);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_admin_home) {
+                return true;
+            } else if (id == R.id.nav_admin_users) {
+                startActivity(new android.content.Intent(this, UserManageActivity.class));
+                return true;
+            } else if (id == R.id.nav_admin_approval) {
+                startActivity(new android.content.Intent(this, CourseApprovalActivity.class));
+                return true;
+            } else if (id == R.id.nav_admin_reports) {
+                startActivity(new android.content.Intent(this, ReportActivity.class));
+                return true;
+            } else if (id == R.id.nav_admin_account) {
+                android.content.Intent accountIntent = new android.content.Intent(this, com.example.myapplication.activities.common.AccountActivity.class);
+                accountIntent.putExtra("email", getIntent().getStringExtra("email"));
+                startActivity(accountIntent);
+                return true;
+            }
+            return false;
         });
     }
 }

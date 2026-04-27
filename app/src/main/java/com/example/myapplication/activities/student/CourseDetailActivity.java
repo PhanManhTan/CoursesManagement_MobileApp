@@ -1,6 +1,8 @@
 package com.example.myapplication.activities.student;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +15,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     private RecyclerView rvLessons;
     private ImageView btnBack;
+    private Button btnEnroll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,11 +26,16 @@ public class CourseDetailActivity extends AppCompatActivity {
         setupRecyclerView();
 
         btnBack.setOnClickListener(v -> finish());
+        btnEnroll.setOnClickListener(v -> {
+            Intent intent = new Intent(this, LearningActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void initViews() {
         rvLessons = findViewById(R.id.rvLessons);
         btnBack = findViewById(R.id.btnBack);
+        btnEnroll = findViewById(R.id.btnEnroll);
     }
 
     private void setupRecyclerView() {

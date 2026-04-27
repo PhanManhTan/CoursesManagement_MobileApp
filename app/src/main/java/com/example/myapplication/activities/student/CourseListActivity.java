@@ -8,6 +8,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 
+import com.example.myapplication.models.Course;
+import com.example.myapplication.models.User;
+import com.example.myapplication.utils.MockData;
+import java.util.List;
+
 public class CourseListActivity extends AppCompatActivity {
 
     LinearLayout lnCourseList;
@@ -23,16 +28,8 @@ public class CourseListActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> finish());
 
-        String[][] categoryData = {
-                {"Logo Design Masterclass 2026", "John Doe", "$49.99"},
-                {"UI/UX Design Essentials", "Jane Smith", "$55.00"},
-                {"Adobe Illustrator CC Mastery", "Mike Ross", "$39.99"},
-                {"Figma for Beginners", "Sarah Connor", "$29.99"},
-                {"Typography and Layout", "Jameson Bell", "$45.99"},
-                {"Color Theory for Designers", "Elena Rodriguez", "$35.00"}
-        };
-
-        for (int i = 0; i < categoryData.length; i++) {
+        List<Course> courses = MockData.getCourses();
+        for (Course course : courses) {
             View itemView = getLayoutInflater().inflate(R.layout.item_course_search, null);
 
             TextView title = itemView.findViewById(R.id.tvCourseTitle);
@@ -40,9 +37,10 @@ public class CourseListActivity extends AppCompatActivity {
             TextView price = itemView.findViewById(R.id.tvPrice);
             ImageView thumb = itemView.findViewById(R.id.ivCourseThumb);
 
-            title.setText(categoryData[i][0]);
-            instructor.setText(categoryData[i][1]);
-            price.setText(categoryData[i][2]);
+            title.setText(course.getTitle());
+            User inst = MockData.getUserById(course.getInstructorId());
+            instructor.setText(inst != null ? inst.getFullName() : "Instructor");
+            price.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));
             thumb.setImageResource(R.drawable.ic_launcher_background);
 
             lnCourseList.addView(itemView);
