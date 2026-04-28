@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@color/bg_tertiary" />
+            android:src="@drawable/image_courses" />
     </androidx.cardview.widget.CardView>
 
     <LinearLayout

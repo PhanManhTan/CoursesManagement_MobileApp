@@ -57,7 +57,7 @@ public class SearchActivity extends AppCompatActivity {
             
             instructor.setText(instructorName);
             price.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));
-            thumb.setImageResource(R.drawable.ic_launcher_background);
+            thumb.setImageResource(R.drawable.image_courses);
 
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(this, CourseDetailActivity.class);

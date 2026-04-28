@@ -40,7 +40,7 @@ public class ProfileInstructorActivity extends AppCompatActivity {
             title.setText(instructorCourses[i][0]);
             instructor.setText(instructorCourses[i][1]);
             price.setText(instructorCourses[i][2]);
-            thumb.setImageResource(R.drawable.ic_launcher_background);
+            thumb.setImageResource(R.drawable.image_courses);
 
             lnInstructorCourses.addView(itemView);
         }

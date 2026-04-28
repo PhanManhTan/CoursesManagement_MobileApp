@@ -57,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:scaleType="centerCrop"
-                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                android:src="@drawable/image_courses" />
 
             <TextView
                 android:id="@+id/tvCourseTitle"

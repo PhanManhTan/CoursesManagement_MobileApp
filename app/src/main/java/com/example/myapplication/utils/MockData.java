@@ -29,10 +29,10 @@ public class MockData {
     // --- Courses ---
     public static List<Course> getCourses() {
         List<Course> courses = new ArrayList<>();
-        courses.add(new Course("c1", "instr_id", "Android Development Masterclass", "Learn Android development from scratch to advanced level with real-world projects.", "https://via.placeholder.com/300x200", 99.99, 79.99, "published", "cat1", "2023-06-01"));
-        courses.add(new Course("c2", "u1", "Modern Web Architecture", "Deep dive into modern web patterns, microservices, and scalable systems.", "https://via.placeholder.com/300x200", 129.99, 109.99, "published", "cat1", "2023-07-01"));
-        courses.add(new Course("c3", "instr_id", "UI/UX Design Fundamentals", "Master the principles of user interface and user experience design for mobile and web.", "https://via.placeholder.com/300x200", 89.99, 69.99, "published", "cat3", "2023-08-01"));
-        courses.add(new Course("c4", "u1", "Database Optimization Secrets", "Learn how to optimize SQL queries and design efficient database schemas for high performance.", "https://via.placeholder.com/300x200", 110.00, 95.00, "pending", "cat1", "2023-09-01"));
+        courses.add(new Course("c1", "instr_id", "Android Development Masterclass", "Learn Android development from scratch to advanced level with real-world projects.", "image_courses", 99.99, 79.99, "published", "cat1", "2023-06-01"));
+        courses.add(new Course("c2", "u1", "Modern Web Architecture", "Deep dive into modern web patterns, microservices, and scalable systems.", "image_courses", 129.99, 109.99, "published", "cat1", "2023-07-01"));
+        courses.add(new Course("c3", "instr_id", "UI/UX Design Fundamentals", "Master the principles of user interface and user experience design for mobile and web.", "image_courses", 89.99, 69.99, "published", "cat3", "2023-08-01"));
+        courses.add(new Course("c4", "u1", "Database Optimization Secrets", "Learn how to optimize SQL queries and design efficient database schemas for high performance.", "image_courses", 110.00, 95.00, "pending", "cat1", "2023-09-01"));
         return courses;
     }
 

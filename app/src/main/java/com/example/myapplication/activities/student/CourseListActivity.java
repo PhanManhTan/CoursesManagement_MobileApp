@@ -41,7 +41,7 @@ public class CourseListActivity extends AppCompatActivity {
             User inst = MockData.getUserById(course.getInstructorId());
             instructor.setText(inst != null ? inst.getFullName() : "Instructor");
             price.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));
-            thumb.setImageResource(R.drawable.ic_launcher_background);
+            thumb.setImageResource(R.drawable.image_courses);
 
             lnCourseList.addView(itemView);
         }
