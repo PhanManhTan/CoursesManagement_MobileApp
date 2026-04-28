@@ -47,7 +47,8 @@
         <activity android:name=".activities.instructor.StudentListActivity"          android:exported="true" />
         <activity android:name=".activities.instructor.RevenueActivity"              android:exported="true" />
         <activity android:name=".activities.instructor.ProfileInstructorActivity"    android:exported="true" />
-
+        <activity android:name=".activities.instructor.EditCourseActivity"           android:exported="true" />
+        
         <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="true" />
         <activity android:name=".activities.admin.UserManageActivity"     android:exported="true" />
         <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="true" />
