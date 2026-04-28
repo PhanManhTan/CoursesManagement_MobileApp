@@ -48,7 +48,6 @@
         <activity android:name=".activities.instructor.RevenueActivity"              android:exported="true" />
         <activity android:name=".activities.instructor.ProfileInstructorActivity"    android:exported="true" />
         <activity android:name=".activities.instructor.EditCourseActivity"           android:exported="true" />
-        
         <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="true" />
         <activity android:name=".activities.admin.UserManageActivity"     android:exported="true" />
         <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="true" />
@@ -60,7 +59,7 @@
         <activity android:name=".activities.common.EditProfileActivity"   android:exported="true" />
         <activity android:name=".activities.common.NotificationActivity"  android:exported="true" />
         <activity android:name=".activities.common.PaymentResultActivity" android:exported="true" />
-
+        
     </application>
 
 </manifest>
