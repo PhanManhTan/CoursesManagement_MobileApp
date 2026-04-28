@@ -59,7 +59,7 @@
         <activity android:name=".activities.common.EditProfileActivity"   android:exported="true" />
         <activity android:name=".activities.common.NotificationActivity"  android:exported="true" />
         <activity android:name=".activities.common.PaymentResultActivity" android:exported="true" />
-        
+        <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="true" />
         
     </application>
 
