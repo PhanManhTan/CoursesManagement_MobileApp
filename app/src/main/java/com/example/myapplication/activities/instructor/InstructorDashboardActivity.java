@@ -1,71 +1,51 @@
 package com.example.myapplication.activities.instructor;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.myapplication.R;
-import com.example.myapplication.activities.admin.AdminDashboardActivity;
 import com.example.myapplication.viewmodels.InstructorViewModel;
 
 public class InstructorDashboardActivity extends AppCompatActivity {
 
     private InstructorViewModel viewModel;
-    private TextView tvTotalStudents, tvMonthlyRevenue, tvAvgRating, tvLiveCourses;
+    private TextView tvTotalStudents, tvMonthlyRevenue, tvAvgRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instructor_dashboard);
 
-        initViews();
-        setupViewModel();
-        setupListeners();
-    }
-
-    private void initViews() {
+        // Initialize UI components
         tvTotalStudents = findViewById(R.id.tvTotalStudents);
         tvMonthlyRevenue = findViewById(R.id.tvMonthlyRevenue);
         tvAvgRating = findViewById(R.id.tvAvgRating);
-        tvLiveCourses = findViewById(R.id.tvLiveCourses);
-    }
 
-    private void setupViewModel() {
+        // Setup ViewModel
         viewModel = new ViewModelProvider(this).get(InstructorViewModel.class);
 
         // Observe data
         viewModel.getTotalStudents().observe(this, students -> tvTotalStudents.setText(students));
         viewModel.getMonthlyRevenue().observe(this, revenue -> tvMonthlyRevenue.setText(revenue));
         viewModel.getAvgRating().observe(this, rating -> tvAvgRating.setText(rating));
-    }
 
-    private void setupListeners() {
-        // Mở danh sách khóa học
-        findViewById(R.id.btnViewCourseList).setOnClickListener(v -> {
-            startActivity(new Intent(this, CourseListActivity.class));
-        });
-
-        // Tạo khóa học mới
+        // Click listeners for actions
         findViewById(R.id.btnCreateCourse).setOnClickListener(v -> {
-            Intent intent = new Intent(this, EditCoursesActivity.class);
-            intent.putExtra("IS_NEW_COURSE", true);
-            startActivity(intent);
+            startActivity(new android.content.Intent(this, EditCourseActivity.class));
         });
 
         findViewById(R.id.btnViewRevenue).setOnClickListener(v -> {
-            startActivity(new Intent(this, RevenueActivity.class));
+            startActivity(new android.content.Intent(this, RevenueActivity.class));
         });
 
         findViewById(R.id.btnManageStudents).setOnClickListener(v -> {
-            startActivity(new Intent(this, StudentListActivity.class));
+            startActivity(new android.content.Intent(this, StudentListActivity.class));
         });
 
-        // Truy cập Admin Dashboard (Nhấn giữ tiêu đề)
+        // Temporary way to access Admin Dashboard for verification
         findViewById(R.id.header).setOnLongClickListener(v -> {
-            startActivity(new Intent(this, AdminDashboardActivity.class));
+            startActivity(new android.content.Intent(this, com.example.myapplication.activities.admin.AdminDashboardActivity.class));
             return true;
         });
     }

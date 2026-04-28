@@ -47,8 +47,7 @@
 
         <!-- ── Instructor Activities ── -->
         <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="true" />
-        <activity android:name=".activities.instructor.CourseListActivity"           android:exported="true" />
-        <activity android:name=".activities.instructor.EditCoursesActivity"           android:exported="true" />
+        <activity android:name=".activities.instructor.EditCourseActivity"           android:exported="true" />
         <activity android:name=".activities.instructor.StudentListActivity"          android:exported="true" />
         <activity android:name=".activities.instructor.RevenueActivity"              android:exported="true" />
         <activity android:name=".activities.instructor.ProfileInstructorActivity"    android:exported="true" />

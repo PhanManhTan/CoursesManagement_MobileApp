@@ -4,65 +4,67 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.myapplication.R;
-import com.example.myapplication.models.Course;
-import com.example.myapplication.viewmodels.EditCourseViewModel;
+import com.example.myapplication.adapters.LessonAdapter;
+import com.example.myapplication.models.Lesson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditCourseActivity extends AppCompatActivity {
 
-    private EditCourseViewModel viewModel;
     private EditText etTitle, etDescription, etPrice;
+    private RecyclerView rvLessons;
+    private LessonAdapter lessonAdapter;
+    private final List<Lesson> lessonList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_course);
 
+        initViews();
+        setupRecyclerView();
+        loadInitialData();
+    }
+
+    private void initViews() {
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         etPrice = findViewById(R.id.etPrice);
-
-        viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
-
-        // Receive course object from Intent (if editing existing)
-        Course existingCourse = (Course) getIntent().getSerializableExtra("COURSE");
-        if (existingCourse != null) {
-            viewModel.setCourse(existingCourse);
-        } else {
-            // New course scenario (mocked)
-            viewModel.setCourse(new Course("tmp", "", "inst_1", "", 0.0));
-        }
-
-        viewModel.getCourse().observe(this, course -> {
-            if (course != null) {
-                etTitle.setText(course.getTitle());
-                etDescription.setText(course.getDescription());
-                etPrice.setText(String.valueOf(course.getPrice()));
-            }
-        });
-
-        viewModel.getSaveSuccess().observe(this, success -> {
-            if (success) {
-                Toast.makeText(this, "Course saved successfully", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-
-        findViewById(R.id.btnSave).setOnClickListener(v -> {
-            String title = etTitle.getText().toString();
-            String desc = etDescription.getText().toString();
-            String priceStr = etPrice.getText().toString();
-            
-            if (title.isEmpty() || desc.isEmpty() || priceStr.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            double price = Double.parseDouble(priceStr);
-            viewModel.saveCourse(title, desc, price);
-        });
+        rvLessons = findViewById(R.id.rvLessons);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        findViewById(R.id.btnAddLesson).setOnClickListener(v -> addNewLesson());
+
+        findViewById(R.id.btnSave).setOnClickListener(v -> {
+            Toast.makeText(this, "Đã lưu toàn bộ thay đổi!", Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK);
+            finish();
+        });
+    }
+
+    private void setupRecyclerView() {
+        lessonAdapter = new LessonAdapter(lessonList, null);
+        rvLessons.setLayoutManager(new LinearLayoutManager(this));
+        rvLessons.setAdapter(lessonAdapter);
+        rvLessons.setNestedScrollingEnabled(false);
+    }
+
+    private void loadInitialData() {
+        if (lessonList.isEmpty()) {
+            lessonList.add(new Lesson("1", "Bài học số 1", "00:00"));
+            lessonAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void addNewLesson() {
+        int nextId = lessonList.size() + 1;
+        lessonList.add(new Lesson(String.valueOf(nextId), "Bài học mới " + nextId, "00:00"));
+        lessonAdapter.notifyItemInserted(lessonList.size() - 1);
+        rvLessons.smoothScrollToPosition(lessonList.size() - 1);
     }
 }
