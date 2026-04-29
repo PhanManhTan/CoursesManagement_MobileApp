@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.EnrollmentApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Enrollment;
@@ -16,9 +17,9 @@ public class EnrollmentRepository {
         void onError(String message);
     }
 
-    public EnrollmentRepository() {
+    public EnrollmentRepository(Context context) {
         // Initialize EnrollmentApi using RetrofitClient
-        this.enrollmentApi = RetrofitClient.getClient().create(EnrollmentApi.class);
+        this.enrollmentApi = RetrofitClient.getClient(context).create(EnrollmentApi.class);
     }
 
     // Get all Enrollments from remote

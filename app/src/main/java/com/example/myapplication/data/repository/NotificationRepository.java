@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.NotificationApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Notification;
@@ -16,9 +17,9 @@ public class NotificationRepository {
         void onError(String message);
     }
 
-    public NotificationRepository() {
+    public NotificationRepository(Context context) {
         // Initialize NotificationApi using RetrofitClient
-        this.notificationApi = RetrofitClient.getClient().create(NotificationApi.class);
+        this.notificationApi = RetrofitClient.getClient(context).create(NotificationApi.class);
     }
 
     // Get all Notifications from remote

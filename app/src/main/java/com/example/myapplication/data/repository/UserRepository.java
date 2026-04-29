@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.data.remote.UserApi;
 import com.example.myapplication.models.User;
@@ -16,9 +17,9 @@ public class UserRepository {
         void onError(String message);
     }
 
-    public UserRepository() {
+    public UserRepository(Context context) {
         // Initialize UserApi using RetrofitClient
-        this.userApi = RetrofitClient.getClient().create(UserApi.class);
+        this.userApi = RetrofitClient.getClient(context).create(UserApi.class);
     }
 
     // Get all Users from remote

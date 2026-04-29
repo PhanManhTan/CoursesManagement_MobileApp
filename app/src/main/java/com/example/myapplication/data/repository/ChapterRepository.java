@@ -1,14 +1,19 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
+
 import com.example.myapplication.data.remote.ChapterApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Chapter;
+
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ChapterRepository {
+
     private final ChapterApi chapterApi;
 
     public interface RepositoryCallback<T> {
@@ -16,12 +21,13 @@ public class ChapterRepository {
         void onError(String message);
     }
 
-    public ChapterRepository() {
-        // Initialize ChapterApi using RetrofitClient
-        this.chapterApi = RetrofitClient.getClient().create(ChapterApi.class);
+    public ChapterRepository(Context context) {
+        this.chapterApi = RetrofitClient
+                .getClient(context)
+                .create(ChapterApi.class);
     }
 
-    // Get all Chapters from remote
+    // Get all Chapters
     public void getAll(RepositoryCallback<List<Chapter>> callback) {
         chapterApi.getAll().enqueue(new Callback<List<Chapter>>() {
             @Override
@@ -40,7 +46,7 @@ public class ChapterRepository {
         });
     }
 
-    // Get Chapter by ID and handle Supabase List response
+    // Get by ID
     public void getById(String id, RepositoryCallback<Chapter> callback) {
         chapterApi.getById(id).enqueue(new Callback<List<Chapter>>() {
             @Override
@@ -59,7 +65,7 @@ public class ChapterRepository {
         });
     }
 
-    // Insert new Chapter to remote
+    // Insert
     public void insert(Chapter chapter, RepositoryCallback<Void> callback) {
         chapterApi.insert(chapter).enqueue(new Callback<Void>() {
             @Override
@@ -78,7 +84,7 @@ public class ChapterRepository {
         });
     }
 
-    // Update Chapter by ID on remote
+    // Update
     public void update(String id, Chapter chapter, RepositoryCallback<Void> callback) {
         chapterApi.update(id, chapter).enqueue(new Callback<Void>() {
             @Override
@@ -97,7 +103,7 @@ public class ChapterRepository {
         });
     }
 
-    // Delete Chapter by ID from remote
+    // Delete
     public void delete(String id, RepositoryCallback<Void> callback) {
         chapterApi.delete(id).enqueue(new Callback<Void>() {
             @Override

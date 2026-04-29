@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.CommentApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Comment;
@@ -16,9 +17,9 @@ public class CommentRepository {
         void onError(String message);
     }
 
-    public CommentRepository() {
+    public CommentRepository(Context context) {
         // Initialize CommentApi using RetrofitClient
-        this.commentApi = RetrofitClient.getClient().create(CommentApi.class);
+        this.commentApi = RetrofitClient.getClient(context).create(CommentApi.class);
     }
 
     // Get all Comments from remote

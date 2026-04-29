@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.QuizApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Quiz;
@@ -16,9 +17,9 @@ public class QuizRepository {
         void onError(String message);
     }
 
-    public QuizRepository() {
+    public QuizRepository(Context context) {
         // Initialize QuizApi using RetrofitClient
-        this.quizApi = RetrofitClient.getClient().create(QuizApi.class);
+        this.quizApi = RetrofitClient.getClient(context).create(QuizApi.class);
     }
 
     // Get all Quizzes from remote

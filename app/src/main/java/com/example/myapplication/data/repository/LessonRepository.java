@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.LessonApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Lesson;
@@ -16,9 +17,9 @@ public class LessonRepository {
         void onError(String message);
     }
 
-    public LessonRepository() {
+    public LessonRepository(Context context) {
         // Initialize LessonApi using RetrofitClient
-        this.lessonApi = RetrofitClient.getClient().create(LessonApi.class);
+        this.lessonApi = RetrofitClient.getClient(context).create(LessonApi.class);
     }
 
     // Get all Lessons from remote

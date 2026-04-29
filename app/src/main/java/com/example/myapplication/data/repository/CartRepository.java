@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.CartApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Cart;
@@ -16,9 +17,9 @@ public class CartRepository {
         void onError(String message);
     }
 
-    public CartRepository() {
+    public CartRepository(Context context) {
         // Initialize CartApi using RetrofitClient
-        this.cartApi = RetrofitClient.getClient().create(CartApi.class);
+        this.cartApi = RetrofitClient.getClient(context).create(CartApi.class);
     }
 
     // Get all Carts from remote

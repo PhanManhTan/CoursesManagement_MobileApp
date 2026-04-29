@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.CategoryApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Category;
@@ -16,9 +17,9 @@ public class CategoryRepository {
         void onError(String message);
     }
 
-    public CategoryRepository() {
+    public CategoryRepository(Context context) {
         // Initialize CategoryApi using RetrofitClient
-        this.categoryApi = RetrofitClient.getClient().create(CategoryApi.class);
+        this.categoryApi = RetrofitClient.getClient(context).create(CategoryApi.class);
     }
 
     // Get all Categories from remote

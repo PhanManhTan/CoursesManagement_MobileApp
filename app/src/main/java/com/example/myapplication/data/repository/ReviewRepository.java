@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository;
 
+import android.content.Context;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.data.remote.ReviewApi;
 import com.example.myapplication.models.Review;
@@ -16,9 +17,9 @@ public class ReviewRepository {
         void onError(String message);
     }
 
-    public ReviewRepository() {
+    public ReviewRepository(Context context) {
         // Initialize ReviewApi using RetrofitClient
-        this.reviewApi = RetrofitClient.getClient().create(ReviewApi.class);
+        this.reviewApi = RetrofitClient.getClient(context).create(ReviewApi.class);
     }
 
     // Get all Reviews from remote
