@@ -188,10 +188,10 @@
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCreateCourse"
+                android:id="@+id/btnViewCourseList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Create New Course"
+                android:text="View Course List"
                 app:cornerRadius="8dp"
                 android:backgroundTint="@color/accent_muted"
                 android:padding="14dp" />

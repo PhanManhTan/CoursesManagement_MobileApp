@@ -1,8 +1,9 @@
 package com.example.myapplication.models;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
-public class Lesson {
+public class Lesson implements Serializable {
     @SerializedName("id")
     private String id;
 
@@ -27,6 +28,12 @@ public class Lesson {
     @SerializedName("created_at")
     private String createdAt;
 
+    @SerializedName("duration")
+    private String duration;
+
+    @SerializedName("content")
+    private String content;
+
     public Lesson() {
     }
 
@@ -39,6 +46,12 @@ public class Lesson {
         this.documentUrl = documentUrl;
         this.orderIndex = orderIndex;
         this.createdAt = createdAt;
+    }
+
+    public Lesson(String id, String title, String duration) {
+        this.id = id;
+        this.title = title;
+        this.duration = duration;
     }
 
     public String getId() {
@@ -103,5 +116,21 @@ public class Lesson {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

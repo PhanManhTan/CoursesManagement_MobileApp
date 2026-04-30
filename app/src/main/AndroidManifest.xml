@@ -26,45 +26,42 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".activities.auth.OnboardingActivity"
-            android:exported="true" />
+        <activity android:name=".activities.auth.OnboardingActivity" android:exported="true" />
+        <activity android:name=".activities.auth.LoginActivity" android:exported="true" />
+        <activity android:name=".activities.auth.RegisterActivity" android:exported="true" />
+        <activity android:name=".activities.auth.OtpVerifyActivity" android:exported="true" />
+        <activity android:name=".activities.auth.ForgotPasswordActivity" android:exported="true" />
+        <activity android:name=".activities.auth.SetNewPasswordActivity" android:exported="true" />
 
-        <activity android:name=".activities.auth.LoginActivity"         android:exported="true" />
-        <activity android:name=".activities.auth.RegisterActivity"      android:exported="true" />
-        <activity android:name=".activities.auth.OtpVerifyActivity"     android:exported="true" />
-        <activity android:name=".activities.auth.ForgotPasswordActivity"   android:exported="true" />
-        <activity android:name=".activities.auth.SetNewPasswordActivity"  android:exported="true" />
-
-        <!-- ── Main ── -->
         <activity android:name=".activities.common.HomeActivity" android:exported="true" />
 
         <!-- ── Student Activities ── -->
+        <activity android:name="com.example.myapplication.activities.student.CourseListActivity" android:exported="true" />
         <activity android:name=".activities.student.CourseDetailActivity" android:exported="true" />
-        <activity android:name=".activities.student.LearningActivity"     android:exported="true" />
-        <activity android:name=".activities.student.MyCoursesActivity"    android:exported="true" />
-        <activity android:name=".activities.student.SearchActivity"       android:exported="true" />
-        <activity android:name=".activities.student.CourseListActivity"   android:exported="true" />
+        <activity android:name=".activities.student.LearningActivity" android:exported="true" />
+        <activity android:name=".activities.student.MyCoursesActivity" android:exported="true" />
+        <activity android:name=".activities.student.SearchActivity" android:exported="true" />
 
         <!-- ── Instructor Activities ── -->
         <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="true" />
-        <activity android:name=".activities.instructor.EditCourseActivity"           android:exported="true" />
-        <activity android:name=".activities.instructor.StudentListActivity"          android:exported="true" />
-        <activity android:name=".activities.instructor.RevenueActivity"              android:exported="true" />
-        <activity android:name=".activities.instructor.ProfileInstructorActivity"    android:exported="true" />
+        <activity android:name="com.example.myapplication.activities.instructor.CourseListActivity" android:exported="true" />
+        <activity android:name=".activities.instructor.EditCourseActivity" android:exported="true" />
+        <activity android:name=".activities.instructor.StudentListActivity" android:exported="true" />
+        <activity android:name=".activities.instructor.RevenueActivity" android:exported="true" />
+        <activity android:name=".activities.instructor.ProfileInstructorActivity" android:exported="true" />
 
         <!-- ── Admin Activities ── -->
         <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="true" />
-        <activity android:name=".activities.admin.UserManageActivity"     android:exported="true" />
+        <activity android:name=".activities.admin.UserManageActivity" android:exported="true" />
         <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="true" />
-        <activity android:name=".activities.admin.ReportActivity"         android:exported="true" />
+        <activity android:name=".activities.admin.ReportActivity" android:exported="true" />
 
         <!-- ── Common Activities ── -->
-        <activity android:name=".activities.common.AccountActivity"       android:exported="true" />
-        <activity android:name=".activities.common.CartActivity"          android:exported="true" />
-        <activity android:name=".activities.common.CheckoutActivity"      android:exported="true" />
-        <activity android:name=".activities.common.EditProfileActivity"   android:exported="true" />
-        <activity android:name=".activities.common.NotificationActivity"  android:exported="true" />
+        <activity android:name=".activities.common.AccountActivity" android:exported="true" />
+        <activity android:name=".activities.common.CartActivity" android:exported="true" />
+        <activity android:name=".activities.common.CheckoutActivity" android:exported="true" />
+        <activity android:name=".activities.common.EditProfileActivity" android:exported="true" />
+        <activity android:name=".activities.common.NotificationActivity" android:exported="true" />
         <activity android:name=".activities.common.PaymentResultActivity" android:exported="true" />
 
     </application>

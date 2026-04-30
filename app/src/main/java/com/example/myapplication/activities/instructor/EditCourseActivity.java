@@ -1,69 +1,97 @@
 package com.example.myapplication.activities.instructor;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.myapplication.R;
-import com.example.myapplication.models.Course;
-import com.example.myapplication.viewmodels.EditCourseViewModel;
+import com.example.myapplication.adapters.LessonAdapter;
+import com.example.myapplication.models.Lesson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditCourseActivity extends AppCompatActivity {
 
-    private EditCourseViewModel viewModel;
     private EditText etTitle, etDescription, etPrice;
+    private RecyclerView rvLessons;
+    private LessonAdapter lessonAdapter;
+    private final List<Lesson> lessonList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_course);
+        // SỬA LỖI: Sử dụng đúng layout chi tiết có quản lý bài học
+        setContentView(R.layout.activity_instructor_course_detail);
 
+        initViews();
+        setupRecyclerView();
+        loadInitialData();
+    }
+
+    private void initViews() {
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         etPrice = findViewById(R.id.etPrice);
+        rvLessons = findViewById(R.id.rvLessons);
 
-        viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
-
-        // Receive course object from Intent (if editing existing)
-        Course existingCourse = (Course) getIntent().getSerializableExtra("COURSE");
-        if (existingCourse != null) {
-            viewModel.setCourse(existingCourse);
-        } else {
-            // New course scenario (mocked)
-            // Updated to use the 10-argument Course constructor: id, instructorId, title, description, thumbnailUrl, price, discountPrice, status, categoryId, createdAt
-            viewModel.setCourse(new Course("tmp", "inst_1", "New Course Title", "Description here", "", 0.0, 0.0, "draft", "cat_1", "2023-11-20"));
+        // Nút quay lại (ID btnBack)
+        View btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
         }
 
-        viewModel.getCourse().observe(this, course -> {
-            if (course != null) {
-                etTitle.setText(course.getTitle());
-                etDescription.setText(course.getDescription());
-                etPrice.setText(String.valueOf(course.getPrice()));
-            }
-        });
+        // Nút thêm bài học (ID btnAddLesson)
+        View btnAddLesson = findViewById(R.id.btnAddLesson);
+        if (btnAddLesson != null) {
+            btnAddLesson.setOnClickListener(v -> addNewLesson());
+        }
 
-        viewModel.getSaveSuccess().observe(this, success -> {
-            if (success) {
-                Toast.makeText(this, "Course saved successfully", Toast.LENGTH_SHORT).show();
+        // Nút lưu (ID btnSave)
+        View btnSave = findViewById(R.id.btnSave);
+        if (btnSave != null) {
+            btnSave.setOnClickListener(v -> {
+                Toast.makeText(this, "Course saved successfully!", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
                 finish();
+            });
+        }
+    }
+
+    private void setupRecyclerView() {
+        if (rvLessons != null) {
+            lessonAdapter = new LessonAdapter(lessonList, null);
+            rvLessons.setLayoutManager(new LinearLayoutManager(this));
+            rvLessons.setAdapter(lessonAdapter);
+            // Quan trọng: Để không bị xung đột cuộn với ScrollView bên ngoài
+            rvLessons.setNestedScrollingEnabled(false);
+        }
+    }
+
+    private void loadInitialData() {
+        if (getIntent() != null) {
+            String title = getIntent().getStringExtra("COURSE_TITLE");
+            if (title != null && etTitle != null) {
+                etTitle.setText(title);
             }
-        });
+        }
 
-        findViewById(R.id.btnSave).setOnClickListener(v -> {
-            String title = etTitle.getText().toString();
-            String desc = etDescription.getText().toString();
-            String priceStr = etPrice.getText().toString();
-            
-            if (title.isEmpty() || desc.isEmpty() || priceStr.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Dữ liệu mẫu bài học để hiển thị danh sách
+        lessonList.add(new Lesson("1", "Overview and Introduction", "05:00"));
+        lessonList.add(new Lesson("2", "Project Setup", "10:45"));
+        if (lessonAdapter != null) lessonAdapter.notifyDataSetChanged();
+    }
 
-            double price = Double.parseDouble(priceStr);
-            viewModel.saveCourse(title, desc, price);
-        });
-
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+    private void addNewLesson() {
+        if (lessonAdapter != null) {
+            int nextId = lessonList.size() + 1;
+            lessonList.add(new Lesson(String.valueOf(nextId), "Lesson " + nextId, "00:00"));
+            lessonAdapter.notifyItemInserted(lessonList.size() - 1);
+            if (rvLessons != null) rvLessons.smoothScrollToPosition(lessonList.size() - 1);
+        }
     }
 }

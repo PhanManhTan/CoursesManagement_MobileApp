@@ -1,79 +1,85 @@
 package com.example.myapplication.activities.instructor;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.example.myapplication.R;
+import com.example.myapplication.activities.admin.AdminDashboardActivity;
 import com.example.myapplication.viewmodels.InstructorViewModel;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class InstructorDashboardActivity extends AppCompatActivity {
 
     private InstructorViewModel viewModel;
-    private TextView tvTotalStudents, tvMonthlyRevenue, tvAvgRating;
-    private BottomNavigationView bottomNav;
+    private TextView tvTotalStudents, tvMonthlyRevenue, tvAvgRating, tvLiveCourses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instructor_dashboard);
 
-        // Initialize UI components
+        initViews();
+        setupViewModel();
+        setupListeners();
+    }
+
+    private void initViews() {
         tvTotalStudents = findViewById(R.id.tvTotalStudents);
         tvMonthlyRevenue = findViewById(R.id.tvMonthlyRevenue);
         tvAvgRating = findViewById(R.id.tvAvgRating);
-        bottomNav = findViewById(R.id.bottomNav);
+        tvLiveCourses = findViewById(R.id.tvLiveCourses);
+    }
 
-        setupBottomNav();
-
-        // Setup ViewModel
+    private void setupViewModel() {
         viewModel = new ViewModelProvider(this).get(InstructorViewModel.class);
 
-        // Observe data
-        viewModel.getTotalStudents().observe(this, students -> tvTotalStudents.setText(students));
-        viewModel.getMonthlyRevenue().observe(this, revenue -> tvMonthlyRevenue.setText(revenue));
-        viewModel.getAvgRating().observe(this, rating -> tvAvgRating.setText(rating));
-
-        // Click listeners for actions
-        findViewById(R.id.btnCreateCourse).setOnClickListener(v -> {
-            startActivity(new android.content.Intent(this, EditCourseActivity.class));
+        // Sử dụng if-null check để tránh crash nếu ID trong XML sai
+        viewModel.getTotalStudents().observe(this, students -> {
+            if (tvTotalStudents != null) tvTotalStudents.setText(students);
         });
-
-        findViewById(R.id.btnViewRevenue).setOnClickListener(v -> {
-            startActivity(new android.content.Intent(this, RevenueActivity.class));
+        viewModel.getMonthlyRevenue().observe(this, revenue -> {
+            if (tvMonthlyRevenue != null) tvMonthlyRevenue.setText(revenue);
         });
-
-        findViewById(R.id.btnManageStudents).setOnClickListener(v -> {
-            startActivity(new android.content.Intent(this, StudentListActivity.class));
-        });
-
-        // Temporary way to access Admin Dashboard for verification
-        findViewById(R.id.header).setOnLongClickListener(v -> {
-            startActivity(new android.content.Intent(this, com.example.myapplication.activities.admin.AdminDashboardActivity.class));
-            return true;
+        viewModel.getAvgRating().observe(this, rating -> {
+            if (tvAvgRating != null) tvAvgRating.setText(rating);
         });
     }
 
-    private void setupBottomNav() {
-        bottomNav.setSelectedItemId(R.id.nav_instructor_home);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_instructor_home) {
+    private void setupListeners() {
+        // Mở danh sách khóa học
+        View btnViewCourseList = findViewById(R.id.btnViewCourseList);
+        if (btnViewCourseList != null) {
+            btnViewCourseList.setOnClickListener(v -> {
+                Intent intent = new Intent(this, com.example.myapplication.activities.instructor.CourseListActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        View btnViewRevenue = findViewById(R.id.btnViewRevenue);
+        if (btnViewRevenue != null) {
+            btnViewRevenue.setOnClickListener(v -> {
+                startActivity(new Intent(this, RevenueActivity.class));
+            });
+        }
+
+        View btnManageStudents = findViewById(R.id.btnManageStudents);
+        if (btnManageStudents != null) {
+            btnManageStudents.setOnClickListener(v -> {
+                startActivity(new Intent(this, StudentListActivity.class));
+            });
+        }
+
+        // Nhấn giữ tiêu đề (nếu có id header)
+        View header = findViewById(R.id.header);
+        if (header != null) {
+            header.setOnLongClickListener(v -> {
+                startActivity(new Intent(this, AdminDashboardActivity.class));
                 return true;
-            } else if (id == R.id.nav_instructor_students) {
-                startActivity(new android.content.Intent(this, StudentListActivity.class));
-                return true;
-            } else if (id == R.id.nav_instructor_revenue) {
-                startActivity(new android.content.Intent(this, RevenueActivity.class));
-                return true;
-            } else if (id == R.id.nav_instructor_account) {
-                android.content.Intent accountIntent = new android.content.Intent(this, com.example.myapplication.activities.common.AccountActivity.class);
-                accountIntent.putExtra("email", getIntent().getStringExtra("email"));
-                startActivity(accountIntent);
-                return true;
-            }
-            return false;
-        });
+            });
+        }
     }
 }
