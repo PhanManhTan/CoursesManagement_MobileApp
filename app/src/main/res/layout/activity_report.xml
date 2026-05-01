@@ -64,10 +64,11 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
             <TextView
+                android:id="@+id/tvRevenueTrend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="+12% from last year"
+                android:text="..."
                 android:textColor="@color/status_success"
                 android:textSize="13sp" />
         </LinearLayout>

@@ -43,7 +43,7 @@ public class EnrollmentRepository {
 
     // Get Enrollment by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<Enrollment> callback) {
-        enrollmentApi.getById(id).enqueue(new Callback<List<Enrollment>>() {
+        enrollmentApi.getById("eq." + id).enqueue(new Callback<List<Enrollment>>() {
             @Override
             public void onResponse(Call<List<Enrollment>> call, Response<List<Enrollment>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -81,7 +81,7 @@ public class EnrollmentRepository {
 
     // Update Enrollment by ID on remote
     public void update(String id, Enrollment enrollment, RepositoryCallback<Void> callback) {
-        enrollmentApi.update(id, enrollment).enqueue(new Callback<Void>() {
+        enrollmentApi.update("eq." + id, enrollment).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -100,7 +100,7 @@ public class EnrollmentRepository {
 
     // Delete Enrollment by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
-        enrollmentApi.delete(id).enqueue(new Callback<Void>() {
+        enrollmentApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

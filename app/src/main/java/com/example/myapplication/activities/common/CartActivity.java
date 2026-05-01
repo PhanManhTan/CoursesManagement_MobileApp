@@ -29,7 +29,6 @@ public class CartActivity extends AppCompatActivity {
         Button btnCheckout = findViewById(R.id.btnCheckout);
 
         List<Course> mockCart = new ArrayList<>();
-        // Updated to use the 10-argument Course constructor
         mockCart.add(new Course(
                 "course_01",
                 "instructor_123",

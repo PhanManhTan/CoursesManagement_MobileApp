@@ -43,7 +43,7 @@ public class ReportRepository {
 
     // Get Report by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<Report> callback) {
-        reportApi.getById(id).enqueue(new Callback<List<Report>>() {
+        reportApi.getById("eq." + id).enqueue(new Callback<List<Report>>() {
             @Override
             public void onResponse(Call<List<Report>> call, Response<List<Report>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -81,7 +81,7 @@ public class ReportRepository {
 
     // Update Report by ID on remote
     public void update(String id, Report report, RepositoryCallback<Void> callback) {
-        reportApi.update(id, report).enqueue(new Callback<Void>() {
+        reportApi.update("eq." + id, report).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -100,7 +100,7 @@ public class ReportRepository {
 
     // Delete Report by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
-        reportApi.delete(id).enqueue(new Callback<Void>() {
+        reportApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

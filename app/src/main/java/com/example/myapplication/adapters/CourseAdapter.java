@@ -44,12 +44,10 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         Course course = courses.get(position);
         holder.tvTitle.setText(course.getTitle());
         
-        // Link click to listener
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(course);
         });
         
-        // Fetch instructor name from mock data
         String instructorName = "Unknown Instructor";
         if (course.getInstructorId() != null) {
             com.example.myapplication.models.User instructor = MockData.getUserById(course.getInstructorId());
@@ -59,8 +57,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         }
         holder.tvInstructor.setText(instructorName);
         
-        // Formatting price for VND as shown in image
-        holder.tvPrice.setText("đ" + String.format("%,.0f", course.getDiscountPrice() > 0 ? course.getDiscountPrice() * 1000 : course.getPrice() * 1000));
+        holder.tvPrice.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));
         
         if (course.getDiscountPrice() > 0) {
             holder.tvOriginalPrice.setVisibility(View.VISIBLE);
@@ -69,7 +66,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
             holder.tvOriginalPrice.setVisibility(View.GONE);
         }
 
-        // Mock rating and badge
         holder.tvRatingValue.setText("4.8");
         holder.tvReviewCount.setText("(24)");
     }

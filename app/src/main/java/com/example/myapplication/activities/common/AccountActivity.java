@@ -28,7 +28,6 @@ public class AccountActivity extends AppCompatActivity {
         // Fetch dynamic data
         String email = getIntent().getStringExtra("email");
         if (email == null) {
-            // Fallback for demo if intent was empty
             email = "student@gmail.com";
         }
         

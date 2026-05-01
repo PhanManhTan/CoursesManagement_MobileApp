@@ -43,7 +43,7 @@ public class UserRepository {
 
     // Get User by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<User> callback) {
-        userApi.getById(id).enqueue(new Callback<List<User>>() {
+        userApi.getById("eq." + id).enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -81,7 +81,7 @@ public class UserRepository {
 
     // Update User by ID on remote
     public void update(String id, User user, RepositoryCallback<Void> callback) {
-        userApi.update(id, user).enqueue(new Callback<Void>() {
+        userApi.update("eq." + id, user).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -100,7 +100,7 @@ public class UserRepository {
 
     // Delete User by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
-        userApi.delete(id).enqueue(new Callback<Void>() {
+        userApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

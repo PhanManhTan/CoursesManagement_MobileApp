@@ -8,26 +8,21 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ReviewApi {
-    // Get all Reviews
     @GET("reviews?select=*")
     Call<List<Review>> getAll();
 
-    // Get Review by ID
-    @GET("reviews?id=eq.{id}&select=*")
-    Call<List<Review>> getById(@Path("id") String id);
+    @GET("reviews?select=*")
+    Call<List<Review>> getById(@Query("id") String idFilter);
 
-    // Insert new Review
     @POST("reviews")
     Call<Void> insert(@Body Review review);
 
-    // Update Review by ID
-    @PATCH("reviews?id=eq.{id}")
-    Call<Void> update(@Path("id") String id, @Body Review review);
+    @PATCH("reviews")
+    Call<Void> update(@Query("id") String idFilter, @Body Review review);
 
-    // Delete Review by ID
-    @DELETE("reviews?id=eq.{id}")
-    Call<Void> delete(@Path("id") String id);
+    @DELETE("reviews")
+    Call<Void> delete(@Query("id") String idFilter);
 }

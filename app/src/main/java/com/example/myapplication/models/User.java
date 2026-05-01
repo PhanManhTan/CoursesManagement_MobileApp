@@ -27,6 +27,9 @@ public class User {
     @SerializedName("created_at")
     private String createdAt;
 
+    @SerializedName("status")
+    private String status;
+
     public User() {
     }
 
@@ -103,5 +106,13 @@ public class User {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

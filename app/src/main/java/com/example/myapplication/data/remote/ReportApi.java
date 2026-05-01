@@ -8,26 +8,21 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ReportApi {
-    // Get all Reports
     @GET("reports?select=*")
     Call<List<Report>> getAll();
 
-    // Get Report by ID
-    @GET("reports?id=eq.{id}&select=*")
-    Call<List<Report>> getById(@Path("id") String id);
+    @GET("reports?select=*")
+    Call<List<Report>> getById(@Query("id") String idFilter);
 
-    // Insert new Report
     @POST("reports")
     Call<Void> insert(@Body Report report);
 
-    // Update Report by ID
-    @PATCH("reports?id=eq.{id}")
-    Call<Void> update(@Path("id") String id, @Body Report report);
+    @PATCH("reports")
+    Call<Void> update(@Query("id") String idFilter, @Body Report report);
 
-    // Delete Report by ID
-    @DELETE("reports?id=eq.{id}")
-    Call<Void> delete(@Path("id") String id);
+    @DELETE("reports")
+    Call<Void> delete(@Query("id") String idFilter);
 }

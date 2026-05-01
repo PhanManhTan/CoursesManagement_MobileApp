@@ -26,7 +26,6 @@ public class NotificationActivity extends AppCompatActivity {
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
 
         List<Notification> mockNotifications = new ArrayList<>();
-        // Updated to use the 6-argument Notification constructor: id, userId, title, message, isRead, createdAt
         mockNotifications.add(new Notification("n1", "user123", "Payment Successful", "Your payment for 'Advanced Android' was successful.", false, "2023-10-25"));
         mockNotifications.add(new Notification("n2", "user123", "New Course Available", "Check out the new UI/UX Design course by Huy.", true, "2023-10-26"));
 

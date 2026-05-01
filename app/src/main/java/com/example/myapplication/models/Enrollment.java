@@ -15,14 +15,22 @@ public class Enrollment {
     @SerializedName("enrolled_at")
     private String enrolledAt;
 
+    @SerializedName("paid_amount")
+    private double paidAmount;
+
+    @SerializedName("created_at")
+    private String createdAt;
+
     public Enrollment() {
     }
 
-    public Enrollment(String id, String userId, String courseId, String enrolledAt) {
+    public Enrollment(String id, String userId, String courseId, String enrolledAt, double paidAmount, String createdAt) {
         this.id = id;
         this.userId = userId;
         this.courseId = courseId;
         this.enrolledAt = enrolledAt;
+        this.paidAmount = paidAmount;
+        this.createdAt = createdAt;
     }
 
     public String getId() {
@@ -55,5 +63,21 @@ public class Enrollment {
 
     public void setEnrolledAt(String enrolledAt) {
         this.enrolledAt = enrolledAt;
+    }
+
+    public double getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(double paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

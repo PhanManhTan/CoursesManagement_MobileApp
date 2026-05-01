@@ -15,10 +15,23 @@ import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
+    public interface OnUserActionListener {
+        void onBanToggle(User user);
+    }
+
     private List<User> users = new ArrayList<>();
+    private OnUserActionListener listener;
+
+    public void setListener(OnUserActionListener listener) {
+        this.listener = listener;
+    }
 
     public void setUsers(List<User> newUsers) {
-        this.users = newUsers;
+        if (newUsers != null) {
+            this.users = newUsers;
+        } else {
+            this.users = new ArrayList<>();
+        }
         notifyDataSetChanged();
     }
 
@@ -36,15 +49,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.tvEmail.setText(user.getEmail());
         holder.tvRole.setText(user.getRole());
 
-//        if (user.isBanned()) {
-//            holder.btnBan.setText("Unban");
-//            holder.btnBan.setTextColor(Color.GREEN);
-//            holder.btnBan.setStrokeColorResource(android.R.color.holo_green_dark);
-//        } else {
-//            holder.btnBan.setText("Ban");
-//            holder.btnBan.setTextColor(Color.RED);
-//            holder.btnBan.setStrokeColorResource(android.R.color.holo_red_dark);
-//        }
+        boolean isBanned = "banned".equalsIgnoreCase(user.getStatus());
+        if (isBanned) {
+            holder.btnBan.setText("Unban");
+            holder.btnBan.setTextColor(Color.parseColor("#10B981")); // Emerald/Green
+            holder.btnBan.setStrokeColorResource(android.R.color.transparent);
+        } else {
+            holder.btnBan.setText("Ban");
+            holder.btnBan.setTextColor(Color.parseColor("#EF4444")); // Red
+            holder.btnBan.setStrokeColorResource(android.R.color.transparent);
+        }
+
+        holder.btnBan.setOnClickListener(v -> {
+            if (listener != null) listener.onBanToggle(user);
+        });
     }
 
     @Override

@@ -40,9 +40,12 @@ public interface AuthApi {
         private String role;
         @SerializedName("full_name")
         private String fullName;
+        @SerializedName("status")
+        private String status;
 
         public String getRole() { return role; }
         public String getFullName() { return fullName; }
+        public String getStatus() { return status; }
     }
 
     class UpdatePasswordRequest {

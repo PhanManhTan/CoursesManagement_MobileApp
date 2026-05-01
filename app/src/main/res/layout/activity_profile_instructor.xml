@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Dr. Sarah Jenkins"
+                android:text="Loading..."
                 android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -69,7 +69,7 @@
                 android:id="@+id/tvExpertise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Senior Software Architect"
+                android:text="Instructor"
                 android:textColor="@color/accent_light"
                 android:textSize="14sp" />
 
@@ -135,7 +135,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Dr. Sarah Jenkins has over 15 years of experience in system architecture and UI design. She has led teams at top tech firms."
+                android:text="..."
                 android:textColor="@color/text_primary"
                 android:lineSpacingExtra="4dp" />
 

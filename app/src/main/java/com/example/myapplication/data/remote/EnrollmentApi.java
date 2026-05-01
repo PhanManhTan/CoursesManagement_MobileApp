@@ -8,7 +8,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface EnrollmentApi {
     // Get all Enrollments
@@ -16,18 +16,18 @@ public interface EnrollmentApi {
     Call<List<Enrollment>> getAll();
 
     // Get Enrollment by ID
-    @GET("enrollments?id=eq.{id}&select=*")
-    Call<List<Enrollment>> getById(@Path("id") String id);
+    @GET("enrollments?select=*")
+    Call<List<Enrollment>> getById(@Query("id") String idFilter);
 
     // Insert new Enrollment
     @POST("enrollments")
     Call<Void> insert(@Body Enrollment enrollment);
 
     // Update Enrollment by ID
-    @PATCH("enrollments?id=eq.{id}")
-    Call<Void> update(@Path("id") String id, @Body Enrollment enrollment);
+    @PATCH("enrollments")
+    Call<Void> update(@Query("id") String idFilter, @Body Enrollment enrollment);
 
     // Delete Enrollment by ID
-    @DELETE("enrollments?id=eq.{id}")
-    Call<Void> delete(@Path("id") String id);
+    @DELETE("enrollments")
+    Call<Void> delete(@Query("id") String idFilter);
 }

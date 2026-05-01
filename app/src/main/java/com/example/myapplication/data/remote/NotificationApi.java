@@ -11,23 +11,18 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface NotificationApi {
-    // Get all Notifications
-    @GET("notifications?select=*")
+    @GET("notifications")
     Call<List<Notification>> getAll();
 
-    // Get Notification by ID
-    @GET("notifications?id=eq.{id}&select=*")
-    Call<List<Notification>> getById(@Path("id") String id);
+    @GET("notifications/{id}")
+    Call<Notification> getById(@Path("id") String id);
 
-    // Insert new Notification
     @POST("notifications")
     Call<Void> insert(@Body Notification notification);
 
-    // Update Notification by ID
-    @PATCH("notifications?id=eq.{id}")
+    @PATCH("notifications/{id}")
     Call<Void> update(@Path("id") String id, @Body Notification notification);
 
-    // Delete Notification by ID
-    @DELETE("notifications?id=eq.{id}")
+    @DELETE("notifications/{id}")
     Call<Void> delete(@Path("id") String id);
 }

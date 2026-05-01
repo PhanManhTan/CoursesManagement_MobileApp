@@ -41,9 +41,47 @@ public class CourseRepository {
         });
     }
 
+    // Get Courses for a specific Instructor
+    public void getByInstructor(String instructorId, RepositoryCallback<List<Course>> callback) {
+        courseApi.getByInstructor("eq." + instructorId).enqueue(new Callback<List<Course>>() {
+            @Override
+            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Course>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    // Get Courses by Status (e.g., 'pending')
+    public void getByStatus(String status, RepositoryCallback<List<Course>> callback) {
+        courseApi.getByStatus("eq." + status).enqueue(new Callback<List<Course>>() {
+            @Override
+            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Course>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     // Get Course by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<Course> callback) {
-        courseApi.getById(id).enqueue(new Callback<List<Course>>() {
+        courseApi.getById("eq." + id).enqueue(new Callback<List<Course>>() {
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -81,7 +119,7 @@ public class CourseRepository {
 
     // Update Course by ID on remote
     public void update(String id, Course course, RepositoryCallback<Void> callback) {
-        courseApi.update(id, course).enqueue(new Callback<Void>() {
+        courseApi.update("eq." + id, course).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -100,7 +138,7 @@ public class CourseRepository {
 
     // Delete Course by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
-        courseApi.delete(id).enqueue(new Callback<Void>() {
+        courseApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

@@ -29,6 +29,9 @@ public class UserManageActivity extends AppCompatActivity {
         rvUsers.setAdapter(adapter);
 
         viewModel = new ViewModelProvider(this).get(UserManageViewModel.class);
+        
+        adapter.setListener(user -> viewModel.toggleBanUser(user));
+        
         viewModel.getUsers().observe(this, users -> adapter.setUsers(users));
 
         // Search Logic

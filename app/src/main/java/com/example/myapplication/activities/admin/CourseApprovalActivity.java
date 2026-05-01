@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.CourseApprovalAdapter;
+import com.example.myapplication.models.Course;
 import com.example.myapplication.viewmodels.CourseApprovalViewModel;
 
 public class CourseApprovalActivity extends AppCompatActivity {
@@ -26,7 +27,20 @@ public class CourseApprovalActivity extends AppCompatActivity {
         rvCourses.setAdapter(adapter);
 
         viewModel = new ViewModelProvider(this).get(CourseApprovalViewModel.class);
+        
         viewModel.getPendingCourses().observe(this, courses -> adapter.setCourses(courses));
+
+        adapter.setListener(new CourseApprovalAdapter.OnApprovalListener() {
+            @Override
+            public void onApprove(Course course) {
+                viewModel.approveCourse(course);
+            }
+
+            @Override
+            public void onReject(Course course) {
+                viewModel.rejectCourse(course);
+            }
+        });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }

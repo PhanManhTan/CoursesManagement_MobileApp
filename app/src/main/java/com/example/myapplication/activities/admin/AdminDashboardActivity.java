@@ -29,8 +29,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(AdminViewModel.class);
 
         viewModel.getTotalUsers().observe(this, val -> tvTotalUsers.setText(val));
-        viewModel.getActiveCourses().observe(this, val -> tvActiveCourses.setText(val));
+        viewModel.getActiveCourses().observe(this, val -> {
+            if (val != null) tvActiveCourses.setText(val);
+            else tvActiveCourses.setText("0");
+        });
         viewModel.getTotalRevenue().observe(this, val -> tvTotalRevenue.setText(val));
+        viewModel.getPendingCourses().observe(this, val -> {
+            TextView tvPending = findViewById(R.id.tvPendingCourses);
+            if (tvPending != null) tvPending.setText(val);
+        });
 
         findViewById(R.id.btnCourseApproval).setOnClickListener(v -> {
             startActivity(new android.content.Intent(this, CourseApprovalActivity.class));
@@ -49,6 +56,14 @@ public class AdminDashboardActivity extends AppCompatActivity {
             startActivity(new android.content.Intent(this, com.example.myapplication.activities.instructor.InstructorDashboardActivity.class));
             return true;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.refreshStats();
+        }
     }
 
     private void setupBottomNav() {

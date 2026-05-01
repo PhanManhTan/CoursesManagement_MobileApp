@@ -99,13 +99,15 @@ public class LoginActivity extends AppCompatActivity {
         authApi.signIn(request).enqueue(new Callback<AuthApi.LoginResponse>() {
             @Override
             public void onResponse(Call<AuthApi.LoginResponse> call, Response<AuthApi.LoginResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // 1. Lưu token để dùng cho các request sau
-                    sessionManager.saveToken(response.body().getAccessToken());
+                if (response.isSuccessful() && response.body() != null && response.body().getUser() != null) {
+                    String accessToken = response.body().getAccessToken();
                     String userId = response.body().getUser().getId();
                     
-                    // 2. Truy vấn thông tin thực tế từ database
-                    fetchRealRoleAndRedirect(userId, email);
+                    // 1. Lưu token ban đầu
+                    sessionManager.saveSession(accessToken, userId, "student");
+                    
+                    // 2. Truy vấn thông tin thực tế
+                    fetchRealRoleAndRedirect(userId, email, accessToken);
                 } else {
                     btnLogin.setEnabled(true);
                     btnLogin.setText("Login");
@@ -122,21 +124,34 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchRealRoleAndRedirect(String userId, String email) {
-        // Gọi API lấy profile từ bảng users dựa trên ID
-        authApi.getUserProfile("eq." + userId, "role,full_name").enqueue(new Callback<List<AuthApi.UserProfile>>() {
+    private void fetchRealRoleAndRedirect(String userId, String email, String token) {
+        // Gọi API lấy profile từ bảng users dựa trên ID, thêm status để check ban
+        authApi.getUserProfile("eq." + userId, "role,full_name,status").enqueue(new Callback<List<AuthApi.UserProfile>>() {
             @Override
             public void onResponse(Call<List<AuthApi.UserProfile>> call, Response<List<AuthApi.UserProfile>> response) {
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Login");
 
-                String role = "student"; // Mặc định
+                String role = "student"; 
+                String status = "active";
+
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    role = response.body().get(0).getRole().toLowerCase();
-                    Log.d("LOGIN_DEBUG", "Fetched role from DB: " + role);
-                } else {
-                    Log.e("LOGIN_DEBUG", "Failed to fetch profile or profile empty. Code: " + response.code());
+                    AuthApi.UserProfile profile = response.body().get(0);
+                    if (profile != null) {
+                        role = profile.getRole() != null ? profile.getRole().toLowerCase() : "student";
+                        status = profile.getStatus() != null ? profile.getStatus().toLowerCase() : "active";
+                    }
                 }
+
+                // 🔥 Check if BANNED
+                if ("banned".equalsIgnoreCase(status)) {
+                    Toast.makeText(LoginActivity.this, "Your account is banned. Please contact support.", Toast.LENGTH_LONG).show();
+                    sessionManager.clear(); // Clear the temporary session
+                    return;
+                }
+
+                // Safe session update
+                sessionManager.saveSession(sessionManager.getToken(), userId, role);
 
                 Toast.makeText(LoginActivity.this, "Login as: " + role, Toast.LENGTH_SHORT).show();
 
@@ -149,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
                     intent = new Intent(LoginActivity.this, HomeActivity.class);
                 }
 
-                intent.putExtra("email", email);
+                intent.putExtra("email", email != null ? email : "");
                 intent.putExtra("role", role);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -161,8 +176,12 @@ public class LoginActivity extends AppCompatActivity {
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Login");
                 Log.e("LOGIN_DEBUG", "API Failure: " + t.getMessage());
-                // Fallback về Home nếu có lỗi
-                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                
+                // Fallback to Home with a default role to prevent crash
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                intent.putExtra("email", email != null ? email : "");
+                intent.putExtra("role", "student");
+                startActivity(intent);
                 finish();
             }
         });

@@ -4,7 +4,6 @@ import android.content.Context;
 import com.example.myapplication.utils.Constants;
 import com.example.myapplication.utils.SessionManager;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
