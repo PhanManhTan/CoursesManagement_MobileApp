@@ -18,22 +18,17 @@ public class LessonRepository {
     }
 
     public LessonRepository(Context context) {
-        // Initialize LessonApi using RetrofitClient
         this.lessonApi = RetrofitClient.getClient(context).create(LessonApi.class);
     }
 
-    // Get all Lessons from remote
+    // Get all Lessons
     public void getAll(RepositoryCallback<List<Lesson>> callback) {
         lessonApi.getAll().enqueue(new Callback<List<Lesson>>() {
             @Override
             public void onResponse(Call<List<Lesson>> call, Response<List<Lesson>> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(response.body());
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(response.body());
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<List<Lesson>> call, Throwable t) {
                 callback.onError(t.getMessage());
@@ -41,7 +36,21 @@ public class LessonRepository {
         });
     }
 
-    // Get Lesson by ID and handle Supabase List response
+    // Get Lessons by Chapter ID
+    public void getByChapterId(String chapterId, RepositoryCallback<List<Lesson>> callback) {
+        lessonApi.getByChapterId("eq." + chapterId).enqueue(new Callback<List<Lesson>>() {
+            @Override
+            public void onResponse(Call<List<Lesson>> call, Response<List<Lesson>> response) {
+                if (response.isSuccessful()) callback.onSuccess(response.body());
+                else callback.onError("Error: " + response.code());
+            }
+            @Override
+            public void onFailure(Call<List<Lesson>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     public void getById(String id, RepositoryCallback<Lesson> callback) {
         lessonApi.getById(id).enqueue(new Callback<List<Lesson>>() {
             @Override
@@ -52,7 +61,6 @@ public class LessonRepository {
                     callback.onError("Lesson not found");
                 }
             }
-
             @Override
             public void onFailure(Call<List<Lesson>> call, Throwable t) {
                 callback.onError(t.getMessage());
@@ -60,18 +68,13 @@ public class LessonRepository {
         });
     }
 
-    // Insert new Lesson to remote
     public void insert(Lesson lesson, RepositoryCallback<Void> callback) {
         lessonApi.insert(lesson).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());
@@ -79,18 +82,13 @@ public class LessonRepository {
         });
     }
 
-    // Update Lesson by ID on remote
     public void update(String id, Lesson lesson, RepositoryCallback<Void> callback) {
         lessonApi.update(id, lesson).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());
@@ -98,18 +96,13 @@ public class LessonRepository {
         });
     }
 
-    // Delete Lesson by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
         lessonApi.delete(id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());

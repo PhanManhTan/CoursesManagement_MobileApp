@@ -11,9 +11,13 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface EnrollmentApi {
-    // Get all Enrollments
-    @GET("enrollments?select=*")
+    // Get all Enrollments with nested course data
+    @GET("enrollments?select=*,courses(*)")
     Call<List<Enrollment>> getAll();
+
+    // Get Enrollments by User ID with nested course data
+    @GET("enrollments?select=*,courses(*)")
+    Call<List<Enrollment>> getByUserId(@Query("user_id") String userIdFilter);
 
     // Get Enrollment by ID
     @GET("enrollments?select=*")

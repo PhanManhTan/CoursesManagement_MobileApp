@@ -9,6 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface LessonApi {
     // Get all Lessons
@@ -18,6 +19,10 @@ public interface LessonApi {
     // Get Lesson by ID
     @GET("lessons?id=eq.{id}&select=*")
     Call<List<Lesson>> getById(@Path("id") String id);
+
+    // Get Lessons by Chapter ID
+    @GET("lessons?select=*")
+    Call<List<Lesson>> getByChapterId(@Query("chapter_id") String chapterIdFilter);
 
     // Insert new Lesson
     @POST("lessons")

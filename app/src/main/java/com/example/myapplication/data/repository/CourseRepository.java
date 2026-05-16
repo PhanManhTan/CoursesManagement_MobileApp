@@ -41,9 +41,9 @@ public class CourseRepository {
         });
     }
 
-    // Get Courses for a specific Instructor
-    public void getByInstructor(String instructorId, RepositoryCallback<List<Course>> callback) {
-        courseApi.getByInstructor("eq." + instructorId).enqueue(new Callback<List<Course>>() {
+    // Search courses by title
+    public void search(String query, RepositoryCallback<List<Course>> callback) {
+        courseApi.search("ilike.*" + query + "*").enqueue(new Callback<List<Course>>() {
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful()) {
@@ -60,9 +60,9 @@ public class CourseRepository {
         });
     }
 
-    // Get Courses by Status (e.g., 'pending')
-    public void getByStatus(String status, RepositoryCallback<List<Course>> callback) {
-        courseApi.getByStatus("eq." + status).enqueue(new Callback<List<Course>>() {
+    // Get courses by category ID
+    public void getByCategoryId(String categoryId, RepositoryCallback<List<Course>> callback) {
+        courseApi.getByCategoryId("eq." + categoryId).enqueue(new Callback<List<Course>>() {
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful()) {
@@ -98,18 +98,13 @@ public class CourseRepository {
         });
     }
 
-    // Insert new Course to remote
     public void insert(Course course, RepositoryCallback<Void> callback) {
         courseApi.insert(course).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());
@@ -117,18 +112,13 @@ public class CourseRepository {
         });
     }
 
-    // Update Course by ID on remote
     public void update(String id, Course course, RepositoryCallback<Void> callback) {
         courseApi.update("eq." + id, course).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());
@@ -136,18 +126,13 @@ public class CourseRepository {
         });
     }
 
-    // Delete Course by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
         courseApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    callback.onError("Error: " + response.code());
-                }
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());

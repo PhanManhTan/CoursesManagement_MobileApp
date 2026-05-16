@@ -20,17 +20,18 @@ public class Enrollment {
 
     @SerializedName("created_at")
     private String createdAt;
+    
+    @SerializedName("progress")
+    private int progress;
+
+    @SerializedName("status")
+    private String status; // 'ongoing', 'completed'
+
+    // Nested course data from Supabase join
+    @SerializedName("courses")
+    private Course course;
 
     public Enrollment() {
-    }
-
-    public Enrollment(String id, String userId, String courseId, String enrolledAt, double paidAmount, String createdAt) {
-        this.id = id;
-        this.userId = userId;
-        this.courseId = courseId;
-        this.enrolledAt = enrolledAt;
-        this.paidAmount = paidAmount;
-        this.createdAt = createdAt;
     }
 
     public String getId() {
@@ -79,5 +80,29 @@ public class Enrollment {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }
