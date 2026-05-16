@@ -9,6 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ChapterApi {
     // Get all Chapters
@@ -18,6 +19,10 @@ public interface ChapterApi {
     // Get Chapter by ID
     @GET("chapters?id=eq.{id}&select=*")
     Call<List<Chapter>> getById(@Path("id") String id);
+
+    // Get Chapters by Course ID
+    @GET("chapters?select=*")
+    Call<List<Chapter>> getByCourseId(@Query("course_id") String courseIdFilter);
 
     // Insert new Chapter
     @POST("chapters")

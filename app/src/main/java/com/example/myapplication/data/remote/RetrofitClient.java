@@ -1,9 +1,10 @@
 package com.example.myapplication.data.remote;
 
 import android.content.Context;
-import com.example.myapplication.utils.Constants;
+import com.example.myapplication.BuildConfig;
 import com.example.myapplication.utils.SessionManager;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -25,7 +26,7 @@ public class RetrofitClient {
                         String token = sessionManager.getToken();
 
                         Request.Builder builder = original.newBuilder()
-                                .header("apikey", Constants.SUPABASE_API_KEY)
+                                .header("apikey", BuildConfig.SUPABASE_API_KEY)
                                 .header("Content-Type", "application/json");
 
                         if (token != null && !token.isEmpty()) {
@@ -36,10 +37,10 @@ public class RetrofitClient {
                     })
                     .build();
 
-            // Kiểm tra URL hợp lệ trước khi build để tránh crash khó hiểu
-            String baseUrl = Constants.SUPABASE_URL;
+            // Lấy URL từ BuildConfig (đã được cấu hình để đọc từ local.properties)
+            String baseUrl = BuildConfig.SUPABASE_URL;
             if (baseUrl == null || baseUrl.isEmpty() || !baseUrl.startsWith("http")) {
-                baseUrl = "https://placeholder.supabase.co"; // Tránh crash, nhưng API sẽ lỗi 404
+                baseUrl = "https://placeholder.supabase.co"; // Tránh crash nếu URL chưa được cấu hình
             }
 
             retrofit = new Retrofit.Builder()
