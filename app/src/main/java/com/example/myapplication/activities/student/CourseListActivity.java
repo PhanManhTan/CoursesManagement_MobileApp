@@ -60,8 +60,8 @@ public class CourseListActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(CourseListActivity.this, CourseDetailActivity.class);
-                        intent.putExtra("course_id", course.getId());
-                        intent.putExtra("course_title", course.getTitle());
+                        intent.putExtra("COURSE_ID", course.getId());
+                        intent.putExtra("COURSE_TITLE", course.getTitle());
                         startActivity(intent);
                     }
                 });

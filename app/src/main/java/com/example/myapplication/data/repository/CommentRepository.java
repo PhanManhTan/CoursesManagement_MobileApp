@@ -43,7 +43,7 @@ public class CommentRepository {
 
     // Get Comment by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<Comment> callback) {
-        commentApi.getById(id).enqueue(new Callback<List<Comment>>() {
+        commentApi.getById("eq." + id).enqueue(new Callback<List<Comment>>() {
             @Override
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -81,7 +81,7 @@ public class CommentRepository {
 
     // Update Comment by ID on remote
     public void update(String id, Comment comment, RepositoryCallback<Void> callback) {
-        commentApi.update(id, comment).enqueue(new Callback<Void>() {
+        commentApi.update("eq." + id, comment).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -100,7 +100,7 @@ public class CommentRepository {
 
     // Delete Comment by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
-        commentApi.delete(id).enqueue(new Callback<Void>() {
+        commentApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

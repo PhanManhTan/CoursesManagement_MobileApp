@@ -9,13 +9,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myapplication.R;
-import com.example.myapplication.activities.admin.AdminDashboardActivity;
 import com.example.myapplication.viewmodels.InstructorViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class InstructorDashboardActivity extends AppCompatActivity {
 
     private InstructorViewModel viewModel;
     private TextView tvTotalStudents, tvMonthlyRevenue, tvAvgRating, tvLiveCourses;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class InstructorDashboardActivity extends AppCompatActivity {
         tvMonthlyRevenue = findViewById(R.id.tvMonthlyRevenue);
         tvAvgRating = findViewById(R.id.tvAvgRating);
         tvLiveCourses = findViewById(R.id.tvLiveCourses);
+        bottomNav = findViewById(R.id.bottomNav);
     }
 
     private void setupViewModel() {
@@ -46,6 +48,9 @@ public class InstructorDashboardActivity extends AppCompatActivity {
         });
         viewModel.getAvgRating().observe(this, rating -> {
             if (tvAvgRating != null) tvAvgRating.setText(rating);
+        });
+        viewModel.getLiveCourses().observe(this, courses -> {
+            if (tvLiveCourses != null) tvLiveCourses.setText(courses);
         });
     }
 
@@ -73,13 +78,34 @@ public class InstructorDashboardActivity extends AppCompatActivity {
             });
         }
 
-        // Nhấn giữ tiêu đề (nếu có id header)
-        View header = findViewById(R.id.header);
-        if (header != null) {
-            header.setOnLongClickListener(v -> {
-                startActivity(new Intent(this, AdminDashboardActivity.class));
-                return true;
+        if (bottomNav != null) {
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_instructor_home) {
+                    return true;
+                } else if (id == R.id.nav_instructor_courses) {
+                    startActivity(new Intent(this, CourseListActivity.class));
+                    return true;
+                } else if (id == R.id.nav_instructor_students) {
+                    startActivity(new Intent(this, StudentListActivity.class));
+                    return true;
+                } else if (id == R.id.nav_instructor_revenue) {
+                    startActivity(new Intent(this, RevenueActivity.class));
+                    return true;
+                } else if (id == R.id.nav_instructor_account) {
+                    startActivity(new Intent(this, com.example.myapplication.activities.common.AccountActivity.class));
+                    return true;
+                }
+                return false;
             });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.refreshStats();
         }
     }
 }

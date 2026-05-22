@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.common.HomeActivity;
 import com.example.myapplication.activities.admin.AdminDashboardActivity;
-import com.example.myapplication.activities.instructor.InstructorDashboardActivity;
+import com.example.myapplication.activities.instructor.InstructorMainActivity;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.utils.SessionManager;
@@ -132,34 +132,36 @@ public class LoginActivity extends AppCompatActivity {
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Login");
 
-                String role = "student"; 
-                String status = "active";
+                if (!response.isSuccessful() || response.body() == null || response.body().isEmpty()) {
+                    handleSessionVerificationFailed("Session expired. Please log in again.");
+                    return;
+                }
 
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    AuthApi.UserProfile profile = response.body().get(0);
-                    if (profile != null) {
-                        role = profile.getRole() != null ? profile.getRole().toLowerCase() : "student";
-                        status = profile.getStatus() != null ? profile.getStatus().toLowerCase() : "active";
-                    }
+                String role = "student";
+                String status = "active";
+                AuthApi.UserProfile profile = response.body().get(0);
+                if (profile != null) {
+                    role = normalizeValue(profile.getRole(), "student");
+                    status = normalizeValue(profile.getStatus(), "active");
                 }
 
                 // 🔥 Check if BANNED
-                if ("banned".equalsIgnoreCase(status)) {
+                if ("banned".equals(status)) {
                     Toast.makeText(LoginActivity.this, "Your account is banned. Please contact support.", Toast.LENGTH_LONG).show();
                     sessionManager.clear(); // Clear the temporary session
                     return;
                 }
 
                 // Safe session update
-                sessionManager.saveSession(sessionManager.getToken(), userId, role);
+                sessionManager.saveSession(token, userId, role);
 
                 Toast.makeText(LoginActivity.this, "Login as: " + role, Toast.LENGTH_SHORT).show();
 
                 Intent intent;
-                if (role.contains("admin")) {
+                if ("admin".equals(role)) {
                     intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-                } else if (role.contains("instructor")) {
-                    intent = new Intent(LoginActivity.this, InstructorDashboardActivity.class);
+                } else if ("instructor".equals(role)) {
+                    intent = new Intent(LoginActivity.this, InstructorMainActivity.class);
                 } else {
                     intent = new Intent(LoginActivity.this, HomeActivity.class);
                 }
@@ -176,14 +178,22 @@ public class LoginActivity extends AppCompatActivity {
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Login");
                 Log.e("LOGIN_DEBUG", "API Failure: " + t.getMessage());
-                
-                // Fallback to Home with a default role to prevent crash
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                intent.putExtra("email", email != null ? email : "");
-                intent.putExtra("role", "student");
-                startActivity(intent);
-                finish();
+                handleSessionVerificationFailed("Session expired. Please log in again.");
             }
         });
+    }
+
+    private String normalizeValue(String value, String fallback) {
+        if (value == null) {
+            return fallback;
+        }
+
+        String normalized = value.trim().toLowerCase();
+        return normalized.isEmpty() ? fallback : normalized;
+    }
+
+    private void handleSessionVerificationFailed(String message) {
+        sessionManager.clear();
+        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
     }
 }

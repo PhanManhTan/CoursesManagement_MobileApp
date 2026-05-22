@@ -4,7 +4,10 @@ import android.content.Context;
 import com.example.myapplication.data.remote.ChapterApi;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.models.Chapter;
+import com.example.myapplication.utils.ApiErrorFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,7 +32,7 @@ public class ChapterRepository {
                 if (response.isSuccessful()) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onError("Error: " + response.code());
+                    callback.onError(getErrorMessage(response));
                 }
             }
             @Override
@@ -47,7 +50,7 @@ public class ChapterRepository {
                 if (response.isSuccessful()) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onError("Error: " + response.code());
+                    callback.onError(getErrorMessage(response));
                 }
             }
             @Override
@@ -58,7 +61,7 @@ public class ChapterRepository {
     }
 
     public void getById(String id, RepositoryCallback<Chapter> callback) {
-        chapterApi.getById(id).enqueue(new Callback<List<Chapter>>() {
+        chapterApi.getById("eq." + id).enqueue(new Callback<List<Chapter>>() {
             @Override
             public void onResponse(Call<List<Chapter>> call, Response<List<Chapter>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -79,7 +82,7 @@ public class ChapterRepository {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) callback.onSuccess(null);
-                else callback.onError("Error: " + response.code());
+                else callback.onError(getErrorMessage(response));
             }
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
@@ -88,12 +91,32 @@ public class ChapterRepository {
         });
     }
 
+    public void insertAndReturn(Chapter chapter, RepositoryCallback<Chapter> callback) {
+        chapterApi.insertAndReturn("return=representation", createWritePayload(chapter)).enqueue(new Callback<List<Chapter>>() {
+            @Override
+            public void onResponse(Call<List<Chapter>> call, Response<List<Chapter>> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    callback.onSuccess(response.body().get(0));
+                } else if (response.isSuccessful()) {
+                    callback.onError("Chapter was created but no chapter id was returned");
+                } else {
+                    callback.onError(getErrorMessage(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Chapter>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     public void update(String id, Chapter chapter, RepositoryCallback<Void> callback) {
-        chapterApi.update(id, chapter).enqueue(new Callback<Void>() {
+        chapterApi.update("eq." + id, createWritePayload(chapter)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) callback.onSuccess(null);
-                else callback.onError("Error: " + response.code());
+                else callback.onError(getErrorMessage(response));
             }
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
@@ -103,16 +126,30 @@ public class ChapterRepository {
     }
 
     public void delete(String id, RepositoryCallback<Void> callback) {
-        chapterApi.delete(id).enqueue(new Callback<Void>() {
+        chapterApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) callback.onSuccess(null);
-                else callback.onError("Error: " + response.code());
+                else callback.onError(getErrorMessage(response));
             }
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 callback.onError(t.getMessage());
             }
         });
+    }
+
+    private Map<String, Object> createWritePayload(Chapter chapter) {
+        Map<String, Object> payload = new HashMap<>();
+        if (chapter == null) return payload;
+
+        payload.put("course_id", chapter.getCourseId());
+        payload.put("title", chapter.getTitle());
+        payload.put("order_index", chapter.getOrderIndex());
+        return payload;
+    }
+
+    private String getErrorMessage(Response<?> response) {
+        return ApiErrorFormatter.fromResponse(response);
     }
 }

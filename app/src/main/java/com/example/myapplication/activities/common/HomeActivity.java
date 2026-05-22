@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
         // Link course click to CourseDetailActivity
         courseAdapter.setOnItemClickListener(course -> {
             Intent intent = new Intent(this, com.example.myapplication.activities.student.CourseDetailActivity.class);
-            intent.putExtra("course_id", course.getId());
+            intent.putExtra("COURSE_ID", course.getId());
             startActivity(intent);
         });
         rvFeaturedCourses.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

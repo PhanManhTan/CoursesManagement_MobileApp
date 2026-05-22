@@ -43,18 +43,19 @@
         <activity android:name=".activities.student.SearchActivity" android:exported="true" />
 
         <!-- ── Instructor Activities ── -->
-        <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="true" />
-        <activity android:name="com.example.myapplication.activities.instructor.CourseListActivity" android:exported="true" />
-        <activity android:name=".activities.instructor.EditCourseActivity" android:exported="true" />
-        <activity android:name=".activities.instructor.StudentListActivity" android:exported="true" />
-        <activity android:name=".activities.instructor.RevenueActivity" android:exported="true" />
-        <activity android:name=".activities.instructor.ProfileInstructorActivity" android:exported="true" />
+        <activity android:name=".activities.instructor.InstructorMainActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
+        <activity android:name="com.example.myapplication.activities.instructor.CourseListActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.EditLessonActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.StudentListActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.RevenueActivity" android:exported="false" />
 
         <!-- ── Admin Activities ── -->
-        <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="true" />
-        <activity android:name=".activities.admin.UserManageActivity" android:exported="true" />
-        <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="true" />
-        <activity android:name=".activities.admin.ReportActivity" android:exported="true" />
+        <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".activities.admin.UserManageActivity" android:exported="false" />
+        <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="false" />
+        <activity android:name=".activities.admin.ReportActivity" android:exported="false" />
 
         <!-- ── Common Activities ── -->
         <activity android:name=".activities.common.AccountActivity" android:exported="true" />

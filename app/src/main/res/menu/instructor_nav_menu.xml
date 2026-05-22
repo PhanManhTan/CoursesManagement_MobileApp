@@ -4,21 +4,26 @@
     <item
         android:id="@+id/nav_instructor_home"
         android:title="Dashboard"
-        android:icon="@drawable/ic_home"/>
+        android:icon="@drawable/ic_home" />
+
+    <item
+        android:id="@+id/nav_instructor_courses"
+        android:title="Courses"
+        android:icon="@drawable/ic_course" />
 
     <item
         android:id="@+id/nav_instructor_students"
         android:title="Students"
-        android:icon="@drawable/ic_user"/>
+        android:icon="@drawable/ic_user" />
 
     <item
         android:id="@+id/nav_instructor_revenue"
         android:title="Revenue"
-        android:icon="@drawable/ic_revenue"/>
+        android:icon="@drawable/ic_revenue" />
 
     <item
         android:id="@+id/nav_instructor_account"
-        android:title="Profile"
-        android:icon="@drawable/ic_account"/>
+        android:title="Account"
+        android:icon="@drawable/ic_account" />
 
 </menu>

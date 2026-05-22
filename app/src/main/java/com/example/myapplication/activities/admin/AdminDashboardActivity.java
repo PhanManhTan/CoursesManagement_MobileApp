@@ -51,11 +51,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             startActivity(new android.content.Intent(this, ReportActivity.class));
         });
 
-        // Temporary way to access Instructor Dashboard for verification
-        findViewById(R.id.header).setOnLongClickListener(v -> {
-            startActivity(new android.content.Intent(this, com.example.myapplication.activities.instructor.InstructorDashboardActivity.class));
-            return true;
-        });
     }
 
     @Override

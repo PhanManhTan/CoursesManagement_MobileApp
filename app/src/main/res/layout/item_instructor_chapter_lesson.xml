@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/bg_lesson_row"
+    android:gravity="center_vertical"
+    android:minHeight="52dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="8dp">
+
+    <TextView
+        android:id="@+id/tvLessonIndex"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:text="Lesson 1"
+        android:textAppearance="@style/TextAppearance.App.Caption" />
+
+    <TextView
+        android:id="@+id/tvLessonTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="Lesson title"
+        android:textAppearance="@style/TextAppearance.App.Body" />
+
+    <TextView
+        android:id="@+id/btnEditLesson"
+        android:layout_width="54dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="@string/edit"
+        android:textAppearance="@style/TextAppearance.App.Action" />
+
+    <TextView
+        android:id="@+id/btnDeleteLesson"
+        android:layout_width="64dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="@string/delete"
+        android:textAppearance="@style/TextAppearance.App.Action.Danger" />
+</LinearLayout>

@@ -2,7 +2,9 @@ package com.example.myapplication.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Quiz {
+import java.io.Serializable;
+
+public class Quiz implements Serializable {
     @SerializedName("id")
     private String id;
 
