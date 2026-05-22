@@ -56,4 +56,8 @@ public class Chapter {
     public void setOrderIndex(int orderIndex) {
         this.orderIndex = orderIndex;
     }
+
+    public Chapter deepCopy() {
+        return new Chapter(id, courseId, title, orderIndex);
+    }
 }

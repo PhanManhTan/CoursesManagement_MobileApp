@@ -2,6 +2,7 @@ package com.example.myapplication.data.remote;
 
 import com.example.myapplication.models.User;
 import java.util.List;
+import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -26,6 +27,9 @@ public interface UserApi {
     // Update User by ID
     @PATCH("users")
     Call<Void> update(@Query("id") String idFilter, @Body User user);
+
+    @PATCH("users")
+    Call<Void> updateFields(@Query("id") String idFilter, @Body Map<String, Object> fields);
 
     // Delete User by ID
     @DELETE("users")

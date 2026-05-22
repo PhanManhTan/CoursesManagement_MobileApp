@@ -1,3 +1,47 @@
 <resources>
     <string name="app_name">Manager Courses</string>
+    <string name="save">Save</string>
+    <string name="saving">Saving...</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="add">Add</string>
+
+    <string name="edit_course_title">Edit Course</string>
+    <string name="create_course_title">Create Course</string>
+    <string name="course_thumbnail">Course Thumbnail</string>
+    <string name="choose_thumbnail">Choose thumbnail</string>
+    <string name="course_title">Course Title</string>
+    <string name="course_title_hint">Enter course title</string>
+    <string name="description">Description</string>
+    <string name="course_description_hint">Enter course description</string>
+    <string name="price">Price</string>
+    <string name="chapters">Chapters</string>
+    <string name="chapter_count_empty">0 chapters</string>
+    <string name="add_chapter">Add chapter</string>
+    <string name="chapter_title_hint">Chapter title</string>
+    <string name="no_lessons_in_chapter">No lessons in this chapter</string>
+    <string name="add_lesson">Add lesson</string>
+    <string name="untitled_lesson">Untitled lesson</string>
+
+    <string name="edit_lesson_title">Edit Lesson</string>
+    <string name="lesson_title">Lesson Title</string>
+    <string name="lesson_title_hint">Enter lesson title</string>
+    <string name="video_file">Video file</string>
+    <string name="no_video_selected">No video selected</string>
+    <string name="choose">Choose</string>
+    <string name="uploading">Uploading</string>
+    <string name="lesson_description">Lesson Description</string>
+    <string name="lesson_description_hint">Enter lesson description</string>
+    <string name="attachments">Attachments</string>
+    <string name="no_attachments">No attachments</string>
+    <string name="add_attachment">Add attachment</string>
+    <string name="quiz">Quiz</string>
+    <string name="add_quiz_question">Add quiz question</string>
+    <string name="question_label">Question:</string>
+    <string name="quiz_question_hint">Question content...</string>
+    <string name="answer_a_hint">Answer A</string>
+    <string name="answer_b_hint">Answer B</string>
+    <string name="answer_c_hint">Answer C</string>
+    <string name="answer_d_hint">Answer D</string>
 </resources>

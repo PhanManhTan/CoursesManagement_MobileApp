@@ -2,9 +2,14 @@ package com.example.myapplication.activities.instructor;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
+import com.example.myapplication.adapters.EnrollmentTransactionAdapter;
 import com.example.myapplication.viewmodels.RevenueViewModel;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -19,6 +24,9 @@ public class RevenueActivity extends AppCompatActivity {
     private RevenueViewModel viewModel;
     private BarChart barChart;
     private PieChart pieChart;
+    private TextView tvTotalRevenue, tvEmptyTransactions;
+    private RecyclerView rvTransactions;
+    private EnrollmentTransactionAdapter transactionAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +35,14 @@ public class RevenueActivity extends AppCompatActivity {
 
         barChart = findViewById(R.id.barChart);
         pieChart = findViewById(R.id.pieChart);
+        tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
+        tvEmptyTransactions = findViewById(R.id.tvEmptyTransactions);
+        rvTransactions = findViewById(R.id.rvTransactions);
 
         viewModel = new ViewModelProvider(this).get(RevenueViewModel.class);
 
         setupCharts();
+        setupRecyclerView();
         observeData();
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -49,6 +61,13 @@ public class RevenueActivity extends AppCompatActivity {
         pieChart.setHoleColor(Color.TRANSPARENT);
         pieChart.setCenterTextColor(Color.WHITE);
         pieChart.getLegend().setTextColor(Color.WHITE);
+    }
+
+    private void setupRecyclerView() {
+        transactionAdapter = new EnrollmentTransactionAdapter();
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        rvTransactions.setNestedScrollingEnabled(false);
+        rvTransactions.setAdapter(transactionAdapter);
     }
 
     private void observeData() {
@@ -71,6 +90,15 @@ public class RevenueActivity extends AppCompatActivity {
             PieData data = new PieData(dataSet);
             pieChart.setData(data);
             pieChart.invalidate();
+        });
+
+        viewModel.getTotalRevenue().observe(this, revenue -> tvTotalRevenue.setText(revenue));
+
+        viewModel.getRecentTransactions().observe(this, transactions -> {
+            transactionAdapter.setTransactions(transactions);
+            boolean isEmpty = transactions == null || transactions.isEmpty();
+            tvEmptyTransactions.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+            rvTransactions.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
         });
     }
 }

@@ -46,7 +46,7 @@ public class Course implements Serializable {
     @SerializedName("duration")
     private String duration;
 
-    private int thumbnailResId;
+    private transient int thumbnailResId;
 
     public Course() {
     }

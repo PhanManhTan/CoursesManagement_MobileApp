@@ -2,6 +2,7 @@ package com.example.myapplication.activities.instructor;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import com.example.myapplication.models.Enrollment;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utils.SessionManager;
 import java.util.List;
+import java.util.Locale;
 
 public class ProfileInstructorActivity extends AppCompatActivity {
 
@@ -107,18 +109,21 @@ public class ProfileInstructorActivity extends AppCompatActivity {
     private void displayCourses(List<Course> courses) {
         lnInstructorCourses.removeAllViews();
         for (Course course : courses) {
-            View itemView = getLayoutInflater().inflate(R.layout.item_course_search, null);
+            View itemView = getLayoutInflater().inflate(R.layout.item_instructor_course, lnInstructorCourses, false);
 
-            TextView title = itemView.findViewById(R.id.tvCourseTitle);
-            TextView instructor = itemView.findViewById(R.id.tvInstructor);
+            TextView title = itemView.findViewById(R.id.tvCourseName);
+            TextView lessons = itemView.findViewById(R.id.tvLessonCount);
             TextView price = itemView.findViewById(R.id.tvPrice);
+            TextView status = itemView.findViewById(R.id.tvStatus);
             ImageView thumb = itemView.findViewById(R.id.ivCourseThumb);
+            ImageButton btnMore = itemView.findViewById(R.id.btnMore);
 
             title.setText(course.getTitle());
-            instructor.setText(tvName.getText());
-            price.setText("$" + course.getPrice());
+            lessons.setText(course.getLessonCount() + " Lessons");
+            price.setText(String.format(Locale.US, "$%.2f", course.getPrice()));
+            status.setText(course.getStatus());
+            btnMore.setVisibility(View.GONE);
 
-            // Use Glide for live thumbnails
             if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
                 Glide.with(this)
                         .load(course.getThumbnailUrl())

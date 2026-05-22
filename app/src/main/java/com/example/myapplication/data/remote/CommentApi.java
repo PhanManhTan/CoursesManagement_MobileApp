@@ -8,7 +8,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CommentApi {
     // Get all Comments
@@ -16,18 +16,18 @@ public interface CommentApi {
     Call<List<Comment>> getAll();
 
     // Get Comment by ID
-    @GET("comments?id=eq.{id}&select=*")
-    Call<List<Comment>> getById(@Path("id") String id);
+    @GET("comments?select=*")
+    Call<List<Comment>> getById(@Query("id") String idFilter);
 
     // Insert new Comment
     @POST("comments")
     Call<Void> insert(@Body Comment comment);
 
     // Update Comment by ID
-    @PATCH("comments?id=eq.{id}")
-    Call<Void> update(@Path("id") String id, @Body Comment comment);
+    @PATCH("comments")
+    Call<Void> update(@Query("id") String idFilter, @Body Comment comment);
 
     // Delete Comment by ID
-    @DELETE("comments?id=eq.{id}")
-    Call<Void> delete(@Path("id") String id);
+    @DELETE("comments")
+    Call<Void> delete(@Query("id") String idFilter);
 }

@@ -1,35 +1,92 @@
 package com.example.myapplication.activities.instructor;
 
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
-import com.example.myapplication.adapters.LessonAdapter;
+import com.example.myapplication.adapters.InstructorChapterAdapter;
+import com.example.myapplication.data.repository.SupabaseStorageRepository;
+import com.example.myapplication.models.Chapter;
+import com.example.myapplication.models.ChapterWithLessons;
+import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Lesson;
+import com.example.myapplication.models.LessonEditorData;
+import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.viewmodels.EditCourseViewModel;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class EditCourseActivity extends AppCompatActivity {
+    private static final String TAG = "EditCourseActivity";
 
-    private EditText etTitle, etDescription, etPrice;
-    private RecyclerView rvLessons;
-    private LessonAdapter lessonAdapter;
-    private final List<Lesson> lessonList = new ArrayList<>();
+    public static final String EXTRA_COURSE = "COURSE";
+    public static final String EXTRA_COURSE_ID = "COURSE_ID";
+
+    private EditText etTitle;
+    private EditText etDescription;
+    private EditText etPrice;
+    private ImageView ivThumbnailPreview;
+    private TextView tvEditorTitle;
+    private TextView tvChapterCount;
+    private MaterialButton btnPickThumbnail;
+    private MaterialButton btnAddChapter;
+    private TextView btnSave;
+    private NestedScrollView courseDetailScroll;
+    private RecyclerView rvChapters;
+    private InstructorChapterAdapter chapterAdapter;
+    private final List<ChapterWithLessons> chapterList = new ArrayList<>();
+    private EditCourseViewModel viewModel;
+    private SupabaseStorageRepository storageRepository;
+    private ActivityResultLauncher<String> pickImageLauncher;
+    private ActivityResultLauncher<Intent> editLessonLauncher;
+    private String currentThumbnailUrl;
+    private String loadedStructureCourseId;
+    private int pendingChapterPosition = RecyclerView.NO_POSITION;
+    private int pendingLessonPosition = RecyclerView.NO_POSITION;
+    private int pendingUploadCount;
+    private boolean isBindingData;
+    private boolean hasUnsavedChanges;
+    private boolean isStructureLoading;
+    private boolean isSaving;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // SỬA LỖI: Sử dụng đúng layout chi tiết có quản lý bài học
+        registerLaunchers();
         setContentView(R.layout.activity_instructor_course_detail);
 
         initViews();
         setupRecyclerView();
+        setupViewModel();
+        setupListeners();
         loadInitialData();
     }
 
@@ -37,61 +94,709 @@ public class EditCourseActivity extends AppCompatActivity {
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         etPrice = findViewById(R.id.etPrice);
-        rvLessons = findViewById(R.id.rvLessons);
-
-        // Nút quay lại (ID btnBack)
-        View btnBack = findViewById(R.id.btnBack);
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
-        }
-
-        // Nút thêm bài học (ID btnAddLesson)
-        View btnAddLesson = findViewById(R.id.btnAddLesson);
-        if (btnAddLesson != null) {
-            btnAddLesson.setOnClickListener(v -> addNewLesson());
-        }
-
-        // Nút lưu (ID btnSave)
-        View btnSave = findViewById(R.id.btnSave);
-        if (btnSave != null) {
-            btnSave.setOnClickListener(v -> {
-                Toast.makeText(this, "Course saved successfully!", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
-                finish();
-            });
-        }
+        ivThumbnailPreview = findViewById(R.id.ivThumbnailPreview);
+        tvEditorTitle = findViewById(R.id.tvEditorTitle);
+        tvChapterCount = findViewById(R.id.tvChapterCount);
+        btnPickThumbnail = findViewById(R.id.btnPickThumbnail);
+        btnAddChapter = findViewById(R.id.btnAddChapter);
+        btnSave = findViewById(R.id.btnSave);
+        courseDetailScroll = findViewById(R.id.courseDetailScroll);
+        rvChapters = findViewById(R.id.rvChapters);
+        storageRepository = new SupabaseStorageRepository(this);
     }
 
     private void setupRecyclerView() {
-        if (rvLessons != null) {
-            lessonAdapter = new LessonAdapter(lessonList, null);
-            rvLessons.setLayoutManager(new LinearLayoutManager(this));
-            rvLessons.setAdapter(lessonAdapter);
-            // Quan trọng: Để không bị xung đột cuộn với ScrollView bên ngoài
-            rvLessons.setNestedScrollingEnabled(false);
+        chapterAdapter = new InstructorChapterAdapter(createChapterActionListener());
+        rvChapters.setLayoutManager(new LinearLayoutManager(this));
+        rvChapters.setItemAnimator(null);
+        rvChapters.setNestedScrollingEnabled(false);
+        rvChapters.setAdapter(chapterAdapter);
+    }
+
+    private InstructorChapterAdapter.OnChapterActionListener createChapterActionListener() {
+        return new InstructorChapterAdapter.OnChapterActionListener() {
+            @Override
+            public void onEditChapter(int chapterPosition) {
+                showChapterDialog(chapterPosition);
+            }
+
+            @Override
+            public void onDeleteChapter(int chapterPosition) {
+                deleteChapter(chapterPosition);
+            }
+
+            @Override
+            public void onAddLesson(int chapterPosition) {
+                openLessonEditor(chapterPosition, RecyclerView.NO_POSITION);
+            }
+
+            @Override
+            public void onEditLesson(int chapterPosition, int lessonPosition) {
+                openLessonEditor(chapterPosition, lessonPosition);
+            }
+
+            @Override
+            public void onDeleteLesson(int chapterPosition, int lessonPosition) {
+                deleteLesson(chapterPosition, lessonPosition);
+            }
+        };
+    }
+
+    private void setupViewModel() {
+        viewModel = new ViewModelProvider(this).get(EditCourseViewModel.class);
+        viewModel.resetSaveState();
+
+        viewModel.getCourse().observe(this, this::populateCourse);
+        viewModel.getChapterDrafts().observe(this, drafts -> {
+            isBindingData = true;
+            chapterList.clear();
+            if (drafts != null) {
+                chapterList.addAll(drafts);
+            }
+            refreshChapterList();
+            isBindingData = false;
+        });
+        viewModel.getSaveSuccess().observe(this, saved -> {
+            if (Boolean.TRUE.equals(saved)) {
+                hasUnsavedChanges = false;
+                Toast.makeText(this, "Course saved successfully", Toast.LENGTH_SHORT).show();
+                viewModel.resetSaveState();
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
+        viewModel.getErrorMessage().observe(this, message -> {
+            if (message != null && !message.isEmpty()) {
+                showEditorError("Course editor error", message);
+                viewModel.resetSaveState();
+            }
+        });
+        viewModel.getIsStructureLoading().observe(this, loading -> {
+            isStructureLoading = Boolean.TRUE.equals(loading);
+            updateEditorLockState();
+        });
+        viewModel.getIsSaving().observe(this, saving -> {
+            isSaving = Boolean.TRUE.equals(saving);
+            updateEditorLockState();
+        });
+    }
+
+    private void setupListeners() {
+        View btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> confirmExitIfDirty(this::finish));
         }
+        btnAddChapter.setOnClickListener(v -> showChapterDialog(RecyclerView.NO_POSITION));
+        btnPickThumbnail.setOnClickListener(v -> launchImagePicker());
+        btnSave.setOnClickListener(v -> attemptSave());
+        setupDirtyWatchers();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                confirmExitIfDirty(EditCourseActivity.this::finish);
+            }
+        });
     }
 
     private void loadInitialData() {
-        if (getIntent() != null) {
-            String title = getIntent().getStringExtra("COURSE_TITLE");
-            if (title != null && etTitle != null) {
-                etTitle.setText(title);
+        if (getIntent() == null) {
+            viewModel.setCourse(new Course());
+            return;
+        }
+
+        Course course = readCourseExtra();
+        String courseId = getIntent().getStringExtra(EXTRA_COURSE_ID);
+        if (course != null) {
+            viewModel.setCourse(course);
+        } else if (hasValue(courseId)) {
+            viewModel.loadCourse(courseId);
+        } else {
+            viewModel.setCourse(new Course());
+        }
+    }
+
+    private Course readCourseExtra() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return getIntent().getSerializableExtra(EXTRA_COURSE, Course.class);
+        }
+        return (Course) getIntent().getSerializableExtra(EXTRA_COURSE);
+    }
+
+    private void populateCourse(Course course) {
+        if (course == null) return;
+
+        isBindingData = true;
+        tvEditorTitle.setText(hasValue(course.getId()) ? getString(R.string.edit_course_title) : getString(R.string.create_course_title));
+        etTitle.setText(valueOrEmpty(course.getTitle()));
+        etDescription.setText(valueOrEmpty(course.getDescription()));
+        etPrice.setText(course.getPrice() > 0 ? String.format(Locale.US, "%.0f", course.getPrice()) : "");
+
+        currentThumbnailUrl = course.getThumbnailUrl();
+        if (hasValue(currentThumbnailUrl)) {
+            Glide.with(this)
+                    .load(currentThumbnailUrl)
+                    .placeholder(R.drawable.image_courses)
+                    .into(ivThumbnailPreview);
+        } else {
+            ivThumbnailPreview.setImageResource(R.drawable.image_courses);
+        }
+        isBindingData = false;
+
+        if (hasValue(course.getId()) && !course.getId().equals(loadedStructureCourseId)) {
+            loadedStructureCourseId = course.getId();
+            viewModel.loadCourseStructure(course.getId());
+        } else if (!hasValue(course.getId())) {
+            loadedStructureCourseId = null;
+            chapterList.clear();
+            refreshChapterList();
+        }
+    }
+
+    private void showChapterDialog(int chapterPosition) {
+        boolean editing = isValidChapterPosition(chapterPosition);
+        EditText input = new EditText(this);
+        input.setSingleLine(true);
+        input.setHint(getString(R.string.chapter_title_hint));
+        input.setTextColor(getColor(R.color.text_primary));
+        input.setHintTextColor(getColor(R.color.text_hint));
+        input.setPadding(24, 16, 24, 16);
+        input.setBackgroundResource(R.drawable.bg_input_square);
+        if (editing) {
+            input.setText(chapterList.get(chapterPosition).getChapter().getTitle());
+            input.setSelection(input.getText().length());
+        }
+
+        int padding = Math.round(20 * getResources().getDisplayMetrics().density);
+        androidx.appcompat.widget.LinearLayoutCompat wrapper = new androidx.appcompat.widget.LinearLayoutCompat(this);
+        wrapper.setPadding(padding, padding / 2, padding, 0);
+        wrapper.addView(input, new androidx.appcompat.widget.LinearLayoutCompat.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+
+        new AlertDialog.Builder(this)
+                .setTitle(editing ? "Edit chapter" : "Add chapter")
+                .setView(wrapper)
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setPositiveButton(editing ? getString(R.string.save) : getString(R.string.add), (dialog, which) -> {
+                    String title = input.getText().toString().trim();
+                    if (!hasValue(title)) {
+                        title = "Chapter " + (editing ? chapterPosition + 1 : chapterList.size() + 1);
+                    }
+                    if (editing) {
+                        chapterList.get(chapterPosition).getChapter().setTitle(title);
+                        chapterAdapter.notifyItemChanged(chapterPosition);
+                        markDirty();
+                    } else {
+                        Chapter chapter = new Chapter(null, null, title, chapterList.size() + 1);
+                        chapterList.add(new ChapterWithLessons(chapter, new ArrayList<>()));
+                        refreshChapterList();
+                        scrollToBottom();
+                        markDirty();
+                    }
+                })
+                .show();
+    }
+
+    private void deleteChapter(int chapterPosition) {
+        if (!isValidChapterPosition(chapterPosition)) return;
+
+        Chapter chapter = chapterList.get(chapterPosition).getChapter();
+        String title = chapter != null && hasValue(chapter.getTitle())
+                ? chapter.getTitle()
+                : "this chapter";
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete chapter")
+                .setMessage("Delete " + title + " and all lessons inside it? Save the course after deleting to sync this change.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    chapterList.remove(chapterPosition);
+                    refreshChapterList();
+                    markDirty();
+                })
+                .show();
+    }
+
+    private void openLessonEditor(int chapterPosition, int lessonPosition) {
+        if (!isValidChapterPosition(chapterPosition)) return;
+
+        Chapter chapter = chapterList.get(chapterPosition).getChapter();
+        if (chapter != null && !hasValue(chapter.getId()) && hasValue(getCurrentCourseId())) {
+            saveChapterThenOpenLesson(chapterPosition, lessonPosition);
+            return;
+        }
+
+        launchLessonEditor(chapterPosition, lessonPosition);
+    }
+
+    private void saveChapterThenOpenLesson(int chapterPosition, int lessonPosition) {
+        if (!isValidChapterPosition(chapterPosition)) return;
+
+        Chapter chapter = chapterList.get(chapterPosition).getChapter();
+        Toast.makeText(this, "Saving chapter before opening lesson...", Toast.LENGTH_SHORT).show();
+        viewModel.saveChapterDraft(chapter, chapterPosition + 1, new EditCourseViewModel.ChapterSaveCallback() {
+            @Override
+            public void onSuccess(Chapter savedChapter) {
+                runIfActive(() -> {
+                    chapterAdapter.notifyItemChanged(chapterPosition);
+                    launchLessonEditor(chapterPosition, lessonPosition);
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runIfActive(() -> showEditorError("Chapter save failed", message));
+            }
+        });
+    }
+
+    private void launchLessonEditor(int chapterPosition, int lessonPosition) {
+        if (!isValidChapterPosition(chapterPosition)) return;
+
+        pendingChapterPosition = chapterPosition;
+        pendingLessonPosition = lessonPosition;
+
+        Lesson lesson;
+        if (isValidLessonPosition(chapterPosition, lessonPosition)) {
+            lesson = chapterList.get(chapterPosition).getLessons().get(lessonPosition);
+        } else {
+            lesson = new Lesson();
+            lesson.setTitle("Lesson " + (chapterList.get(chapterPosition).getLessons().size() + 1));
+            lesson.setOrderIndex(chapterList.get(chapterPosition).getLessons().size() + 1);
+        }
+
+        Chapter chapter = chapterList.get(chapterPosition).getChapter();
+        if (chapter != null) {
+            lesson.setChapterId(chapter.getId());
+        }
+
+        Intent intent = new Intent(this, EditLessonActivity.class);
+        intent.putExtra(EditLessonActivity.EXTRA_LESSON_DATA, LessonEditorData.fromLesson(lesson));
+        editLessonLauncher.launch(intent);
+    }
+
+    private void handleLessonResult(Intent data) {
+        if (!isValidChapterPosition(pendingChapterPosition)) {
+            clearPendingLessonTarget();
+            return;
+        }
+
+        LessonEditorData editorData;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            editorData = data.getSerializableExtra(EditLessonActivity.EXTRA_LESSON_DATA, LessonEditorData.class);
+        } else {
+            editorData = (LessonEditorData) data.getSerializableExtra(EditLessonActivity.EXTRA_LESSON_DATA);
+        }
+        if (editorData == null) {
+            clearPendingLessonTarget();
+            return;
+        }
+
+        boolean lessonSynced = data.getBooleanExtra(EditLessonActivity.EXTRA_LESSON_SYNCED, false);
+        ChapterWithLessons chapterDraft = chapterList.get(pendingChapterPosition);
+        Chapter chapter = chapterDraft.getChapter();
+        editorData.setChapterId(chapter != null ? chapter.getId() : null);
+
+        Lesson lesson;
+        if (isValidLessonPosition(pendingChapterPosition, pendingLessonPosition)) {
+            lesson = chapterDraft.getLessons().get(pendingLessonPosition);
+            editorData.applyToLesson(lesson);
+            chapterAdapter.notifyItemChanged(pendingChapterPosition);
+            if (!lessonSynced) {
+                markDirty();
+            }
+            Toast.makeText(this,
+                    lessonSynced ? "Lesson saved" : "Lesson updated in course draft. Save the course to sync.",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            lesson = new Lesson();
+            editorData.applyToLesson(lesson);
+            chapterDraft.getLessons().add(lesson);
+            refreshChapterList();
+            scrollToBottom();
+            if (!lessonSynced) {
+                markDirty();
+            }
+            Toast.makeText(this,
+                    lessonSynced ? "Lesson saved" : "Lesson added to course draft. Save the course to sync.",
+                    Toast.LENGTH_SHORT).show();
+        }
+        clearPendingLessonTarget();
+    }
+
+    private void deleteLesson(int chapterPosition, int lessonPosition) {
+        if (!isValidLessonPosition(chapterPosition, lessonPosition)) return;
+
+        Lesson lesson = chapterList.get(chapterPosition).getLessons().get(lessonPosition);
+        String title = lesson != null && hasValue(lesson.getTitle())
+                ? lesson.getTitle()
+                : "this lesson";
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete lesson")
+                .setMessage("Delete " + title + "? Save the course after deleting to sync this change.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    chapterList.get(chapterPosition).getLessons().remove(lessonPosition);
+                    chapterAdapter.notifyItemChanged(chapterPosition);
+                    updateChapterCount();
+                    markDirty();
+                })
+                .show();
+    }
+
+    private void attemptSave() {
+        if (isStructureLoading) {
+            Toast.makeText(this, "Course structure is still loading", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (isSaving) {
+            return;
+        }
+
+        String title = etTitle.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+        String priceText = etPrice.getText().toString().trim();
+
+        if (TextUtils.isEmpty(title)) {
+            etTitle.setError("Course title is required");
+            etTitle.requestFocus();
+            return;
+        }
+        if (TextUtils.isEmpty(description)) {
+            etDescription.setError("Description is required");
+            etDescription.requestFocus();
+            return;
+        }
+
+        double price;
+        try {
+            price = TextUtils.isEmpty(priceText) ? 0 : Double.parseDouble(priceText);
+        } catch (NumberFormatException e) {
+            etPrice.setError("Invalid price");
+            etPrice.requestFocus();
+            return;
+        }
+
+        if (pendingUploadCount > 0) {
+            Toast.makeText(this, "Please wait for uploads to finish", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (hasLocalMediaUrl(currentThumbnailUrl) || hasUnuploadedLessonMedia()) {
+            Toast.makeText(this, "Some media files are not uploaded yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!validateLessonVideos()) {
+            return;
+        }
+
+        normalizeOrderIndexes();
+        isSaving = true;
+        updateEditorLockState();
+        viewModel.saveCourseStructure(title, description, price, currentThumbnailUrl, createChapterSnapshot());
+    }
+
+    private void registerLaunchers() {
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        uploadCourseThumbnail(uri);
+                    }
+                }
+        );
+        editLessonLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        handleLessonResult(result.getData());
+                    } else {
+                        clearPendingLessonTarget();
+                    }
+                }
+        );
+    }
+
+    private void launchImagePicker() {
+        try {
+            pickImageLauncher.launch("image/*");
+        } catch (Exception e) {
+            Toast.makeText(this, "Cannot open image picker", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void uploadCourseThumbnail(Uri imageUri) {
+        String fileName = getDisplayName(imageUri);
+        beginMediaUpload();
+        currentThumbnailUrl = imageUri.toString();
+        setThumbnailUploadState(true);
+        storageRepository.upload(imageUri, fileName, "courses/thumbnails", new SupabaseStorageRepository.RepositoryCallback<String>() {
+            @Override
+            public void onSuccess(String url) {
+                runIfActive(() -> {
+                    currentThumbnailUrl = url;
+                    Glide.with(EditCourseActivity.this)
+                            .load(currentThumbnailUrl)
+                            .placeholder(R.drawable.image_courses)
+                            .into(ivThumbnailPreview);
+                    Toast.makeText(EditCourseActivity.this, "Thumbnail uploaded", Toast.LENGTH_SHORT).show();
+                    setThumbnailUploadState(false);
+                    markDirty();
+                    finishMediaUpload();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runIfActive(() -> {
+                    currentThumbnailUrl = null;
+                    ivThumbnailPreview.setImageResource(R.drawable.image_courses);
+                    Toast.makeText(EditCourseActivity.this, message, Toast.LENGTH_SHORT).show();
+                    setThumbnailUploadState(false);
+                    finishMediaUpload();
+                });
+            }
+        });
+    }
+
+    private void refreshChapterList() {
+        updateChapterCount();
+        chapterAdapter.submitList(new ArrayList<>(chapterList));
+    }
+
+    private void updateChapterCount() {
+        int lessonCount = 0;
+        for (ChapterWithLessons draft : chapterList) {
+            lessonCount += draft.getLessons().size();
+        }
+        tvChapterCount.setText(String.format(Locale.US, "%d chapters • %d lessons", chapterList.size(), lessonCount));
+    }
+
+    private void normalizeOrderIndexes() {
+        for (int chapterIndex = 0; chapterIndex < chapterList.size(); chapterIndex++) {
+            ChapterWithLessons draft = chapterList.get(chapterIndex);
+            Chapter chapter = draft.getChapter();
+            if (chapter != null) {
+                chapter.setOrderIndex(chapterIndex + 1);
+            }
+            List<Lesson> lessons = draft.getLessons();
+            for (int lessonIndex = 0; lessonIndex < lessons.size(); lessonIndex++) {
+                lessons.get(lessonIndex).setOrderIndex(lessonIndex + 1);
+            }
+        }
+    }
+
+    private boolean hasUnuploadedLessonMedia() {
+        for (ChapterWithLessons draft : chapterList) {
+            for (Lesson lesson : draft.getLessons()) {
+                if (hasLocalMediaUrl(lesson.getLocalVideoUri())) {
+                    return true;
+                }
+                for (String fileUri : lesson.getLocalFileUris()) {
+                    if (hasLocalMediaUrl(fileUri)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean validateLessonVideos() {
+        for (ChapterWithLessons draft : chapterList) {
+            if (draft == null) continue;
+
+            for (Lesson lesson : draft.getLessons()) {
+                if (lesson == null) continue;
+
+                if (!hasValue(lesson.getLocalVideoUri()) && !hasValue(lesson.getVideoUrl())) {
+                    String lessonName = hasValue(lesson.getTitle()) ? lesson.getTitle().trim() : "this lesson";
+                    showEditorError(
+                            "Lesson video required",
+                            "Add a video before saving \"" + lessonName + "\". Attachments and quizzes are optional."
+                    );
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void setThumbnailUploadState(boolean uploading) {
+        updateEditorLockState();
+    }
+
+    private void beginMediaUpload() {
+        pendingUploadCount++;
+        updateSaveState();
+    }
+
+    private void finishMediaUpload() {
+        if (pendingUploadCount > 0) {
+            pendingUploadCount--;
+        }
+        updateSaveState();
+    }
+
+    private void updateSaveState() {
+        updateEditorLockState();
+    }
+
+    private void updateEditorLockState() {
+        boolean uploadsIdle = pendingUploadCount == 0;
+        boolean canEdit = uploadsIdle && !isStructureLoading && !isSaving;
+        if (btnSave != null) {
+            btnSave.setEnabled(canEdit);
+            btnSave.setAlpha(canEdit ? 1.0f : 0.5f);
+            btnSave.setText(isSaving ? getString(R.string.saving) : getString(R.string.save));
+        }
+        if (btnAddChapter != null) {
+            btnAddChapter.setEnabled(canEdit);
+        }
+        if (btnPickThumbnail != null) {
+            btnPickThumbnail.setEnabled(canEdit);
+        }
+        if (chapterAdapter != null) {
+            chapterAdapter.setActionsEnabled(canEdit);
+        }
+    }
+
+    private List<ChapterWithLessons> createChapterSnapshot() {
+        List<ChapterWithLessons> snapshot = new ArrayList<>();
+        for (ChapterWithLessons draft : chapterList) {
+            if (draft != null) {
+                snapshot.add(draft.deepCopy());
+            }
+        }
+        return snapshot;
+    }
+
+    private void scrollToBottom() {
+        if (courseDetailScroll != null) {
+            courseDetailScroll.post(() -> courseDetailScroll.fullScroll(View.FOCUS_DOWN));
+        }
+    }
+
+    private boolean isValidChapterPosition(int position) {
+        return position >= 0 && position < chapterList.size();
+    }
+
+    private boolean isValidLessonPosition(int chapterPosition, int lessonPosition) {
+        return isValidChapterPosition(chapterPosition)
+                && lessonPosition >= 0
+                && lessonPosition < chapterList.get(chapterPosition).getLessons().size();
+    }
+
+    private void clearPendingLessonTarget() {
+        pendingChapterPosition = RecyclerView.NO_POSITION;
+        pendingLessonPosition = RecyclerView.NO_POSITION;
+    }
+
+    private boolean hasLocalMediaUrl(String value) {
+        return hasValue(value)
+                && !value.startsWith("http://")
+                && !value.startsWith("https://");
+    }
+
+    private String getDisplayName(Uri uri) {
+        String displayName = null;
+        try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (nameIndex >= 0) {
+                    displayName = cursor.getString(nameIndex);
+                }
             }
         }
 
-        // Dữ liệu mẫu bài học để hiển thị danh sách
-        lessonList.add(new Lesson("1", "Overview and Introduction", "05:00"));
-        lessonList.add(new Lesson("2", "Project Setup", "10:45"));
-        if (lessonAdapter != null) lessonAdapter.notifyDataSetChanged();
+        if (TextUtils.isEmpty(displayName)) {
+            displayName = uri.getLastPathSegment();
+        }
+        return TextUtils.isEmpty(displayName) ? "Selected file" : displayName;
     }
 
-    private void addNewLesson() {
-        if (lessonAdapter != null) {
-            int nextId = lessonList.size() + 1;
-            lessonList.add(new Lesson(String.valueOf(nextId), "Lesson " + nextId, "00:00"));
-            lessonAdapter.notifyItemInserted(lessonList.size() - 1);
-            if (rvLessons != null) rvLessons.smoothScrollToPosition(lessonList.size() - 1);
+    private void runIfActive(Runnable action) {
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+            action.run();
+        });
+    }
+
+    private void setupDirtyWatchers() {
+        TextWatcher watcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                markDirty();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        };
+        etTitle.addTextChangedListener(watcher);
+        etDescription.addTextChangedListener(watcher);
+        etPrice.addTextChangedListener(watcher);
+    }
+
+    private void markDirty() {
+        if (!isBindingData) {
+            hasUnsavedChanges = true;
         }
+    }
+
+    private void confirmExitIfDirty(Runnable exitAction) {
+        if (!hasUnsavedChanges) {
+            exitAction.run();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Unsaved changes")
+                .setMessage("Save your changes before leaving?")
+                .setPositiveButton("Save", (dialog, which) -> attemptSave())
+                .setNegativeButton("Discard", (dialog, which) -> {
+                    hasUnsavedChanges = false;
+                    exitAction.run();
+                })
+                .setNeutralButton("Cancel", null)
+                .show();
+    }
+
+    private String getCurrentCourseId() {
+        Course current = viewModel != null && viewModel.getCourse() != null
+                ? viewModel.getCourse().getValue()
+                : null;
+        return current != null ? current.getId() : null;
+    }
+
+    private void showEditorError(String title, String message) {
+        String rawDetail = hasValue(message) ? message : "Unknown error";
+        String detail = ApiErrorFormatter.fromMessage(rawDetail);
+        Log.e(TAG, title + ": " + rawDetail);
+        Toast.makeText(this, detail, Toast.LENGTH_LONG).show();
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(detail)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    private String valueOrEmpty(String value) {
+        return value != null ? value : "";
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

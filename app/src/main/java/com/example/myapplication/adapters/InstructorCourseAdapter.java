@@ -11,9 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Course;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCourseAdapter.CourseViewHolder> {
@@ -33,6 +35,11 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
         this.listener = listener;
     }
 
+    public void setCourses(List<Course> courses) {
+        this.courseList = courses != null ? courses : new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public CourseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,12 +51,13 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         Course course = courseList.get(position);
         holder.tvCourseName.setText(course.getTitle());
-        holder.tvLessonCount.setText(course.getLessonCount() + " Lessons • " + course.getDuration());
+        String duration = course.getDuration() != null ? course.getDuration() : "N/A";
+        holder.tvLessonCount.setText(course.getLessonCount() + " Lessons • " + duration);
         holder.tvPrice.setText("$" + String.format("%.2f", course.getPrice()));
         holder.tvStatus.setText(course.getStatus());
 
         // Update status background/color based on status
-        if ("PUBLISHED".equalsIgnoreCase(course.getStatus())) {
+        if ("PUBLISHED".equalsIgnoreCase(course.getStatus()) || "APPROVED".equalsIgnoreCase(course.getStatus())) {
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_published);
             holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
         } else {
@@ -58,11 +66,15 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
             holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
         }
 
-        if (course.getThumbnailResId() != 0) {
+        if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(course.getThumbnailUrl())
+                    .placeholder(R.drawable.image_courses)
+                    .into(holder.ivCourseThumb);
+        } else if (course.getThumbnailResId() != 0) {
             holder.ivCourseThumb.setImageResource(course.getThumbnailResId());
         } else {
-            // placeholder
-            holder.ivCourseThumb.setImageResource(R.drawable.ic_home);
+            holder.ivCourseThumb.setImageResource(R.drawable.image_courses);
         }
 
         holder.itemView.setOnClickListener(v -> {

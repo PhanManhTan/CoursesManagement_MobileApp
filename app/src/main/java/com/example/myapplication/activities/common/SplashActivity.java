@@ -10,20 +10,25 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
+import com.example.myapplication.activities.admin.AdminDashboardActivity;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.activities.auth.OnboardingActivity;
+import com.example.myapplication.activities.instructor.InstructorMainActivity;
+import com.example.myapplication.utils.SessionManager;
 
 public class SplashActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private int progressStatus = 0;
     private Handler handler = new Handler(Looper.getMainLooper());
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        sessionManager = new SessionManager(this);
         progressBar = findViewById(R.id.progressBar);
         new Thread(() -> {
             while (progressStatus < 100) {
@@ -47,12 +52,29 @@ public class SplashActivity extends AppCompatActivity {
         Intent intent;
         if (!onboardingDone) {
             intent = new Intent(SplashActivity.this, OnboardingActivity.class);
+        } else if (sessionManager.isLoggedIn()) {
+            intent = getSessionIntent();
         } else {
-            // Có thể kiểm tra thêm trạng thái đăng nhập ở đây
             intent = new Intent(SplashActivity.this, LoginActivity.class);
         }
-        
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private Intent getSessionIntent() {
+        String role = sessionManager.getRole();
+        if (role == null) {
+            return new Intent(SplashActivity.this, LoginActivity.class);
+        }
+
+        String normalizedRole = role.trim().toLowerCase();
+        if ("admin".equals(normalizedRole)) {
+            return new Intent(SplashActivity.this, AdminDashboardActivity.class);
+        } else if ("instructor".equals(normalizedRole)) {
+            return new Intent(SplashActivity.this, InstructorMainActivity.class);
+        }
+        return new Intent(SplashActivity.this, HomeActivity.class);
     }
 }

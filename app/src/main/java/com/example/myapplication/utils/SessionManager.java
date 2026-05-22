@@ -36,7 +36,17 @@ public class SessionManager {
         return prefs.getString(KEY_ROLE, null);
     }
 
+    public boolean isLoggedIn() {
+        return hasValue(getToken())
+                && hasValue(getUserId())
+                && hasValue(getRole());
+    }
+
     public void clear() {
         prefs.edit().clear().apply();
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

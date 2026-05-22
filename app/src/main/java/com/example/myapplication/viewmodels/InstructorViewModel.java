@@ -12,6 +12,8 @@ import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Enrollment;
 import com.example.myapplication.models.Review;
 import com.example.myapplication.utils.SessionManager;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,41 +27,118 @@ public class InstructorViewModel extends AndroidViewModel {
     private final MutableLiveData<String> monthlyRevenue = new MutableLiveData<>();
     private final MutableLiveData<String> avgRating = new MutableLiveData<>();
     private final MutableLiveData<String> liveCourses = new MutableLiveData<>();
+    private final MutableLiveData<List<Course>> instructorCourses = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private boolean coursesRequestInFlight;
+    private boolean statsRefreshQueued;
 
     public InstructorViewModel(@NonNull Application application) {
         super(application);
         courseRepository = new CourseRepository(application);
         enrollmentRepository = new EnrollmentRepository(application);
         reviewRepository = new ReviewRepository(application);
-        
+
         SessionManager sessionManager = new SessionManager(application);
         this.instructorId = sessionManager.getUserId();
-        
-        refreshStats();
     }
 
     public void refreshStats() {
-        if (instructorId == null) return;
+        fetchInstructorCourses(true);
+    }
 
+    public void refreshCourses() {
+        fetchInstructorCourses(false);
+    }
+
+    private void fetchInstructorCourses(boolean includeStats) {
+        if (instructorId == null) {
+            instructorCourses.setValue(new ArrayList<>());
+            if (includeStats) {
+                totalStudents.setValue("0");
+                monthlyRevenue.setValue("$0");
+                avgRating.setValue("0.0 ★");
+                liveCourses.setValue("0");
+            }
+            errorMessage.setValue("Missing instructor session");
+            return;
+        }
+
+        if (coursesRequestInFlight) {
+            statsRefreshQueued = statsRefreshQueued || includeStats;
+            return;
+        }
+
+        coursesRequestInFlight = true;
+        statsRefreshQueued = false;
+        loading.setValue(true);
         courseRepository.getByInstructor(instructorId, new CourseRepository.RepositoryCallback<List<Course>>() {
             @Override
             public void onSuccess(List<Course> courses) {
-                int liveCount = 0;
-                if (courses != null) {
-                    for (Course c : courses) {
-                        if ("approved".equalsIgnoreCase(c.getStatus())) {
-                            liveCount++;
-                        }
-                    }
+                coursesRequestInFlight = false;
+                boolean shouldRefreshStats = includeStats || statsRefreshQueued;
+                statsRefreshQueued = false;
+                loading.setValue(false);
+                List<Course> safeCourses = courses != null ? courses : new ArrayList<>();
+                instructorCourses.setValue(safeCourses);
+                liveCourses.setValue(String.valueOf(countLiveCourses(safeCourses)));
+                if (shouldRefreshStats) {
+                    fetchEnrollmentStats(safeCourses);
+                    fetchReviewStats(safeCourses);
                 }
-                liveCourses.setValue(String.valueOf(liveCount));
-                fetchEnrollmentStats(courses);
-                fetchReviewStats(courses);
             }
             @Override public void onError(String message) {
-                liveCourses.setValue("0");
+                coursesRequestInFlight = false;
+                statsRefreshQueued = false;
+                loading.setValue(false);
+                instructorCourses.setValue(new ArrayList<>());
+                errorMessage.setValue(message);
+                if (includeStats) {
+                    liveCourses.setValue("0");
+                    totalStudents.setValue("0");
+                    monthlyRevenue.setValue("$0");
+                    avgRating.setValue("0.0 ★");
+                }
             }
         });
+    }
+
+    public void deleteCourse(String courseId) {
+        if (courseId == null || courseId.isEmpty()) {
+            errorMessage.setValue("Invalid course id");
+            return;
+        }
+        if (instructorId == null || instructorId.trim().isEmpty()) {
+            errorMessage.setValue("Missing instructor session");
+            return;
+        }
+
+        loading.setValue(true);
+        courseRepository.deleteForInstructor(courseId, instructorId, new CourseRepository.RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                loading.setValue(false);
+                refreshCourses();
+            }
+
+            @Override
+            public void onError(String message) {
+                loading.setValue(false);
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
+    private int countLiveCourses(List<Course> courses) {
+        int liveCount = 0;
+        if (courses != null) {
+            for (Course c : courses) {
+                if ("approved".equalsIgnoreCase(c.getStatus())) {
+                    liveCount++;
+                }
+            }
+        }
+        return liveCount;
     }
 
     private void fetchEnrollmentStats(List<Course> courses) {
@@ -67,33 +146,51 @@ public class InstructorViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(List<Enrollment> allEnrollments) {
                 int studentCount = 0;
-                double revenue = 0;
-                
+                double monthlyTotal = 0;
+
                 if (courses != null && allEnrollments != null) {
                     for (Course course : courses) {
                         for (Enrollment enrollment : allEnrollments) {
                             if (enrollment.getCourseId() != null && enrollment.getCourseId().equals(course.getId())) {
                                 studentCount++;
-                                
+
                                 // Fallback: If enrollment has no price, use the course price
                                 double amount = enrollment.getPaidAmount();
                                 if (amount <= 0) {
                                     amount = course.getPrice();
                                 }
-                                revenue += amount;
+                                if (isCurrentMonthEnrollment(enrollment)) {
+                                    monthlyTotal += amount;
+                                }
                             }
                         }
                     }
                 }
-                
+
                 totalStudents.setValue(String.valueOf(studentCount));
-                monthlyRevenue.setValue(String.format(Locale.US, "$%.0f", revenue));
+                monthlyRevenue.setValue(String.format(Locale.US, "$%.0f", monthlyTotal));
             }
             @Override public void onError(String message) {
                 totalStudents.setValue("0");
                 monthlyRevenue.setValue("$0");
             }
         });
+    }
+
+    private boolean isCurrentMonthEnrollment(Enrollment enrollment) {
+        String date = enrollment.getCreatedAt() != null ? enrollment.getCreatedAt() : enrollment.getEnrolledAt();
+        if (date == null || date.length() < 7) {
+            return false;
+        }
+
+        try {
+            int year = Integer.parseInt(date.substring(0, 4));
+            int month = Integer.parseInt(date.substring(5, 7));
+            Calendar now = Calendar.getInstance();
+            return year == now.get(Calendar.YEAR) && month == now.get(Calendar.MONTH) + 1;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private void fetchReviewStats(List<Course> courses) {
@@ -132,4 +229,7 @@ public class InstructorViewModel extends AndroidViewModel {
     public LiveData<String> getMonthlyRevenue() { return monthlyRevenue; }
     public LiveData<String> getAvgRating() { return avgRating; }
     public LiveData<String> getLiveCourses() { return liveCourses; }
+    public LiveData<List<Course>> getInstructorCourses() { return instructorCourses; }
+    public LiveData<Boolean> getLoading() { return loading; }
+    public LiveData<String> getErrorMessage() { return errorMessage; }
 }

@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_primary"
@@ -34,11 +33,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:layout_weight="1"
-            android:text="@string/edit_course_title"
+            android:text="@string/edit_lesson_title"
             android:textAppearance="@style/TextAppearance.App.Subtitle" />
 
         <TextView
-            android:id="@+id/btnSave"
+            android:id="@+id/btnSaveLesson"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:gravity="center"
@@ -47,11 +46,9 @@
             android:textAppearance="@style/TextAppearance.App.Action" />
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/courseDetailScroll"
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,122 +63,136 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/course_thumbnail"
-                android:textAppearance="@style/TextAppearance.App.Label.Accent" />
-
-            <ImageView
-                android:id="@+id/ivThumbnailPreview"
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/bg_tertiary"
-                android:scaleType="centerCrop"
-                android:src="@drawable/image_courses" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPickThumbnail"
-                style="@style/Widget.App.Button.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="10dp"
-                android:text="@string/choose_thumbnail" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/course_title"
+                android:text="@string/lesson_title"
                 android:textAppearance="@style/TextAppearance.App.Label.Accent" />
 
             <EditText
-                android:id="@+id/etTitle"
+                android:id="@+id/etLessonTitle"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_input_square"
-                android:hint="@string/course_title_hint"
+                android:hint="@string/lesson_title_hint"
                 android:paddingHorizontal="12dp"
                 android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_hint" />
+                android:textColorHint="@color/text_hint"
+                android:textSize="15sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/description"
+                android:text="@string/video_file"
+                android:textAppearance="@style/TextAppearance.App.Label.Accent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvVideoFileName"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_input_square"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/no_video_selected"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChooseVideo"
+                    style="@style/Widget.App.Button.Secondary"
+                    android:layout_width="96dp"
+                    android:layout_height="50dp"
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/choose" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeleteVideo"
+                    style="@style/Widget.App.Button.Danger"
+                    android:layout_width="88dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:paddingHorizontal="6dp"
+                    android:text="@string/delete"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/lesson_description"
                 android:textAppearance="@style/TextAppearance.App.Label.Accent" />
 
             <EditText
-                android:id="@+id/etDescription"
+                android:id="@+id/etLessonDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_input_square"
                 android:gravity="top"
-                android:hint="@string/course_description_hint"
-                android:minHeight="110dp"
+                android:hint="@string/lesson_description_hint"
+                android:minHeight="120dp"
                 android:padding="12dp"
                 android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_hint" />
+                android:textColorHint="@color/text_hint"
+                android:textSize="15sp" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/price"
-                android:textAppearance="@style/TextAppearance.App.Label.Accent" />
-
-            <EditText
-                android:id="@+id/etPrice"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_input_square"
-                android:hint="0"
-                android:inputType="numberDecimal"
-                android:paddingHorizontal="12dp"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_hint" />
-
-            <LinearLayout
+                android:id="@+id/tvAttachmentsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:text="@string/attachments"
+                android:textAppearance="@style/TextAppearance.App.Label.Accent" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/chapters"
-                    android:textAppearance="@style/TextAppearance.App.Label.Accent" />
-
-                <TextView
-                    android:id="@+id/tvChapterCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/chapter_count_empty"
-                    android:textAppearance="@style/TextAppearance.App.Caption" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvChapters"
+            <LinearLayout
+                android:id="@+id/llAttachments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_instructor_chapter" />
+                android:orientation="vertical" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddChapter"
+                android:id="@+id/btnAddAttachment"
                 style="@style/Widget.App.Button.Secondary"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="4dp"
-                android:text="@string/add_chapter" />
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/add_attachment" />
+
+            <TextView
+                android:id="@+id/tvQuizTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/quiz"
+                android:textAppearance="@style/TextAppearance.App.Label.Accent" />
+
+            <LinearLayout
+                android:id="@+id/llQuizContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddQuiz"
+                style="@style/Widget.App.Button.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/add_quiz_question" />
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
