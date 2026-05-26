@@ -18,6 +18,7 @@ public class ReportViewModel extends AndroidViewModel {
     private final EnrollmentRepository enrollmentRepository;
     
     private final MutableLiveData<List<Report>> reports = new MutableLiveData<>();
+    private final MutableLiveData<List<Enrollment>> enrollments = new MutableLiveData<>();
     private final MutableLiveData<String> totalAnnualRevenue = new MutableLiveData<>();
     private final MutableLiveData<String> revenueTrend = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -51,12 +52,15 @@ public class ReportViewModel extends AndroidViewModel {
     public void fetchRevenueStats() {
         enrollmentRepository.getAll(new EnrollmentRepository.RepositoryCallback<List<Enrollment>>() {
             @Override
-            public void onSuccess(List<Enrollment> enrollments) {
+            public void onSuccess(List<Enrollment> enrollmentsList) {
                 double total = 0;
-                if (enrollments != null) {
-                    for (Enrollment e : enrollments) {
+                if (enrollmentsList != null) {
+                    for (Enrollment e : enrollmentsList) {
                         total += e.getPaidAmount();
                     }
+                    enrollments.setValue(enrollmentsList);
+                } else {
+                    enrollments.setValue(new ArrayList<>());
                 }
                 totalAnnualRevenue.setValue(String.format(Locale.US, "$%,.2f", total));
                 revenueTrend.setValue("Total Lifetime Revenue");
@@ -66,11 +70,13 @@ public class ReportViewModel extends AndroidViewModel {
             public void onError(String message) {
                 totalAnnualRevenue.setValue("$0.00");
                 revenueTrend.setValue("Error loading revenue");
+                enrollments.setValue(new ArrayList<>());
             }
         });
     }
 
     public LiveData<List<Report>> getReports() { return reports; }
+    public LiveData<List<Enrollment>> getEnrollments() { return enrollments; }
     public LiveData<String> getTotalAnnualRevenue() { return totalAnnualRevenue; }
     public LiveData<String> getRevenueTrend() { return revenueTrend; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
