@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.UserAdapter;
 import com.example.myapplication.viewmodels.UserManageViewModel;
+import android.content.Intent;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class UserManageActivity extends AppCompatActivity {
 
@@ -50,5 +52,33 @@ public class UserManageActivity extends AppCompatActivity {
         findViewById(R.id.tvFilterInstructor).setOnClickListener(v -> viewModel.filterUsers("Instructor"));
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        setupBottomNav(bottomNav);
+    }
+
+    private void setupBottomNav(BottomNavigationView bottomNav) {
+        bottomNav.setSelectedItemId(R.id.nav_admin_users);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_admin_users) {
+                return true;
+            }
+            Intent intent;
+            if (id == R.id.nav_admin_home) {
+                intent = new Intent(this, AdminDashboardActivity.class);
+            } else if (id == R.id.nav_admin_approval) {
+                intent = new Intent(this, CourseApprovalActivity.class);
+            } else if (id == R.id.nav_admin_reports) {
+                intent = new Intent(this, ReportActivity.class);
+            } else if (id == R.id.nav_admin_account) {
+                intent = new Intent(this, com.example.myapplication.activities.common.AccountActivity.class);
+            } else {
+                return false;
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            return true;
+        });
     }
 }

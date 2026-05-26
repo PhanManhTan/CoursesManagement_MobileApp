@@ -9,6 +9,8 @@ import com.example.myapplication.R;
 import com.example.myapplication.adapters.CourseApprovalAdapter;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.viewmodels.CourseApprovalViewModel;
+import android.content.Intent;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class CourseApprovalActivity extends AppCompatActivity {
 
@@ -43,5 +45,33 @@ public class CourseApprovalActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        setupBottomNav(bottomNav);
+    }
+
+    private void setupBottomNav(BottomNavigationView bottomNav) {
+        bottomNav.setSelectedItemId(R.id.nav_admin_approval);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_admin_approval) {
+                return true;
+            }
+            Intent intent;
+            if (id == R.id.nav_admin_home) {
+                intent = new Intent(this, AdminDashboardActivity.class);
+            } else if (id == R.id.nav_admin_users) {
+                intent = new Intent(this, UserManageActivity.class);
+            } else if (id == R.id.nav_admin_reports) {
+                intent = new Intent(this, ReportActivity.class);
+            } else if (id == R.id.nav_admin_account) {
+                intent = new Intent(this, com.example.myapplication.activities.common.AccountActivity.class);
+            } else {
+                return false;
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            return true;
+        });
     }
 }

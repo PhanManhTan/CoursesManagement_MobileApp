@@ -32,7 +32,7 @@ public class RetrofitClient {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(BuildConfig.DEBUG
-                    ? HttpLoggingInterceptor.Level.BASIC
+                    ? HttpLoggingInterceptor.Level.BODY
                     : HttpLoggingInterceptor.Level.NONE);
 
             SessionManager sessionManager = new SessionManager(context.getApplicationContext());
