@@ -25,10 +25,11 @@
             app:tint="@color/text_primary" />
 
         <TextView
+            android:id="@+id/tvCourseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Java Mobile"
+            android:text="Course Title"
             android:textColor="@color/text_primary"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -92,14 +93,60 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <Button
+        android:id="@+id/btnAddDiscussion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/accent"
+        android:text="Add Discussion"
+        android:textAllCaps="false"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScroll" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filterScroll"
+        app:layout_constraintBottom_toTopOf="@+id/layoutCommentInput"
+        app:layout_constraintTop_toBottomOf="@id/btnAddDiscussion"
         tools:listitem="@layout/item_lesson_learning"
         tools:itemCount="5"/>
+
+    <LinearLayout
+        android:id="@+id/layoutCommentInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_secondary"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <EditText
+            android:id="@+id/etCommentInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="Add a discussion..."
+            android:textColorHint="@color/text_secondary"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:padding="8dp"/>
+
+        <ImageView
+            android:id="@+id/btnSendComment"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:padding="4dp"
+            app:srcCompat="@android:drawable/ic_menu_send"
+            app:tint="@color/accent" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

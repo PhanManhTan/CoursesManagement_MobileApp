@@ -60,6 +60,10 @@ public class User {
         this.fullName = fullName;
     }
 
+    public String getName() {
+        return fullName;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cvLessonContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="#252628"
@@ -18,7 +19,8 @@
         <androidx.cardview.widget.CardView
             android:layout_width="80dp"
             android:layout_height="50dp"
-            app:cardCornerRadius="8dp">
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#333333">
             <ImageView
                 android:id="@+id/ivLessonThumb"
                 android:layout_width="match_parent"
@@ -49,13 +51,29 @@
                 android:layout_height="wrap_content"
                 android:text="14:20 • Complete"
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:layout_marginTop="2dp" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@android:drawable/ic_menu_more"
-            app:tint="#8E8E93" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp">
+
+            <ImageView
+                android:id="@+id/ivPlayIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_play_circle"
+                app:tint="@color/accent" />
+
+            <ImageView
+                android:id="@+id/ivLockIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock"
+                app:tint="#8E8E93"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

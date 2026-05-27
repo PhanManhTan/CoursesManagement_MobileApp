@@ -143,6 +143,7 @@ public class LessonRepository {
         payload.put("video_url", hasValue(lesson.getVideoUrl()) ? lesson.getVideoUrl() : null);
         payload.put("document_url", hasValue(lesson.getDocumentUrl()) ? lesson.getDocumentUrl() : null);
         payload.put("order_index", lesson.getOrderIndex() > 0 ? lesson.getOrderIndex() : 1);
+        payload.put("duration_seconds", lesson.getDurationSeconds());
         payload.put("content", lesson.getContent());
         return payload;
     }

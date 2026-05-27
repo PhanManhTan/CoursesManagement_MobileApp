@@ -11,23 +11,21 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface CommentApi {
-    // Get all Comments
     @GET("comments?select=*")
     Call<List<Comment>> getAll();
 
-    // Get Comment by ID
     @GET("comments?select=*")
     Call<List<Comment>> getById(@Query("id") String idFilter);
 
-    // Insert new Comment
+    @GET("comments?select=*,users(id,full_name,avatar_url)&order=created_at.asc")
+    Call<List<Comment>> getByLessonId(@Query("lesson_id") String lessonIdFilter);
+
     @POST("comments")
     Call<Void> insert(@Body Comment comment);
 
-    // Update Comment by ID
     @PATCH("comments")
     Call<Void> update(@Query("id") String idFilter, @Body Comment comment);
 
-    // Delete Comment by ID
     @DELETE("comments")
     Call<Void> delete(@Query("id") String idFilter);
 }

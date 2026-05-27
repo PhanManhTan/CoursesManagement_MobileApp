@@ -18,11 +18,9 @@ public class CommentRepository {
     }
 
     public CommentRepository(Context context) {
-        // Initialize CommentApi using RetrofitClient
         this.commentApi = RetrofitClient.getClient(context).create(CommentApi.class);
     }
 
-    // Get all Comments from remote
     public void getAll(RepositoryCallback<List<Comment>> callback) {
         commentApi.getAll().enqueue(new Callback<List<Comment>>() {
             @Override
@@ -41,7 +39,6 @@ public class CommentRepository {
         });
     }
 
-    // Get Comment by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<Comment> callback) {
         commentApi.getById("eq." + id).enqueue(new Callback<List<Comment>>() {
             @Override
@@ -60,7 +57,24 @@ public class CommentRepository {
         });
     }
 
-    // Insert new Comment to remote
+    public void getByLessonId(String lessonId, RepositoryCallback<List<Comment>> callback) {
+        commentApi.getByLessonId("eq." + lessonId).enqueue(new Callback<List<Comment>>() {
+            @Override
+            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     public void insert(Comment comment, RepositoryCallback<Void> callback) {
         commentApi.insert(comment).enqueue(new Callback<Void>() {
             @Override
@@ -79,7 +93,6 @@ public class CommentRepository {
         });
     }
 
-    // Update Comment by ID on remote
     public void update(String id, Comment comment, RepositoryCallback<Void> callback) {
         commentApi.update("eq." + id, comment).enqueue(new Callback<Void>() {
             @Override
@@ -98,7 +111,6 @@ public class CommentRepository {
         });
     }
 
-    // Delete Comment by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
         commentApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override

@@ -279,7 +279,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:background="@color/design_default_color_primary"
+                app:backgroundTint="@color/design_default_color_primary"
                 android:text="Enroll Now" />
 
         </LinearLayout>

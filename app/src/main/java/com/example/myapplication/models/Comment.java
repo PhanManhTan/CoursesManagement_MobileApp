@@ -21,6 +21,9 @@ public class Comment {
     @SerializedName("created_at")
     private String createdAt;
 
+    @SerializedName("users")
+    private User users;
+
     public Comment() {
     }
 
@@ -79,5 +82,13 @@ public class Comment {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public User getUsers() {
+        return users;
+    }
+
+    public void setUsers(User users) {
+        this.users = users;
     }
 }

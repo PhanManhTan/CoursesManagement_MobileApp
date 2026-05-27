@@ -11,27 +11,24 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface EnrollmentApi {
-    // Get all Enrollments with nested course data
-    @GET("enrollments?select=*,courses(*)")
+    @GET("enrollment_progress_view?select=*,courses(*)")
     Call<List<Enrollment>> getAll();
 
-    // Get Enrollments by User ID with nested course data
-    @GET("enrollments?select=*,courses(*)")
+    @GET("enrollment_progress_view?select=*,courses(*)")
     Call<List<Enrollment>> getByUserId(@Query("user_id") String userIdFilter);
 
-    // Get Enrollment by ID
-    @GET("enrollments?select=*")
+    @GET("enrollment_progress_view?select=*")
     Call<List<Enrollment>> getById(@Query("id") String idFilter);
 
-    // Insert new Enrollment
     @POST("enrollments")
     Call<Void> insert(@Body Enrollment enrollment);
 
-    // Update Enrollment by ID
     @PATCH("enrollments")
     Call<Void> update(@Query("id") String idFilter, @Body Enrollment enrollment);
 
-    // Delete Enrollment by ID
     @DELETE("enrollments")
     Call<Void> delete(@Query("id") String idFilter);
+
+    @GET("enrollments?select=id")
+    Call<List<Object>> checkEnrollment(@Query("user_id") String userIdFilter, @Query("course_id") String courseIdFilter);
 }

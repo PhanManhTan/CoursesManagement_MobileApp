@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,11 +13,8 @@ import com.example.myapplication.R;
 import com.example.myapplication.adapters.CategoryAdapter;
 import com.example.myapplication.adapters.CourseAdapter;
 import com.example.myapplication.viewmodels.HomeViewModel;
-import com.example.myapplication.activities.student.MyCoursesActivity;
 import com.example.myapplication.activities.student.SearchActivity;
-import com.example.myapplication.activities.common.AccountActivity;
-import com.example.myapplication.activities.common.NotificationActivity;
-
+import com.example.myapplication.utils.BottomNavigationHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -29,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
     private CategoryAdapter categoryAdapter;
     private CourseAdapter courseAdapter;
     private HomeViewModel homeViewModel;
+    private String userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,55 +37,37 @@ public class HomeActivity extends AppCompatActivity {
         rvCategories = findViewById(R.id.rvCategories);
         rvFeaturedCourses = findViewById(R.id.rvFeaturedCourses);
 
+        userEmail = getIntent().getStringExtra("email");
+
         setupRecyclerViews();
-        
+
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getCategories().observe(this, categories -> categoryAdapter.setCategories(categories));
         homeViewModel.getFeaturedCourses().observe(this, courses -> courseAdapter.setCourses(courses));
 
-        String email = getIntent().getStringExtra("email");
-        if (email != null && !email.isEmpty()) {
-            String name = email.split("@")[0];
+        if (userEmail != null && !userEmail.isEmpty()) {
+            String name = userEmail.split("@")[0];
             tvWelcome.setText("Welcome, " + capitalize(name));
         }
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                // already home
-                return true;
-            } else if (id == R.id.nav_search) {
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            } else if (id == R.id.nav_courses) {
-                startActivity(new Intent(this, MyCoursesActivity.class));
-                return true;
-            } else if (id == R.id.nav_notification) {
-                startActivity(new Intent(this, NotificationActivity.class));
-                return true;
-            } else if (id == R.id.nav_account) {
-                Intent accountIntent = new Intent(this, AccountActivity.class);
-                accountIntent.putExtra("email", getIntent().getStringExtra("email"));
-                startActivity(accountIntent);
-                return true;
-            }
-            return false;
-        });
+        bottomNav.setSelectedItemId(R.id.nav_home);
+        BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
     }
 
     private void setupRecyclerViews() {
         categoryAdapter = new CategoryAdapter();
-        // Link category click to SearchActivity with category name
         categoryAdapter.setOnItemClickListener(category -> {
             Intent intent = new Intent(this, SearchActivity.class);
-            intent.putExtra("category_name", category.getName());
+            intent.putExtra("category_id", category.getId());
+            if (userEmail != null && !userEmail.isEmpty()) {
+                intent.putExtra("email", userEmail);
+            }
             startActivity(intent);
         });
         rvCategories.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvCategories.setAdapter(categoryAdapter);
 
         courseAdapter = new CourseAdapter();
-        // Link course click to CourseDetailActivity
         courseAdapter.setOnItemClickListener(course -> {
             Intent intent = new Intent(this, com.example.myapplication.activities.student.CourseDetailActivity.class);
             intent.putExtra("COURSE_ID", course.getId());
