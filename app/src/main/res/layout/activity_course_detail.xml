@@ -9,11 +9,11 @@
 
     <LinearLayout
         android:id="@+id/headerBar"
-        android:layout_width="406dp"
+        android:layout_width="match_parent"
         android:layout_height="62dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -28,19 +28,55 @@
 
         <TextView
             android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:text="Course Details"
             android:textColor="@color/text_primary"
-            android:textSize="26sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
+
+        <!-- Cart Badge Container -->
+        <FrameLayout
+            android:id="@+id/btnCartContainer"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/btnCart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:src="@drawable/ic_cart"
+                app:tint="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/tvCartBadge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_circle_play"
+                android:backgroundTint="@color/status_error"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/text_primary"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollDetail"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Lập trình Android Java"
+                android:text="Course Title"
                 android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -81,7 +117,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="70.000đ"
+                    android:text="0đ"
                     android:textColor="@color/accent_light"
                     android:textSize="26sp"
                     android:textStyle="bold" />
@@ -91,7 +127,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="100.000đ"
+                    android:text="0đ"
                     android:textColor="@color/text_secondary"
                     android:textSize="16sp" />
 
@@ -99,7 +135,7 @@
                     android:id="@+id/tvPerDiscount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="30% OFF"
+                    android:text="0% OFF"
                     android:textColor="@color/accent_light" />
             </LinearLayout>
 
@@ -113,13 +149,12 @@
                     android:id="@+id/containerCourseDuration"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
-                    android:background="@color/cardview_dark_background"
+                    android:background="@drawable/bg_rounded_dark"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="8dp">
 
                     <ImageView
-                        android:id="@+id/icCourseDuration"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:tint="@color/accent_light"
@@ -130,7 +165,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="12 Hours Content"
+                        android:text="12 Hours"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
@@ -138,13 +173,12 @@
                     android:id="@+id/containerRating"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
-                    android:background="@color/cardview_dark_background"
+                    android:background="@drawable/bg_rounded_dark"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="8dp">
 
                     <ImageView
-                        android:id="@+id/icRating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:tint="@color/accent_light"
@@ -155,7 +189,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="4.9 (2k Reviews)"
+                        android:text="4.9"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
@@ -163,29 +197,27 @@
                     android:id="@+id/containerCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
-                    android:background="@color/cardview_dark_background"
+                    android:background="@drawable/bg_rounded_dark"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="8dp">
 
                     <ImageView
-                        android:id="@+id/icCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:tint="@color/accent_light"
-                        app:srcCompat="?attr/actionModePasteDrawable" />
+                        app:srcCompat="@drawable/outline_article_24" />
 
                     <TextView
                         android:id="@+id/tvCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="Category: IT"
+                        android:text="IT"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
                 <androidx.constraintlayout.helper.widget.Flow
-                    android:id="@+id/flowDetail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:constraint_referenced_ids="containerCourseDuration,containerRating,containerCategory"
@@ -200,19 +232,17 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
-                android:id="@+id/desArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/tvDesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="About the course"
                     android:textColor="@color/text_primary"
-                    android:textSize="26sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -220,15 +250,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Master the 2026 AI Toolstack: Expertly use Google Gemini, Grok, Sora 2, KLING AI, and Veo 3 for professional video production..."
+                    android:text="Description..."
                     android:textColor="@color/text_primary" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/containerTeacher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start|top|center_vertical"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="16dp">
 
@@ -238,10 +267,9 @@
                     android:layout_height="60dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircleImage"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    android:src="@drawable/ic_user" />
 
                 <LinearLayout
-                    android:id="@+id/teacherInfoArea"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -251,7 +279,7 @@
                         android:id="@+id/tvTeacherName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Mohamed Sela"
+                        android:text="Instructor Name"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -260,8 +288,8 @@
                         android:id="@+id/textView6"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Senior Android Developer"
-                        android:textColor="@color/text_primary"
+                        android:text="Senior Developer"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -270,19 +298,42 @@
                 android:id="@+id/rvLessons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/item_chapter"
-                tools:itemCount="3"/>
-
-            <Button
-                android:id="@+id/btnEnroll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                app:backgroundTint="@color/design_default_color_primary"
-                android:text="Enroll Now" />
+                android:layout_marginBottom="16dp"
+                tools:listitem="@layout/item_chapter" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Action Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@color/bg_secondary"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnAddToCart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Add to Cart"
+            android:textColor="@color/text_primary"
+            android:backgroundTint="@color/bg_primary"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/accent_light" />
+
+        <Button
+            android:id="@+id/btnEnroll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Enroll Now"
+            android:backgroundTint="@color/accent_pressed"
+            android:textColor="@color/text_primary" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

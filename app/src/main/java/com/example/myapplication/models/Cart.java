@@ -12,6 +12,10 @@ public class Cart {
     @SerializedName("course_id")
     private String courseId;
 
+    // Supabase Join: select=*,courses(*)
+    @SerializedName("courses")
+    private Course course;
+
     public Cart() {
     }
 
@@ -43,5 +47,13 @@ public class Cart {
 
     public void setCourseId(String courseId) {
         this.courseId = courseId;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }

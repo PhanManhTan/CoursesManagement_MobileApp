@@ -13,25 +13,25 @@ import retrofit2.http.Query;
 
 public interface UserApi {
     // Get all Users
-    @GET("users?select=*")
+    @GET("/rest/v1/users?select=*")
     Call<List<User>> getAll();
 
     // Get User by ID
-    @GET("users?select=*")
+    @GET("/rest/v1/users?select=*")
     Call<List<User>> getById(@Query("id") String idFilter);
 
     // Insert new User
-    @POST("users")
+    @POST("/rest/v1/users")
     Call<Void> insert(@Body User user);
 
     // Update User by ID
-    @PATCH("users")
+    @PATCH("/rest/v1/users")
     Call<Void> update(@Query("id") String idFilter, @Body User user);
 
-    @PATCH("users")
+    @PATCH("/rest/v1/users")
     Call<Void> updateFields(@Query("id") String idFilter, @Body Map<String, Object> fields);
 
     // Delete User by ID
-    @DELETE("users")
+    @DELETE("/rest/v1/users")
     Call<Void> delete(@Query("id") String idFilter);
 }

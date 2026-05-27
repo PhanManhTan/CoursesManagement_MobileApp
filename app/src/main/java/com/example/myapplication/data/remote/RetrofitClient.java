@@ -31,9 +31,7 @@ public class RetrofitClient {
     public static Retrofit getClient(Context context) {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(BuildConfig.DEBUG
-                    ? HttpLoggingInterceptor.Level.BODY
-                    : HttpLoggingInterceptor.Level.NONE);
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY); // Luôn bật BODY để debug
 
             SessionManager sessionManager = new SessionManager(context.getApplicationContext());
             String apiKey = BuildConfig.SUPABASE_API_KEY;
@@ -67,17 +65,16 @@ public class RetrofitClient {
                     .addInterceptor(logging)
                     .build();
 
+            // SỬA LẠI BASE URL: Phải có /rest/v1/ ở cuối
             String baseUrl = BuildConfig.SUPABASE_URL;
-            if (baseUrl == null || baseUrl.isEmpty() || !baseUrl.startsWith("http")) {
-                baseUrl = "https://placeholder.supabase.co";
+            if (baseUrl != null) {
+                if (!baseUrl.endsWith("/")) baseUrl += "/";
+                if (!baseUrl.contains("/rest/v1/")) baseUrl += "rest/v1/";
+            } else {
+                baseUrl = "https://placeholder.supabase.co/rest/v1/";
             }
 
-            if (!baseUrl.endsWith("/")) {
-                baseUrl += "/";
-            }
-            if (!baseUrl.endsWith("rest/v1/")) {
-                baseUrl += "rest/v1/";
-            }
+            Log.d(TAG, "Retrofit Base URL: " + baseUrl);
 
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
