@@ -52,7 +52,7 @@ public class LearningChapterAdapter extends RecyclerView.Adapter<LearningChapter
                     if (duration > 0) {
                         isNextUnlocked = ((double) watchTime / duration) >= 0.8;
                     } else {
-                        isNextUnlocked = false;
+                        isNextUnlocked = true;
                     }
                 }
             }

@@ -138,4 +138,10 @@ public class MyCoursesActivity extends AppCompatActivity {
         }
         myCourseAdapter.setEnrollmentList(filteredList);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadMyCourses();
+    }
 }
