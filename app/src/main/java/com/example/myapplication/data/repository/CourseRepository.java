@@ -309,4 +309,22 @@ public class CourseRepository {
             payload.put(key, value);
         }
     }
+
+    public void searchByCategoryAndTitle(String categoryId, String query, RepositoryCallback<List<Course>> callback) {
+        courseApi.searchByCategoryAndTitle("eq." + categoryId, "ilike.*" + query + "*").enqueue(new Callback<List<Course>>() {
+            @Override
+            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError(getErrorMessage(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Course>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
 }

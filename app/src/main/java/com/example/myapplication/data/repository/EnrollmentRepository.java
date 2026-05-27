@@ -92,4 +92,22 @@ public class EnrollmentRepository {
             }
         });
     }
+
+    public void checkEnrollment(String userId, String courseId, RepositoryCallback<Boolean> callback) {
+        enrollmentApi.checkEnrollment("eq." + userId, "eq." + courseId).enqueue(new Callback<List<Object>>() {
+            @Override
+            public void onResponse(Call<List<Object>> call, Response<List<Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(!response.body().isEmpty());
+                } else {
+                    callback.onSuccess(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Object>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
 }

@@ -37,9 +37,6 @@ public class RetrofitClient {
 
             SessionManager sessionManager = new SessionManager(context.getApplicationContext());
             String apiKey = BuildConfig.SUPABASE_API_KEY;
-            if (apiKey == null || apiKey.trim().isEmpty()) {
-                Log.e(TAG, "Missing SUPABASE_API_KEY in local.properties");
-            }
 
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(chain -> {
@@ -70,10 +67,16 @@ public class RetrofitClient {
                     .addInterceptor(logging)
                     .build();
 
-            // Lấy URL từ BuildConfig (đã được cấu hình để đọc từ local.properties)
             String baseUrl = BuildConfig.SUPABASE_URL;
             if (baseUrl == null || baseUrl.isEmpty() || !baseUrl.startsWith("http")) {
-                baseUrl = "https://placeholder.supabase.co"; // Tránh crash nếu URL chưa được cấu hình
+                baseUrl = "https://placeholder.supabase.co";
+            }
+
+            if (!baseUrl.endsWith("/")) {
+                baseUrl += "/";
+            }
+            if (!baseUrl.endsWith("rest/v1/")) {
+                baseUrl += "rest/v1/";
             }
 
             retrofit = new Retrofit.Builder()

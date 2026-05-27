@@ -72,4 +72,10 @@ public interface CourseApi {
             @Query("id") String idFilter,
             @Query("instructor_id") String instructorFilter
     );
+
+    @GET("courses")
+    Call<List<Course>> searchByCategoryAndTitle(
+            @Query("category_id") String categoryId,
+            @Query("title") String title
+    );
 }

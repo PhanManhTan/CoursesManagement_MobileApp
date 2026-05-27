@@ -4,17 +4,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.activities.student.LearningActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.MyCourseAdapter;
 import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.models.Enrollment;
+import com.example.myapplication.utils.BottomNavigationHelper;
 import com.example.myapplication.utils.SessionManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +26,8 @@ import java.util.List;
 public class MyCoursesActivity extends AppCompatActivity {
 
     private RecyclerView rvMyCourses;
-    private ImageView btnBack;
     private Button btnFilterAll, btnFilterOnGoing, btnFilterCompleted;
+    private BottomNavigationView bottomNav;
     private MyCourseAdapter myCourseAdapter;
     private EnrollmentRepository enrollmentRepository;
     private SessionManager sessionManager;
@@ -43,15 +47,22 @@ public class MyCoursesActivity extends AppCompatActivity {
 
         loadMyCourses();
 
-        btnBack.setOnClickListener(v -> finish());
+        bottomNav.setSelectedItemId(R.id.bottomNav);
+        BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+            }
+        });
     }
 
     private void initViews() {
         rvMyCourses = findViewById(R.id.rvMyCourses);
-        btnBack = findViewById(R.id.btnBack);
         btnFilterAll = findViewById(R.id.btnFilterAll);
         btnFilterOnGoing = findViewById(R.id.btnFilterOnGoing);
         btnFilterCompleted = findViewById(R.id.btnFilterCompleted);
+        bottomNav = findViewById(R.id.bottomNav);
     }
 
     private void setupRecyclerView() {
@@ -87,11 +98,10 @@ public class MyCoursesActivity extends AppCompatActivity {
     }
 
     private void updateFilterButtons(Button activeBtn) {
-        // Simple UI feedback for active filter
         btnFilterAll.setBackgroundTintList(getColorStateList(R.color.bg_secondary));
         btnFilterOnGoing.setBackgroundTintList(getColorStateList(R.color.bg_secondary));
         btnFilterCompleted.setBackgroundTintList(getColorStateList(R.color.bg_secondary));
-        
+
         activeBtn.setBackgroundTintList(getColorStateList(R.color.accent));
     }
 
@@ -119,7 +129,10 @@ public class MyCoursesActivity extends AppCompatActivity {
     private void filterEnrollments(String status) {
         List<Enrollment> filteredList = new ArrayList<>();
         for (Enrollment e : allEnrollments) {
-            if (status.equals(e.getStatus())) {
+            boolean isCourseCompleted = e.getTotalLessons() > 0 && e.getProgress() == e.getTotalLessons();
+            if (status.equals("completed") && isCourseCompleted) {
+                filteredList.add(e);
+            } else if (status.equals("ongoing") && !isCourseCompleted) {
                 filteredList.add(e);
             }
         }

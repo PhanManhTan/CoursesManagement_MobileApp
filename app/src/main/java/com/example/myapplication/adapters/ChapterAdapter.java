@@ -96,7 +96,9 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                     TextView tvTime = lessonView.findViewById(R.id.tvLessonDuration);
 
                     tvTitle.setText(lesson.getTitle());
-                    tvTime.setText(lesson.getDuration() != null ? lesson.getDuration() : "");
+                    
+                    String durationStr = formatDuration(lesson.getDurationSeconds());
+                    tvTime.setText(durationStr);
 
                     container.addView(lessonView);
                 }
@@ -107,6 +109,13 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                 // Handle error
             }
         });
+    }
+
+    private String formatDuration(int seconds) {
+        if (seconds <= 0) return "";
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        return String.format("%02d:%02d", minutes, remainingSeconds);
     }
 
     @Override

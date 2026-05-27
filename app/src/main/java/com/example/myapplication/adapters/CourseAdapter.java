@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Course;
-import com.example.myapplication.utils.MockData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,22 +42,15 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Course course = courses.get(position);
         holder.tvTitle.setText(course.getTitle());
-        
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(course);
         });
-        
-        String instructorName = "Unknown Instructor";
-        if (course.getInstructorId() != null) {
-            com.example.myapplication.models.User instructor = MockData.getUserById(course.getInstructorId());
-            if (instructor != null) {
-                instructorName = instructor.getFullName();
-            }
-        }
-        holder.tvInstructor.setText(instructorName);
-        
+
+        holder.tvInstructor.setText("Instructor");
+
         holder.tvPrice.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));
-        
+
         if (course.getDiscountPrice() > 0) {
             holder.tvOriginalPrice.setVisibility(View.VISIBLE);
             holder.tvOriginalPrice.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));

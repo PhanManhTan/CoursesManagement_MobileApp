@@ -54,11 +54,11 @@ public class MockData {
     public static List<Lesson> getLessons(String chapterId) {
         List<Lesson> lessons = new ArrayList<>();
         if ("ch1".equals(chapterId)) {
-            lessons.add(new Lesson("l1", "ch1", "Setting up Android Studio", "video", "https://example.com/video1", null, 1, "2023-06-01"));
-            lessons.add(new Lesson("l2", "ch1", "Understanding Project Structure", "video", "https://example.com/video2", null, 2, "2023-06-01"));
+            lessons.add(new Lesson("l1", "ch1", "Setting up Android Studio", "video", "https://example.com/video1", null, 1, "2023-06-01", 5));
+            lessons.add(new Lesson("l2", "ch1", "Understanding Project Structure", "video", "https://example.com/video2", null, 2, "2023-06-01", 5));
         } else {
-            lessons.add(new Lesson("l_other", chapterId, "Standard Lesson", "video", null, null, 1, "2023-06-01"));
-            lessons.add(new Lesson("l_other_2", chapterId, "Supplementary Material", "document", null, "https://example.com/doc", 2, "2023-06-01"));
+            lessons.add(new Lesson("l_other", chapterId, "Standard Lesson", "video", null, null, 1, "2023-06-01", 5));
+            lessons.add(new Lesson("l_other_2", chapterId, "Supplementary Material", "document", null, "https://example.com/doc", 2, "2023-06-01", 5));
         }
         return lessons;
     }

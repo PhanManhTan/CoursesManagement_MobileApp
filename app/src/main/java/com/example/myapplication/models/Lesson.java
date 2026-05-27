@@ -32,8 +32,8 @@ public class Lesson implements Serializable {
     @SerializedName("created_at")
     private String createdAt;
 
-    @SerializedName("duration")
-    private String duration;
+    @SerializedName("duration_seconds")
+    private int durationSeconds;
 
     @SerializedName("content")
     private Object content;
@@ -48,7 +48,7 @@ public class Lesson implements Serializable {
     public Lesson() {
     }
 
-    public Lesson(String id, String chapterId, String title, String contentType, String videoUrl, String documentUrl, int orderIndex, String createdAt) {
+    public Lesson(String id, String chapterId, String title, String contentType, String videoUrl, String documentUrl, int orderIndex, String createdAt, int durationSeconds) {
         this.id = id;
         this.chapterId = chapterId;
         this.title = title;
@@ -57,12 +57,13 @@ public class Lesson implements Serializable {
         this.documentUrl = documentUrl;
         this.orderIndex = orderIndex;
         this.createdAt = createdAt;
+        this.durationSeconds = durationSeconds;
     }
 
-    public Lesson(String id, String title, String duration) {
+    public Lesson(String id, String title, int durationSeconds) {
         this.id = id;
         this.title = title;
-        this.duration = duration;
+        this.durationSeconds = durationSeconds;
     }
 
     public String getId() {
@@ -129,12 +130,12 @@ public class Lesson implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getDuration() {
-        return duration;
+    public int getDurationSeconds() {
+        return durationSeconds;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public void setDurationSeconds(int durationSeconds) {
+        this.durationSeconds = durationSeconds;
     }
 
     public Object getContent() {
@@ -228,7 +229,7 @@ public class Lesson implements Serializable {
         copy.setDocumentUrl(documentUrl);
         copy.setOrderIndex(orderIndex);
         copy.setCreatedAt(createdAt);
-        copy.setDuration(duration);
+        copy.setDurationSeconds(durationSeconds);
         copy.setContent(deepCopyValue(content));
         copy.setLocalVideoFile(localVideoName, localVideoUri);
         copy.setLocalThumbnailFile(localThumbnailName, localThumbnailUri);
@@ -237,7 +238,6 @@ public class Lesson implements Serializable {
         return copy;
     }
 
-    @SuppressWarnings("unchecked")
     private Object deepCopyValue(Object value) {
         if (value instanceof Map) {
             Map<String, Object> copiedMap = new HashMap<>();
