@@ -18,6 +18,7 @@
             android:padding="24dp"
             android:gravity="center_horizontal">
 
+            <!-- Header from Teammate with User's Back Icon style -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -31,7 +32,8 @@
                     android:layout_centerVertical="true"
                     android:padding="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_revert"
+                    app:srcCompat="@drawable/outline_arrow_back_24"
+                    app:tint="#FFFFFF"
                     android:contentDescription="Back" />
 
                 <TextView
@@ -44,12 +46,34 @@
                     android:textColor="@color/text_primary"/>
             </RelativeLayout>
 
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@android:drawable/ic_menu_camera"
+            <!-- Avatar with Update Button from User -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp">
+
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:padding="2dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_rounded_dark" />
+
+                <ImageView
+                    android:id="@+id/btnUpdateAvatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_circle_play"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:padding="6dp"
+                    android:elevation="4dp"
+                    android:backgroundTint="@color/accent_pressed"
+                    android:contentDescription="Update Avatar" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvFullName"
@@ -67,7 +91,36 @@
                 android:text="student@example.com"
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
-                android:layout_marginBottom="32dp"/>
+                android:layout_marginBottom="24dp"
+                android:layout_marginTop="4dp"/>
+
+            <!-- Bio Section from User -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_rounded_dark"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="32dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BIO"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvBio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No bio available"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnEditProfile"
@@ -100,5 +153,4 @@
         app:itemTextColor="#FFFFFF"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/admin_nav_menu"/>
-
 </RelativeLayout>

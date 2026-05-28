@@ -46,7 +46,10 @@ public class SupabaseStorageRepository {
         this.sessionManager = new SessionManager(this.context);
     }
 
-    public void upload(Uri fileUri, String displayName, String folder, RepositoryCallback<String> callback) {
+    /**
+     * @param bucketName Tên bucket trên Supabase (ví dụ: "avatars")
+     */
+    public void upload(Uri fileUri, String displayName, String bucketName, RepositoryCallback<String> callback) {
         if (fileUri == null) {
             callback.onError("No file selected");
             return;
@@ -64,8 +67,10 @@ public class SupabaseStorageRepository {
             return;
         }
 
-        String bucket = getBucketName();
-        String objectPath = buildObjectPath(folder, displayName, fileUri);
+        String bucket = hasValue(bucketName) ? bucketName : getBucketName();
+
+        String objectPath = buildObjectPath("", displayName, fileUri);
+
         String mimeType = context.getContentResolver().getType(fileUri);
         if (!hasValue(mimeType)) {
             mimeType = "application/octet-stream";
@@ -76,6 +81,9 @@ public class SupabaseStorageRepository {
                 + encodePath(bucket)
                 + "/"
                 + encodePath(objectPath);
+                
+        Log.d(TAG, "Uploading to Bucket: " + bucket + " | Path: " + objectPath);
+
         RequestBody fileBody = new UriRequestBody(
                 context.getContentResolver(),
                 fileUri,
@@ -88,7 +96,6 @@ public class SupabaseStorageRepository {
                 .header("apikey", Constants.SUPABASE_API_KEY)
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", mimeType)
-                .header("cache-control", "3600")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -105,7 +112,7 @@ public class SupabaseStorageRepository {
                 response.close();
 
                 if (!successful) {
-                    Log.e(TAG, "Upload failed: " + responseBody);
+                    Log.e(TAG, "Upload failed (" + statusCode + "): " + responseBody);
                     callback.onError(parseUploadError(responseBody, statusCode));
                     return;
                 }
@@ -118,102 +125,58 @@ public class SupabaseStorageRepository {
     private String getProjectBaseUrl() {
         String supabaseUrl = Constants.SUPABASE_URL;
         if (!hasValue(supabaseUrl)) return "";
-
         Uri uri = Uri.parse(supabaseUrl);
-        if (!hasValue(uri.getScheme()) || !hasValue(uri.getHost())) {
-            return "";
-        }
         return uri.getScheme() + "://" + uri.getHost();
     }
 
     private String getBucketName() {
-        return hasValue(Constants.SUPABASE_STORAGE_BUCKET)
-                ? Constants.SUPABASE_STORAGE_BUCKET
-                : DEFAULT_BUCKET;
+        return hasValue(Constants.SUPABASE_STORAGE_BUCKET) ? Constants.SUPABASE_STORAGE_BUCKET : DEFAULT_BUCKET;
     }
 
     private String buildObjectPath(String folder, String displayName, Uri fileUri) {
         String userFolder = sanitizePathPart(sessionManager.getUserId());
-        if (!hasValue(userFolder)) {
-            userFolder = "anonymous";
-        }
+        if (!hasValue(userFolder)) userFolder = "anonymous";
 
-        String safeFolder = normalizeFolder(folder);
         String safeFileName = sanitizeFileName(hasValue(displayName) ? displayName : getDisplayName(fileUri));
-        String uniqueName = System.currentTimeMillis() + "_" + UUID.randomUUID() + "_" + safeFileName;
+        String uniqueName = System.currentTimeMillis() + "_" + safeFileName;
 
-        if (hasValue(safeFolder)) {
-            return userFolder + "/" + safeFolder + "/" + uniqueName;
+        if (hasValue(folder)) {
+            return sanitizePathPart(folder) + "/" + userFolder + "/" + uniqueName;
         }
         return userFolder + "/" + uniqueName;
     }
 
-    private String normalizeFolder(String folder) {
-        if (!hasValue(folder)) return "";
-
-        String[] parts = folder.split("/");
-        StringBuilder builder = new StringBuilder();
-        for (String part : parts) {
-            String safePart = sanitizePathPart(part);
-            if (!hasValue(safePart)) continue;
-
-            if (builder.length() > 0) {
-                builder.append('/');
-            }
-            builder.append(safePart);
-        }
-        return builder.toString();
-    }
-
     private String sanitizeFileName(String name) {
-        String safeName = sanitizePathPart(name);
-        return hasValue(safeName) ? safeName : "selected-file";
+        return sanitizePathPart(name);
     }
 
     private String sanitizePathPart(String value) {
         if (!hasValue(value)) return "";
-        return value.trim()
-                .replaceAll("[\\\\/]+", "-")
-                .replaceAll("[^A-Za-z0-9._-]", "-")
-                .replaceAll("-+", "-");
+        return value.trim().replaceAll("[\\\\/]+", "-").replaceAll("[^A-Za-z0-9._-]", "-");
     }
 
     private String encodePath(String path) {
+        if (!hasValue(path)) return "";
         String[] parts = path.split("/");
         StringBuilder builder = new StringBuilder();
         for (String part : parts) {
-            if (builder.length() > 0) {
-                builder.append('/');
-            }
+            if (builder.length() > 0) builder.append('/');
             builder.append(Uri.encode(part));
         }
         return builder.toString();
     }
 
     private String buildPublicUrl(String projectBaseUrl, String bucket, String objectPath) {
-        return projectBaseUrl
-                + "/storage/v1/object/public/"
-                + encodePath(bucket)
-                + "/"
-                + encodePath(objectPath);
+        return projectBaseUrl + "/storage/v1/object/public/" + encodePath(bucket) + "/" + encodePath(objectPath);
     }
 
     private String parseUploadError(String responseBody, int statusCode) {
-        if (!hasValue(responseBody)) {
-            return "Supabase Storage upload failed: " + statusCode;
-        }
         try {
             JSONObject json = new JSONObject(responseBody);
-            String message = json.optString("message", "");
-            if (!hasValue(message)) {
-                message = json.optString("error", "");
-            }
-            if (hasValue(message)) {
-                return "Supabase Storage upload failed: " + message;
-            }
-        } catch (JSONException ignored) {
+            return json.optString("message", json.optString("error", "Error " + statusCode));
+        } catch (JSONException e) {
+            return "Error " + statusCode;
         }
-        return "Supabase Storage upload failed: " + statusCode;
     }
 
     private String getDisplayName(Uri uri) {
@@ -221,16 +184,10 @@ public class SupabaseStorageRepository {
         try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                if (nameIndex >= 0) {
-                    displayName = cursor.getString(nameIndex);
-                }
+                if (nameIndex >= 0) displayName = cursor.getString(nameIndex);
             }
         }
-
-        if (TextUtils.isEmpty(displayName)) {
-            displayName = uri.getLastPathSegment();
-        }
-        return TextUtils.isEmpty(displayName) ? "selected-file" : displayName;
+        return TextUtils.isEmpty(displayName) ? "file_" + System.currentTimeMillis() : displayName;
     }
 
     private boolean hasValue(String value) {
@@ -249,21 +206,16 @@ public class SupabaseStorageRepository {
         }
 
         @Override
-        public MediaType contentType() {
-            return mediaType;
-        }
+        public MediaType contentType() { return mediaType; }
 
         @Override
         public void writeTo(BufferedSink sink) throws IOException {
             try (InputStream inputStream = contentResolver.openInputStream(uri)) {
-                if (inputStream == null) {
-                    throw new IOException("Cannot open selected file");
-                }
-
+                if (inputStream == null) throw new IOException("Uri not found");
                 byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    sink.write(buffer, 0, bytesRead);
+                int read;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    sink.write(buffer, 0, read);
                 }
             }
         }

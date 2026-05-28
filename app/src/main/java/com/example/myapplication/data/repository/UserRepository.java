@@ -124,6 +124,26 @@ public class UserRepository {
         });
     }
 
+    public void updateAvatar(String id, String avatarUrl, RepositoryCallback<Void> callback) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("avatar_url", avatarUrl);
+        userApi.updateFields("eq." + id, fields).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onError(getErrorMessage(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     // Delete User by ID from remote
     public void delete(String id, RepositoryCallback<Void> callback) {
         userApi.delete("eq." + id).enqueue(new Callback<Void>() {
