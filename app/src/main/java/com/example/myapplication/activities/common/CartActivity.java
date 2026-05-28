@@ -46,12 +46,31 @@ public class CartActivity extends AppCompatActivity {
         loadCartData();
 
         btnBack.setOnClickListener(v -> finish());
+        // Trong file CartActivity.java
         btnCheckout.setOnClickListener(v -> {
             if (cartItems.isEmpty()) {
                 Toast.makeText(this, "Your cart is empty", Toast.LENGTH_SHORT).show();
                 return;
             }
-            startActivity(new Intent(CartActivity.this, CheckoutActivity.class));
+
+            double total = 0;
+            ArrayList<String> cartIds = new ArrayList<>();
+            ArrayList<String> courseIds = new ArrayList<>();
+
+            for (Cart item : cartItems) {
+                Course course = item.getCourse();
+                if (course != null) {
+                    total += (course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice());
+                }
+                cartIds.add(item.getId());
+                courseIds.add(item.getCourseId());
+            }
+
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            intent.putExtra("TOTAL_AMOUNT", total);
+            intent.putStringArrayListExtra("CART_IDS", cartIds);
+            intent.putStringArrayListExtra("COURSE_IDS", courseIds);
+            startActivity(intent);
         });
     }
 

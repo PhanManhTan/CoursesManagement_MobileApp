@@ -65,7 +65,7 @@
         <activity android:name=".activities.common.EditProfileActivity" android:exported="true" />
         <activity android:name=".activities.common.NotificationActivity" android:exported="true" />
         <activity android:name=".activities.common.PaymentResultActivity" android:exported="true" />
-
+        <activity android:name=".activities.common.VNPAYActivity" android:exported="true" />/>
         <!-- Firebase Cloud Messaging Service -->
         <service
             android:name=".services.MyFirebaseMessagingService"
