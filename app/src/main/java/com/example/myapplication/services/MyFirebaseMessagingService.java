@@ -10,8 +10,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import com.example.myapplication.R;
-import com.example.myapplication.activities.admin.CourseApprovalActivity;
-import com.example.myapplication.activities.admin.ReportActivity;
+import com.example.myapplication.activities.admin.AdminMainActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -64,14 +63,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendLocalNotification(String title, String body, String type) {
-        Intent intent;
+        Intent intent = new Intent(this, AdminMainActivity.class);
         if ("course_pending_approval".equalsIgnoreCase(type)) {
-            intent = new Intent(this, CourseApprovalActivity.class);
+            intent.putExtra("TARGET_TAB", "course_pending_approval");
         } else if ("course_violation_report".equalsIgnoreCase(type)) {
-            intent = new Intent(this, ReportActivity.class);
-        } else {
-            // Default fallback is to launch application dashboard/main
-            intent = new Intent(this, com.example.myapplication.activities.admin.AdminDashboardActivity.class);
+            intent.putExtra("TARGET_TAB", "course_violation_report");
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 

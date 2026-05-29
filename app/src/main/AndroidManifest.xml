@@ -53,10 +53,10 @@
         <activity android:name=".activities.instructor.RevenueActivity" android:exported="false" />
 
         <!-- ── Admin Activities ── -->
-        <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="false" />
-        <activity android:name=".activities.admin.UserManageActivity" android:exported="false" />
-        <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="false" />
-        <activity android:name=".activities.admin.ReportActivity" android:exported="false" />
+        <activity
+            android:name=".activities.admin.AdminMainActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
 
         <!-- ── Common Activities ── -->
         <activity android:name=".activities.common.AccountActivity" android:exported="true" />
