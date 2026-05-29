@@ -8,7 +8,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav"
         android:fillViewport="true">
 
         <LinearLayout
@@ -142,15 +141,4 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/bg_primary"
-        android:visibility="gone"
-        app:itemIconTint="#FFFFFF"
-        app:itemTextColor="#FFFFFF"
-        app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/admin_nav_menu"/>
 </RelativeLayout>

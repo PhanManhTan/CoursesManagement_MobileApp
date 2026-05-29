@@ -79,6 +79,12 @@ serve(async (req) => {
     let actionType = "default"
 
     if (table === 'courses') {
+      if (record.status !== 'pending') {
+        return new Response(JSON.stringify({ message: "Course status is not pending. Skipping notification." }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200
+        })
+      }
       title = "Yêu cầu duyệt khóa học mới"
       body = `Khóa học "${record.title || 'Không tên'}" đang chờ bạn phê duyệt.`
       actionType = "course_pending_approval"

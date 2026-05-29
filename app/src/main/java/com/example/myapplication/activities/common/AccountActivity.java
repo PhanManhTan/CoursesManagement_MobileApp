@@ -21,7 +21,6 @@ import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utils.ApiErrorFormatter;
 import com.example.myapplication.utils.SessionManager;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AccountActivity extends AppCompatActivity {
     private static final String TAG = "AccountActivity";
@@ -135,41 +134,6 @@ public class AccountActivity extends AppCompatActivity {
                     .into(ivAvatar);
         }
 
-        // Dynamically show and configure bottomNav if role is admin
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        if (bottomNav != null) {
-            if ("admin".equalsIgnoreCase(user.getRole())) {
-                bottomNav.setVisibility(android.view.View.VISIBLE);
-                setupBottomNav(bottomNav);
-            } else {
-                bottomNav.setVisibility(android.view.View.GONE);
-            }
-        }
-    }
-
-    private void setupBottomNav(BottomNavigationView bottomNav) {
-        bottomNav.setSelectedItemId(R.id.nav_admin_account);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_admin_account) {
-                return true;
-            }
-            Intent intent;
-            if (id == R.id.nav_admin_home) {
-                intent = new Intent(this, com.example.myapplication.activities.admin.AdminDashboardActivity.class);
-            } else if (id == R.id.nav_admin_users) {
-                intent = new Intent(this, com.example.myapplication.activities.admin.UserManageActivity.class);
-            } else if (id == R.id.nav_admin_approval) {
-                intent = new Intent(this, com.example.myapplication.activities.admin.CourseApprovalActivity.class);
-            } else if (id == R.id.nav_admin_reports) {
-                intent = new Intent(this, com.example.myapplication.activities.admin.ReportActivity.class);
-            } else {
-                return false;
-            }
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-            return true;
-        });
     }
 
     private void uploadImageToSupabaseStorage(Uri uri) {
