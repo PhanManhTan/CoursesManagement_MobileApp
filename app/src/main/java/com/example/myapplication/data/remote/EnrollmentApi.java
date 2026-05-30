@@ -21,7 +21,7 @@ public interface EnrollmentApi {
     Call<List<Enrollment>> getById(@Query("id") String idFilter);
 
     @POST("enrollments")
-    Call<Void> insert(@Body Enrollment enrollment);
+    Call<Void> insert(@Body java.util.Map<String, Object> enrollmentPayload);
 
     @PATCH("enrollments")
     Call<Void> update(@Query("id") String idFilter, @Body Enrollment enrollment);

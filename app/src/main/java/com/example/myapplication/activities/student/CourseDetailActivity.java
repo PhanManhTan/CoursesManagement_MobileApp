@@ -16,19 +16,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
+import com.example.myapplication.activities.common.CartActivity;
 import com.example.myapplication.adapters.ChapterAdapter;
-import com.example.myapplication.adapters.ReviewAdapter;
+import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.data.repository.CategoryRepository;
 import com.example.myapplication.data.repository.ChapterRepository;
 import com.example.myapplication.data.repository.CourseRepository;
 import com.example.myapplication.data.repository.ReviewRepository;
 import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.data.repository.EnrollmentRepository;
+import com.example.myapplication.models.Cart;
 import com.example.myapplication.models.Category;
 import com.example.myapplication.models.Chapter;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Review;
 import com.example.myapplication.models.User;
+import com.example.myapplication.utils.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -38,16 +41,21 @@ public class CourseDetailActivity extends AppCompatActivity {
     private RecyclerView rvLessons;
     private RecyclerView rvReviews;
     private ImageView btnBack, ivThumbnail;
+    private TextView tvCartBadge;
+    private View btnCartContainer;
     private ShapeableImageView avtTeacher;
     private Button btnEnroll;
     private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole, tvReviewsTitle;
+    private Button btnEnroll, btnAddToCart;
+    private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole;
 
     private CourseRepository courseRepository;
     private ChapterRepository chapterRepository;
     private UserRepository userRepository;
     private CategoryRepository categoryRepository;
     private EnrollmentRepository enrollmentRepository;
-    private ReviewRepository reviewRepository;
+    private CartRepository cartRepository;
+    private SessionManager sessionManager;
 
     private ChapterAdapter chapterAdapter;
     private ReviewAdapter reviewAdapter;
@@ -59,8 +67,9 @@ public class CourseDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_detail);
 
+        sessionManager = new SessionManager(this);
         courseId = getIntent().getStringExtra("COURSE_ID");
-        userId = getIntent().getStringExtra("USER_ID");
+        userId = sessionManager.getUserId();
 
         if (courseId == null) {
             Toast.makeText(this, "Course not found", Toast.LENGTH_SHORT).show();
@@ -78,13 +87,22 @@ public class CourseDetailActivity extends AppCompatActivity {
         checkEnrollmentStatus();
 
         btnBack.setOnClickListener(v -> finish());
+        btnCartContainer.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
+        btnAddToCart.setOnClickListener(v -> addToCart());
+        
+        btnEnroll.setOnClickListener(v -> {
+            Toast.makeText(this, "Buy feature coming soon", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void initViews() {
         rvLessons = findViewById(R.id.rvLessons);
         rvReviews = findViewById(R.id.rvReviews);
         btnBack = findViewById(R.id.btnBack);
+        btnCartContainer = findViewById(R.id.btnCartContainer);
+        tvCartBadge = findViewById(R.id.tvCartBadge);
         btnEnroll = findViewById(R.id.btnEnroll);
+        btnAddToCart = findViewById(R.id.btnAddToCart);
         ivThumbnail = findViewById(R.id.ivThumbnail);
         avtTeacher = findViewById(R.id.avtTeacher);
         tvCourseTitle = findViewById(R.id.tvCourseTitle);
@@ -106,7 +124,39 @@ public class CourseDetailActivity extends AppCompatActivity {
         userRepository = new UserRepository(this);
         categoryRepository = new CategoryRepository(this);
         enrollmentRepository = new EnrollmentRepository(this);
-        reviewRepository = new ReviewRepository(this);
+        cartRepository = new CartRepository(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCartBadge();
+    }
+
+    private void updateCartBadge() {
+        if (userId == null) {
+            tvCartBadge.setVisibility(View.GONE);
+            return;
+        }
+
+        cartRepository.getByUserId(userId, new CartRepository.RepositoryCallback<List<Cart>>() {
+            @Override
+            public void onSuccess(List<Cart> data) {
+                runOnUiThread(() -> {
+                    if (data != null && !data.isEmpty()) {
+                        tvCartBadge.setText(String.valueOf(data.size()));
+                        tvCartBadge.setVisibility(View.VISIBLE);
+                    } else {
+                        tvCartBadge.setVisibility(View.GONE);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> tvCartBadge.setVisibility(View.GONE));
+            }
+        });
     }
 
     private void setupRecyclerViews() {
@@ -126,15 +176,17 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Course course) {
                 if (course != null) {
-                    displayCourseDetails(course);
-                    loadInstructorDetails(course.getInstructorId());
-                    loadCategoryDetails(course.getCategoryId());
+                    runOnUiThread(() -> {
+                        displayCourseDetails(course);
+                        loadInstructorDetails(course.getInstructorId());
+                        loadCategoryDetails(course.getCategoryId());
+                    });
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(CourseDetailActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -182,26 +234,25 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(User user) {
                 if (user != null) {
-                    tvTeacherName.setText(user.getName() != null ? user.getName() : "Unknown Instructor");
-                    tvTeacherRole.setText(user.getRole() != null ? user.getRole() : "Instructor");
+                    runOnUiThread(() -> {
+                        tvTeacherName.setText(user.getName() != null ? user.getName() : "Unknown Instructor");
+                        tvTeacherRole.setText(user.getRole() != null ? user.getRole() : "Instructor");
 
-                    if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
-                        Glide.with(CourseDetailActivity.this)
-                                .load(user.getAvatarUrl())
-                                .placeholder(R.drawable.noavatar)
-                                .error(R.drawable.noavatar)
-                                .into(avtTeacher);
-                    } else {
-                        avtTeacher.setImageResource(R.drawable.noavatar);
-                    }
+                        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                            Glide.with(CourseDetailActivity.this)
+                                    .load(user.getAvatarUrl())
+                                    .into(avtTeacher);
+                        }
+                    });
                 }
             }
 
             @Override
             public void onError(String message) {
-                tvTeacherName.setText("Unknown Instructor");
-                tvTeacherRole.setText("");
-                avtTeacher.setImageResource(R.drawable.noavatar);
+                runOnUiThread(() -> {
+                    tvTeacherName.setText("Unknown Instructor");
+                    tvTeacherRole.setText("");
+                });
             }
         });
     }
@@ -216,13 +267,14 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Category category) {
                 if (category != null) {
-                    tvCategory.setText("Category: " + category.getName());
+                    runOnUiThread(() -> tvCategory.setText("Category: " + category.getName()));
                 }
             }
 
             @Override
             public void onError(String message) {
-                tvCategory.setText("Category: N/A");
+                // Thay thế bằng giá trị mặc định khi lỗi
+                runOnUiThread(() -> tvCategory.setText("Category: N/A"));
             }
         });
     }
@@ -235,15 +287,47 @@ public class CourseDetailActivity extends AppCompatActivity {
         enrollmentRepository.checkEnrollment(userId, courseId, new EnrollmentRepository.RepositoryCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean isEnrolled) {
-                if (isEnrolled) {
-                    btnEnroll.setText("Owned");
-                    btnEnroll.setEnabled(false);
-                    btnEnroll.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
-                }
+                runOnUiThread(() -> {
+                    if (isEnrolled) {
+                        btnEnroll.setText("Owned");
+                        btnEnroll.setEnabled(false);
+                        btnEnroll.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+                        btnAddToCart.setVisibility(View.GONE);
+                    }
+                });
             }
 
             @Override
             public void onError(String message) {
+            }
+        });
+    }
+
+    private void addToCart() {
+        if (userId == null) {
+            Toast.makeText(this, "Please login to add to cart", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Cart cartItem = new Cart(null, userId, courseId);
+        btnAddToCart.setEnabled(false);
+        
+        cartRepository.addToCart(cartItem, new CartRepository.RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                runOnUiThread(() -> {
+                    btnAddToCart.setEnabled(true);
+                    Toast.makeText(CourseDetailActivity.this, "Added to cart!", Toast.LENGTH_SHORT).show();
+                    updateCartBadge(); // Cập nhật lại số lượng ngay lập tức
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    btnAddToCart.setEnabled(true);
+                    Toast.makeText(CourseDetailActivity.this, "Failed to add to cart: " + message, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
@@ -253,15 +337,15 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<Chapter> chapters) {
                 if (chapters == null || chapters.isEmpty()) {
-                    Toast.makeText(CourseDetailActivity.this, "This course has no chapters yet.", Toast.LENGTH_LONG).show();
+                    runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, "This course has no chapters yet.", Toast.LENGTH_LONG).show());
                 } else {
-                    chapterAdapter.setChapterList(chapters);
+                    runOnUiThread(() -> chapterAdapter.setChapterList(chapters));
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(CourseDetailActivity.this, "Failed to load chapters: " + message, Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, "Failed to load chapters: " + message, Toast.LENGTH_SHORT).show());
             }
         });
     }

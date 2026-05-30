@@ -52,11 +52,22 @@ public class EnrollmentRepository {
     }
 
     public void insert(Enrollment enrollment, RepositoryCallback<Void> callback) {
-        enrollmentApi.insert(enrollment).enqueue(new Callback<Void>() {
+        // CHỈ GỬI CÁC TRƯỜNG CƠ BẢN LÊN SUPABASE (Tránh lỗi dư thừa cột)
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("user_id", enrollment.getUserId());
+        payload.put("course_id", enrollment.getCourseId());
+
+        // Gửi số tiền thanh toán nếu bảng của bạn có cột này
+        // payload.put("paid_amount", enrollment.getPaidAmount());
+
+        enrollmentApi.insert(payload).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) callback.onSuccess(null);
-                else callback.onError("Error: " + response.code());
+                if (response.isSuccessful()) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onError("Error: " + response.code());
+                }
             }
             @Override
             public void onFailure(Call<Void> call, Throwable t) {

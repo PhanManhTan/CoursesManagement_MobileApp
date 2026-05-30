@@ -29,6 +29,9 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL") ?: ""}\"")
         buildConfigField("String", "SUPABASE_API_KEY", "\"${properties.getProperty("SUPABASE_API_KEY") ?: ""}\"")
         buildConfigField("String", "SUPABASE_STORAGE_BUCKET", "\"${properties.getProperty("SUPABASE_STORAGE_BUCKET") ?: "course-media"}\"")
+
+        buildConfigField("String", "VNP_TMN_CODE", "\"${properties.getProperty("VNP_TMN_CODE")}\"")
+        buildConfigField("String", "VNP_HASH_SECRET", "\"${properties.getProperty("VNP_HASH_SECRET")}\"")
     }
 
     buildTypes {

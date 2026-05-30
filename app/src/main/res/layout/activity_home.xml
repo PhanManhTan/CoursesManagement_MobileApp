@@ -18,6 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+        
         <TextView
             android:id="@+id/tvAvatar"
             android:layout_width="44dp"
@@ -28,6 +29,7 @@
             android:textSize="15sp"
             android:textStyle="bold"
             android:background="@color/accent_muted" />
+
         <LinearLayout android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -48,6 +50,41 @@
                 android:textColor="@color/accent_light"
                 android:textSize="14sp" />
         </LinearLayout>
+
+        <!-- Container for Cart with Badge -->
+        <FrameLayout
+            android:id="@+id/btnCartContainer"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivCart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:background="@drawable/bg_rounded_dark"
+                android:src="@drawable/ic_cart"
+                app:tint="@color/text_primary"
+                android:contentDescription="Cart" />
+
+            <TextView
+                android:id="@+id/tvCartBadge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/bg_circle_play"
+                android:backgroundTint="@color/status_error"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/text_primary"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
 
 

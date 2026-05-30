@@ -2,70 +2,155 @@ package com.example.myapplication.activities.common;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.CartAdapter;
+import com.example.myapplication.data.repository.CartRepository;
+import com.example.myapplication.models.Cart;
 import com.example.myapplication.models.Course;
+import com.example.myapplication.utils.SessionManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CartActivity extends AppCompatActivity {
+
+    private RecyclerView rvCart;
+    private TextView tvTotalPrice;
+    private Button btnCheckout;
+    private ImageView btnBack;
+    
+    private CartAdapter adapter;
+    private List<Cart> cartItems = new ArrayList<>();
+    private CartRepository cartRepository;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cart_activity);
 
-        ImageView btnBack = findViewById(R.id.btnBack);
+        initViews();
+        initRepositories();
+        setupRecyclerView();
+
+        loadCartData();
+
         btnBack.setOnClickListener(v -> finish());
+        // Trong file CartActivity.java
+        btnCheckout.setOnClickListener(v -> {
+            if (cartItems.isEmpty()) {
+                Toast.makeText(this, "Your cart is empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        RecyclerView rvCart = findViewById(R.id.rvCart);
-        TextView tvTotalPrice = findViewById(R.id.tvTotalPrice);
-        Button btnCheckout = findViewById(R.id.btnCheckout);
+            double total = 0;
+            ArrayList<String> cartIds = new ArrayList<>();
+            ArrayList<String> courseIds = new ArrayList<>();
 
-        List<Course> mockCart = new ArrayList<>();
-        mockCart.add(new Course(
-                "course_01",
-                "instructor_123",
-                "Advanced Android Development",
-                "Khóa học Android nâng cao với Java",
-                "https://via.placeholder.com/150",
-                49.99,
-                39.99,
-                "published",
-                "cat_android",
-                "2023-10-01"
-        ));
-        mockCart.add(new Course(
-                "course_02",
-                "instructor_456",
-                "UI/UX Design for Beginners",
-                "Thiết kế giao diện cơ bản",
-                "https://via.placeholder.com/150",
-                29.99,
-                19.99,
-                "published",
-                "cat_design",
-                "2023-10-05"
-        ));
+            for (Cart item : cartItems) {
+                Course course = item.getCourse();
+                if (course != null) {
+                    total += (course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice());
+                }
+                cartIds.add(item.getId());
+                courseIds.add(item.getCourseId());
+            }
 
-        double total = 0;
-        for (Course c : mockCart) {
-            total += c.getPrice();
-        }
-        tvTotalPrice.setText(String.format("$%.2f", total));
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            intent.putExtra("TOTAL_AMOUNT", total);
+            intent.putStringArrayListExtra("CART_IDS", cartIds);
+            intent.putStringArrayListExtra("COURSE_IDS", courseIds);
+            startActivity(intent);
+        });
+    }
 
-        CartAdapter adapter = new CartAdapter(mockCart);
+    private void initViews() {
+        rvCart = findViewById(R.id.rvCart);
+        tvTotalPrice = findViewById(R.id.tvTotalPrice);
+        btnCheckout = findViewById(R.id.btnCheckout);
+        btnBack = findViewById(R.id.btnBack);
+    }
+
+    private void initRepositories() {
+        cartRepository = new CartRepository(this);
+        sessionManager = new SessionManager(this);
+    }
+
+    private void setupRecyclerView() {
+        adapter = new CartAdapter(cartItems);
         rvCart.setLayoutManager(new LinearLayoutManager(this));
         rvCart.setAdapter(adapter);
 
-        btnCheckout.setOnClickListener(v -> {
-            startActivity(new Intent(CartActivity.this, CheckoutActivity.class));
+        adapter.setOnItemClickListener(new CartAdapter.OnItemClickListener() {
+            @Override
+            public void onDeleteClick(Cart cart, int position) {
+                removeFromCart(cart.getId(), position);
+            }
         });
+    }
+
+    private void loadCartData() {
+        String userId = sessionManager.getUserId();
+        if (userId == null) return;
+
+        cartRepository.getByUserId(userId, new CartRepository.RepositoryCallback<List<Cart>>() {
+            @Override
+            public void onSuccess(List<Cart> data) {
+                runOnUiThread(() -> {
+                    cartItems.clear();
+                    if (data != null) {
+                        cartItems.addAll(data);
+                    }
+                    adapter.notifyDataSetChanged();
+                    calculateTotal();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> Toast.makeText(CartActivity.this, "Failed to load cart: " + message, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void removeFromCart(String cartId, int position) {
+        cartRepository.removeFromCart(cartId, new CartRepository.RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                runOnUiThread(() -> {
+                    cartItems.remove(position);
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(position, cartItems.size());
+                    calculateTotal();
+                    Toast.makeText(CartActivity.this, "Item removed", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> Toast.makeText(CartActivity.this, "Failed to remove item: " + message, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void calculateTotal() {
+        double total = 0;
+        for (Cart item : cartItems) {
+            Course course = item.getCourse();
+            if (course != null) {
+                total += (course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice());
+            }
+        }
+        tvTotalPrice.setText(String.format("%,.0fđ", total));
     }
 }

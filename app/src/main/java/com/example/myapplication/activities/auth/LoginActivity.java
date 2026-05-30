@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
 import com.example.myapplication.activities.common.HomeActivity;
-import com.example.myapplication.activities.admin.AdminDashboardActivity;
+import com.example.myapplication.activities.admin.AdminMainActivity;
 import com.example.myapplication.activities.instructor.InstructorMainActivity;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
@@ -159,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 Intent intent;
                 if ("admin".equals(role)) {
-                    intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                    intent = new Intent(LoginActivity.this, AdminMainActivity.class);
                 } else if ("instructor".equals(role)) {
                     intent = new Intent(LoginActivity.this, InstructorMainActivity.class);
                 } else {
