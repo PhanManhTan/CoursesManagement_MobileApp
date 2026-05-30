@@ -76,6 +76,13 @@ public class MyCoursesActivity extends AppCompatActivity {
             }
             startActivity(intent);
         });
+
+        myCourseAdapter.setOnReviewClickListener(enrollment -> {
+            Intent intent = new Intent(this, ReviewActivity.class);
+            intent.putExtra("COURSE_ID", enrollment.getCourseId());
+            startActivity(intent);
+        });
+
         rvMyCourses.setAdapter(myCourseAdapter);
         rvMyCourses.setHasFixedSize(true);
     }

@@ -17,14 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.ChapterAdapter;
+import com.example.myapplication.adapters.ReviewAdapter;
 import com.example.myapplication.data.repository.CategoryRepository;
 import com.example.myapplication.data.repository.ChapterRepository;
 import com.example.myapplication.data.repository.CourseRepository;
+import com.example.myapplication.data.repository.ReviewRepository;
 import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.models.Category;
 import com.example.myapplication.models.Chapter;
 import com.example.myapplication.models.Course;
+import com.example.myapplication.models.Review;
 import com.example.myapplication.models.User;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -33,18 +36,21 @@ import java.util.List;
 public class CourseDetailActivity extends AppCompatActivity {
 
     private RecyclerView rvLessons;
+    private RecyclerView rvReviews;
     private ImageView btnBack, ivThumbnail;
     private ShapeableImageView avtTeacher;
     private Button btnEnroll;
-    private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole;
+    private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole, tvReviewsTitle;
 
     private CourseRepository courseRepository;
     private ChapterRepository chapterRepository;
     private UserRepository userRepository;
     private CategoryRepository categoryRepository;
     private EnrollmentRepository enrollmentRepository;
+    private ReviewRepository reviewRepository;
 
     private ChapterAdapter chapterAdapter;
+    private ReviewAdapter reviewAdapter;
     private String courseId;
     private String userId;
 
@@ -64,22 +70,19 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         initViews();
         initRepositories();
-        setupRecyclerView();
+        setupRecyclerViews();
 
         loadCourseDetails();
         loadChapters();
+        loadReviews();
         checkEnrollmentStatus();
 
         btnBack.setOnClickListener(v -> finish());
-//        btnEnroll.setOnClickListener(v -> {
-//            Intent intent = new Intent(this, LearningActivity.class);
-//            intent.putExtra("COURSE_ID", courseId);
-//            startActivity(intent);
-//        });
     }
 
     private void initViews() {
         rvLessons = findViewById(R.id.rvLessons);
+        rvReviews = findViewById(R.id.rvReviews);
         btnBack = findViewById(R.id.btnBack);
         btnEnroll = findViewById(R.id.btnEnroll);
         ivThumbnail = findViewById(R.id.ivThumbnail);
@@ -94,6 +97,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         tvDesDetail = findViewById(R.id.tvDesDetail);
         tvTeacherName = findViewById(R.id.tvTeacherName);
         tvTeacherRole = findViewById(R.id.textView6);
+        tvReviewsTitle = findViewById(R.id.tvReviewsTitle);
     }
 
     private void initRepositories() {
@@ -102,13 +106,19 @@ public class CourseDetailActivity extends AppCompatActivity {
         userRepository = new UserRepository(this);
         categoryRepository = new CategoryRepository(this);
         enrollmentRepository = new EnrollmentRepository(this);
+        reviewRepository = new ReviewRepository(this);
     }
 
-    private void setupRecyclerView() {
+    private void setupRecyclerViews() {
         rvLessons.setLayoutManager(new LinearLayoutManager(this));
         rvLessons.setNestedScrollingEnabled(false);
         chapterAdapter = new ChapterAdapter(this);
         rvLessons.setAdapter(chapterAdapter);
+
+        rvReviews.setLayoutManager(new LinearLayoutManager(this));
+        rvReviews.setNestedScrollingEnabled(false);
+        reviewAdapter = new ReviewAdapter();
+        rvReviews.setAdapter(reviewAdapter);
     }
 
     private void loadCourseDetails() {
@@ -164,6 +174,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (instructorId == null || instructorId.isEmpty()) {
             tvTeacherName.setText("Unknown Instructor");
             tvTeacherRole.setText("");
+            avtTeacher.setImageResource(R.drawable.noavatar);
             return;
         }
 
@@ -177,7 +188,11 @@ public class CourseDetailActivity extends AppCompatActivity {
                     if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
                         Glide.with(CourseDetailActivity.this)
                                 .load(user.getAvatarUrl())
+                                .placeholder(R.drawable.noavatar)
+                                .error(R.drawable.noavatar)
                                 .into(avtTeacher);
+                    } else {
+                        avtTeacher.setImageResource(R.drawable.noavatar);
                     }
                 }
             }
@@ -186,6 +201,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             public void onError(String message) {
                 tvTeacherName.setText("Unknown Instructor");
                 tvTeacherRole.setText("");
+                avtTeacher.setImageResource(R.drawable.noavatar);
             }
         });
     }
@@ -221,9 +237,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             public void onSuccess(Boolean isEnrolled) {
                 if (isEnrolled) {
                     btnEnroll.setText("Owned");
-
                     btnEnroll.setEnabled(false);
-
                     btnEnroll.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
                 }
             }
@@ -248,6 +262,27 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 Toast.makeText(CourseDetailActivity.this, "Failed to load chapters: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadReviews() {
+        reviewRepository.getByCourseId(courseId, new ReviewRepository.RepositoryCallback<List<Review>>() {
+            @Override
+            public void onSuccess(List<Review> reviews) {
+                if (reviews == null || reviews.isEmpty()) {
+                    tvReviewsTitle.setText("Student Reviews (0)");
+                    rvReviews.setVisibility(View.GONE);
+                } else {
+                    tvReviewsTitle.setText("Student Reviews (" + reviews.size() + ")");
+                    rvReviews.setVisibility(View.VISIBLE);
+                    reviewAdapter.setReviewList(reviews);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                tvReviewsTitle.setText("Student Reviews");
             }
         });
     }

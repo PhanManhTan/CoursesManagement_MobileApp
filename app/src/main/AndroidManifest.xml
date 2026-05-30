@@ -42,6 +42,7 @@
         <activity android:name=".activities.student.LearningActivity" android:exported="true" />
         <activity android:name=".activities.student.MyCoursesActivity" android:exported="true" />
         <activity android:name=".activities.student.SearchActivity" android:exported="true" />
+        <activity android:name=".activities.student.ReviewActivity" android:exported="true"/>
 
         <!-- ── Instructor Activities ── -->
         <activity android:name=".activities.instructor.InstructorMainActivity" android:exported="false" />

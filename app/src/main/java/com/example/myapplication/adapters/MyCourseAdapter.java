@@ -3,6 +3,7 @@ package com.example.myapplication.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,8 +24,13 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
         void onItemClick(Enrollment enrollment);
     }
 
+    public interface OnReviewClickListener {
+        void onReviewClick(Enrollment enrollment);
+    }
+
     private List<Enrollment> enrollmentList = new ArrayList<>();
     private OnItemClickListener listener;
+    private OnReviewClickListener reviewListener;
     private UserRepository userRepository;
 
     public void setEnrollmentList(List<Enrollment> enrollmentList) {
@@ -34,6 +40,10 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setOnReviewClickListener(OnReviewClickListener reviewListener) {
+        this.reviewListener = reviewListener;
     }
 
     @NonNull
@@ -86,14 +96,25 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
                 int percent = (completed * 100) / total;
                 holder.pb.setProgress(percent);
                 holder.tvPercent.setText(percent + "% COMPLETE");
+
+                if (percent == 100) {
+                    holder.btnReview.setVisibility(View.VISIBLE);
+                } else {
+                    holder.btnReview.setVisibility(View.GONE);
+                }
             } else {
                 holder.pb.setProgress(0);
                 holder.tvPercent.setText("0% COMPLETE");
+                holder.btnReview.setVisibility(View.GONE);
             }
         }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(enrollment);
+        });
+
+        holder.btnReview.setOnClickListener(v -> {
+            if (reviewListener != null) reviewListener.onReviewClick(enrollment);
         });
     }
 
@@ -106,6 +127,7 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
         TextView tvName, tvPercent, tvAuthor, tvLessonCount;
         ProgressBar pb;
         ImageView ivThumb;
+        Button btnReview;
 
         public ViewHolder(View v) {
             super(v);
@@ -115,6 +137,7 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
             tvLessonCount = v.findViewById(R.id.tvLessonCount);
             pb = v.findViewById(R.id.pbCourse);
             ivThumb = v.findViewById(R.id.ivCourseThumb);
+            btnReview = v.findViewById(R.id.btnReview);
         }
     }
 }

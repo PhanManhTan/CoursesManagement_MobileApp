@@ -116,4 +116,41 @@ public class ReviewRepository {
             }
         });
     }
+
+    public void getReviewByUserAndCourse(String userId, String courseId, RepositoryCallback<Review> callback) {
+        reviewApi.getReviewByUserAndCourse("eq." + userId, "eq." + courseId).enqueue(new Callback<List<Review>>() {
+            @Override
+            public void onResponse(Call<List<Review>> call, Response<List<Review>> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    callback.onSuccess(response.body().get(0));
+                } else {
+                    callback.onError("Review not found");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Review>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    // Get list of reviews by Course ID
+    public void getByCourseId(String courseId, RepositoryCallback<List<Review>> callback) {
+        reviewApi.getByCourseId("eq." + courseId).enqueue(new Callback<List<Review>>() {
+            @Override
+            public void onResponse(Call<List<Review>> call, Response<List<Review>> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Review>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
 }
