@@ -308,7 +308,44 @@ public class AdminMainActivity extends AppCompatActivity {
             public void onReject(Course course) {
                 courseApprovalViewModel.rejectCourse(course);
             }
+
+            @Override
+            public void onCourseClick(Course course) {
+                Intent intent = new Intent(AdminMainActivity.this, com.example.myapplication.activities.student.CourseDetailActivity.class);
+                intent.putExtra("COURSE_ID", course.getId());
+                startActivity(intent);
+            }
         });
+
+        TabLayout tabLayout = root.findViewById(R.id.tabLayout);
+        if (tabLayout != null) {
+            tabLayout.removeAllTabs();
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_pending_approvals));
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_active_courses));
+
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    if (tab.getPosition() == 0) {
+                        courseApprovalViewModel.fetchPendingCourses();
+                    } else {
+                        courseApprovalViewModel.fetchApprovedCourses();
+                    }
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {}
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                    if (tab.getPosition() == 0) {
+                        courseApprovalViewModel.fetchPendingCourses();
+                    } else {
+                        courseApprovalViewModel.fetchApprovedCourses();
+                    }
+                }
+            });
+        }
 
         courseApprovalViewModel.fetchPendingCourses();
     }

@@ -497,4 +497,6 @@
     <string name="usd_price_format">$%1$.2f</string>
     <string name="vnd_price_format">đ%1$,.0f</string>
     <string name="lesson_count_with_duration_format">%1$d bài học • %2$s</string>
+    <string name="tab_pending_approvals">Chờ duyệt</string>
+    <string name="tab_active_courses">Hoạt động</string>
 </resources>
