@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
@@ -79,7 +80,8 @@
                 android:id="@+id/tvFullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/loading"
+                android:text=""
+                tools:text="@string/loading"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"/>
@@ -98,10 +100,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_rounded_dark"
+                android:background="@drawable/bg_flat_card"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="24dp">
 
                 <TextView
                     android:id="@+id/tvBioLabel"
@@ -117,7 +119,8 @@
                     android:id="@+id/tvBio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/loading"
+                    android:text=""
+                    tools:text="@string/loading"
                     android:textSize="16sp"
                     android:textColor="@color/text_primary"
                     android:lineSpacingExtra="4dp"/>
@@ -127,10 +130,10 @@
                 android:id="@+id/languageContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_rounded_dark"
+                android:background="@drawable/bg_flat_card"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="24dp">
 
                 <TextView
                     android:id="@+id/tvLanguageLabel"
@@ -153,10 +156,10 @@
                 <Spinner
                     android:id="@+id/spLanguage"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/bg_tertiary"
-                    android:paddingHorizontal="8dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_spinner_rounded"
+                    android:paddingHorizontal="12dp"
                     android:popupBackground="@color/bg_tertiary" />
             </LinearLayout>
 

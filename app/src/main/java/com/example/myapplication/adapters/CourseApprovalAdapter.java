@@ -55,7 +55,7 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
             instructorDisplay = "ID: " + instructorDisplay.substring(0, 8) + "...";
         }
         holder.tvInstructor.setText(instructorDisplay);
-        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.usd_price_format, course.getPrice()));
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, course.getPrice()));
 
         // Using Glide for thumbnail loading
         if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {

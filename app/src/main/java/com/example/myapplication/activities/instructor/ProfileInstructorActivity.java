@@ -17,14 +17,22 @@ import com.example.myapplication.data.repository.CourseRepository;
 import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.data.repository.ReviewRepository;
 import com.example.myapplication.data.repository.UserRepository;
+import com.example.myapplication.data.repository.ChapterRepository;
+import com.example.myapplication.data.repository.LessonRepository;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Enrollment;
 import com.example.myapplication.models.Review;
 import com.example.myapplication.models.User;
+import com.example.myapplication.models.Chapter;
+import com.example.myapplication.models.Lesson;
+import com.example.myapplication.utils.CurrencyFormatter;
 import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileInstructorActivity extends AppCompatActivity {
 
@@ -92,9 +100,65 @@ public class ProfileInstructorActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<Course> courses) {
                 if (courses != null) {
-                    displayCourses(courses);
-                    calculateTotalStudents(courses);
-                    calculateAverageRating(courses);
+                    List<Course> safeCourses = courses;
+                    ChapterRepository chapterRepository = new ChapterRepository(ProfileInstructorActivity.this);
+                    LessonRepository lessonRepository = new LessonRepository(ProfileInstructorActivity.this);
+
+                    chapterRepository.getAll(new ChapterRepository.RepositoryCallback<List<Chapter>>() {
+                        @Override
+                        public void onSuccess(List<Chapter> allChapters) {
+                            lessonRepository.getAll(new LessonRepository.RepositoryCallback<List<Lesson>>() {
+                                @Override
+                                public void onSuccess(List<Lesson> allLessons) {
+                                    Map<String, List<Chapter>> chaptersByCourse = new HashMap<>();
+                                    for (Chapter chapter : allChapters) {
+                                        if (chapter.getCourseId() != null) {
+                                            chaptersByCourse.computeIfAbsent(chapter.getCourseId(), k -> new ArrayList<>()).add(chapter);
+                                        }
+                                    }
+
+                                    Map<String, List<Lesson>> lessonsByChapter = new HashMap<>();
+                                    for (Lesson lesson : allLessons) {
+                                        if (lesson.getChapterId() != null) {
+                                            lessonsByChapter.computeIfAbsent(lesson.getChapterId(), k -> new ArrayList<>()).add(lesson);
+                                        }
+                                    }
+
+                                    for (Course course : safeCourses) {
+                                        int count = 0;
+                                        List<Chapter> courseChapters = chaptersByCourse.get(course.getId());
+                                        if (courseChapters != null) {
+                                            for (Chapter chapter : courseChapters) {
+                                                List<Lesson> chapterLessons = lessonsByChapter.get(chapter.getId());
+                                                if (chapterLessons != null) {
+                                                    count += chapterLessons.size();
+                                                }
+                                            }
+                                        }
+                                        course.setLessonCount(count);
+                                    }
+
+                                    displayCourses(safeCourses);
+                                    calculateTotalStudents(safeCourses);
+                                    calculateAverageRating(safeCourses);
+                                }
+
+                                @Override
+                                public void onError(String message) {
+                                    displayCourses(safeCourses);
+                                    calculateTotalStudents(safeCourses);
+                                    calculateAverageRating(safeCourses);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            displayCourses(safeCourses);
+                            calculateTotalStudents(safeCourses);
+                            calculateAverageRating(safeCourses);
+                        }
+                    });
                 }
             }
             @Override public void onError(String message) {
@@ -166,7 +230,7 @@ public class ProfileInstructorActivity extends AppCompatActivity {
 
             title.setText(course.getTitle());
             lessons.setText(getString(R.string.lesson_count_format, course.getLessonCount()));
-            price.setText(String.format(Locale.US, "$%.2f", course.getPrice()));
+            price.setText(CurrencyFormatter.formatVnd(course.getPrice()));
             InstructorCourseAdapter.bindStatus(this, status, course.getStatus());
             btnMore.setVisibility(View.GONE);
 

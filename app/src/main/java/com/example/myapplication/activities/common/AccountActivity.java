@@ -23,8 +23,10 @@ import com.example.myapplication.data.repository.SupabaseStorageRepository;
 import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.utils.BottomNavigationHelper;
 import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AccountActivity extends AppCompatActivity {
     private static final String TAG = "AccountActivity";
@@ -40,6 +42,7 @@ public class AccountActivity extends AppCompatActivity {
     private ImageView btnUpdateAvatar;
     private Button btnEditProfile;
     private Button btnLogout;
+    private BottomNavigationView bottomNav;
 
     private UserRepository userRepository;
     private SupabaseStorageRepository storageRepository;
@@ -104,6 +107,13 @@ public class AccountActivity extends AppCompatActivity {
         btnUpdateAvatar.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
         setupLanguageSpinner();
         applyLanguageText();
+        bindCachedProfile();
+
+        bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_account);
+            BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
+        }
     }
 
     @Override
@@ -123,12 +133,22 @@ public class AccountActivity extends AppCompatActivity {
             return;
         }
 
-        tvFullName.setText(R.string.loading);
-        tvEmail.setText("");
-        tvBio.setText(R.string.loading);
+        if (bindCachedProfile()) {
+            if (sessionManager.isProfileLoadedMemory()) {
+                return;
+            }
+        } else {
+            tvFullName.setText(R.string.loading);
+            tvEmail.setText("");
+            tvBio.setText(R.string.loading);
+        }
+
         userRepository.getById(userId, new UserRepository.RepositoryCallback<User>() {
             @Override
             public void onSuccess(User user) {
+                if (user != null) {
+                    sessionManager.saveProfile(user.getFullName(), user.getEmail(), user.getBio(), user.getAvatarUrl());
+                }
                 runOnUiThread(() -> bindUser(user));
             }
 
@@ -150,19 +170,38 @@ public class AccountActivity extends AppCompatActivity {
             return;
         }
 
-        tvFullName.setText(hasValue(user.getFullName()) ? user.getFullName() : getString(R.string.unnamed_user));
-        tvEmail.setText(valueOrEmpty(user.getEmail()));
-        tvBio.setText(hasValue(user.getBio()) ? user.getBio() : getNoBioText());
+        bindProfile(user.getFullName(), user.getEmail(), user.getBio(), user.getAvatarUrl());
+    }
 
-        if (hasValue(user.getAvatarUrl())) {
-            Glide.with(this)
-                    .load(user.getAvatarUrl())
-                    .circleCrop()
-                    .placeholder(android.R.drawable.ic_menu_camera)
-                    .error(android.R.drawable.ic_menu_camera)
-                    .into(ivAvatar);
+    private boolean bindCachedProfile() {
+        String cachedFullName = sessionManager.getFullName();
+        String cachedEmail = sessionManager.getEmail();
+        String cachedBio = sessionManager.getBio();
+        String cachedAvatar = sessionManager.getAvatarUrl();
+        if (!hasValue(cachedFullName) && !hasValue(cachedEmail)
+                && !hasValue(cachedBio) && !hasValue(cachedAvatar)) {
+            return false;
         }
 
+        bindProfile(cachedFullName, cachedEmail, cachedBio, cachedAvatar);
+        return true;
+    }
+
+    private void bindProfile(String fullName, String email, String bio, String avatarUrl) {
+        tvFullName.setText(hasValue(fullName) ? fullName : getString(R.string.unnamed_user));
+        tvEmail.setText(valueOrEmpty(email));
+        tvBio.setText(hasValue(bio) ? bio : getNoBioText());
+
+        if (hasValue(avatarUrl)) {
+            Glide.with(this)
+                    .load(avatarUrl)
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_camera_24)
+                    .error(R.drawable.ic_camera_24)
+                    .into(ivAvatar);
+        } else {
+            ivAvatar.setImageResource(R.drawable.ic_camera_24);
+        }
     }
 
     private void uploadImageToSupabaseStorage(Uri uri) {
@@ -185,15 +224,14 @@ public class AccountActivity extends AppCompatActivity {
                 userRepository.updateAvatar(userId, publicUrl, new UserRepository.RepositoryCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
+                        sessionManager.saveProfile(
+                            valueOrEmpty(sessionManager.getFullName()),
+                            valueOrEmpty(sessionManager.getEmail()),
+                            valueOrEmpty(sessionManager.getBio()),
+                            publicUrl
+                        );
                         runOnUiThread(() -> {
                             Toast.makeText(AccountActivity.this, R.string.avatar_updated_success, Toast.LENGTH_SHORT).show();
-                            // Load lại ảnh từ URL chính thức
-                            Glide.with(AccountActivity.this)
-                                    .load(publicUrl)
-                                    .skipMemoryCache(true)
-                                    .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE)
-                                    .placeholder(ivAvatar.getDrawable())
-                                    .into(ivAvatar);
                             btnUpdateAvatar.setEnabled(true);
                             btnUpdateAvatar.setAlpha(1.0f);
                         });

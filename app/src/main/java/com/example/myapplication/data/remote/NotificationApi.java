@@ -9,6 +9,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+
 import retrofit2.http.Query;
 
 public interface NotificationApi {
@@ -22,6 +23,7 @@ public interface NotificationApi {
 
     @GET("notifications?select=*")
     Call<List<Notification>> getAll();
+
 
     @POST("notifications")
     Call<Void> insert(@Body Map<String, Object> payload);

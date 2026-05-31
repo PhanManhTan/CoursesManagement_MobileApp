@@ -116,6 +116,12 @@ public class EditProfileActivity extends AppCompatActivity {
         userRepository.updateProfile(currentUserId, fullName, bio, new UserRepository.RepositoryCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
+                sessionManager.saveProfile(
+                    fullName,
+                    valueOrEmpty(sessionManager.getEmail()),
+                    valueOrEmpty(bio),
+                    valueOrEmpty(sessionManager.getAvatarUrl())
+                );
                 runOnUiThread(() -> {
                     setSaving(false);
                     Toast.makeText(EditProfileActivity.this, R.string.profile_updated, Toast.LENGTH_SHORT).show();

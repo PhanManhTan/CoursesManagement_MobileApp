@@ -32,7 +32,11 @@ import com.example.myapplication.adapters.EnrollmentTransactionAdapter;
 import com.example.myapplication.adapters.InstructorCourseAdapter;
 import com.example.myapplication.adapters.InstructorReviewAdapter;
 import com.example.myapplication.adapters.StudentAdapter;
+import com.example.myapplication.adapters.RecentActivityAdapter;
+import com.example.myapplication.data.repository.NotificationRepository;
+import com.example.myapplication.models.Notification;
 import com.example.myapplication.activities.auth.LoginActivity;
+import com.example.myapplication.activities.common.NotificationActivity;
 import com.example.myapplication.activities.common.EditProfileActivity;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.data.repository.CourseRepository;
@@ -58,6 +62,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,8 +98,9 @@ public class InstructorMainActivity extends AppCompatActivity
     private String pendingStudentCourseId;
     private String pendingRevenueCourseId;
     private String pendingReviewCourseId;
+    private boolean pendingShowReviewsTab = false;
     private String selectedReviewCourseId;
-    private Spinner spReviewCourseFilter;
+    private MaterialAutoCompleteTextView spReviewCourseFilter;
     private TextView tvReviewCourseName, tvAverageRating, tvReviewCount, tvEmptyReviews;
     private RecyclerView rvReviews;
     private InstructorReviewAdapter reviewAdapter;
@@ -237,6 +244,64 @@ public class InstructorMainActivity extends AppCompatActivity
         root.findViewById(R.id.btnViewRevenue).setOnClickListener(v -> bottomNav.setSelectedItemId(R.id.nav_instructor_revenue));
         root.findViewById(R.id.btnManageStudents).setOnClickListener(v -> bottomNav.setSelectedItemId(R.id.nav_instructor_students));
 
+        // Setup Recent Notifications / Activities
+        RecyclerView rvRecentNotifications = root.findViewById(R.id.rvRecentNotifications);
+        TextView tvEmptyRecentNotifications = root.findViewById(R.id.tvEmptyRecentNotifications);
+
+        if (rvRecentNotifications != null && tvEmptyRecentNotifications != null) {
+            rvRecentNotifications.setLayoutManager(new LinearLayoutManager(this));
+            List<Notification> recentNotificationsList = new ArrayList<>();
+            RecentActivityAdapter recentActivitiesAdapter = new RecentActivityAdapter(recentNotificationsList);
+            rvRecentNotifications.setAdapter(recentActivitiesAdapter);
+
+            String instructorId = sessionManager.getUserId();
+            if (instructorId != null) {
+                NotificationRepository notificationRepository = new NotificationRepository(this);
+                notificationRepository.getByUserId(instructorId, new NotificationRepository.RepositoryCallback<List<Notification>>() {
+                    @Override
+                    public void onSuccess(List<Notification> data) {
+                        runOnUiThread(() -> {
+                            if (data != null && !data.isEmpty()) {
+                                // Sort by created_at DESC (most recent first)
+                                Collections.sort(data, (a, b) -> {
+                                    String dateA = a.getCreatedAt() != null ? a.getCreatedAt() : "";
+                                    String dateB = b.getCreatedAt() != null ? b.getCreatedAt() : "";
+                                    return dateB.compareTo(dateA);
+                                });
+                                // Only show up to 5 recent notifications to avoid cluttering dashboard
+                                List<Notification> courseActivities = filterCourseActivities(data);
+                                List<Notification> displayList = courseActivities.size() > 5
+                                        ? courseActivities.subList(0, 5)
+                                        : courseActivities;
+                                recentNotificationsList.clear();
+                                recentNotificationsList.addAll(displayList);
+                                recentActivitiesAdapter.notifyDataSetChanged();
+
+                                boolean hasRecentActivities = !recentNotificationsList.isEmpty();
+                                tvEmptyRecentNotifications.setVisibility(hasRecentActivities ? View.GONE : View.VISIBLE);
+                                rvRecentNotifications.setVisibility(hasRecentActivities ? View.VISIBLE : View.GONE);
+                            } else {
+                                tvEmptyRecentNotifications.setVisibility(View.VISIBLE);
+                                rvRecentNotifications.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        runOnUiThread(() -> {
+                            tvEmptyRecentNotifications.setText(getString(R.string.no_recent_activities));
+                            tvEmptyRecentNotifications.setVisibility(View.VISIBLE);
+                            rvRecentNotifications.setVisibility(View.GONE);
+                        });
+                    }
+                });
+            } else {
+                tvEmptyRecentNotifications.setVisibility(View.VISIBLE);
+                rvRecentNotifications.setVisibility(View.GONE);
+            }
+        }
+
         instructorViewModel = new ViewModelProvider(this).get(InstructorViewModel.class);
         clearInstructorObservers();
         instructorViewModel.getTotalStudents().observe(this, value -> tvTotalStudents.setText(value));
@@ -246,8 +311,46 @@ public class InstructorMainActivity extends AppCompatActivity
         instructorViewModel.refreshStats();
     }
 
+    private List<Notification> filterCourseActivities(List<Notification> notifications) {
+        List<Notification> courseActivities = new ArrayList<>();
+        if (notifications == null) {
+            return courseActivities;
+        }
+
+        for (Notification notification : notifications) {
+            if (isCourseActivity(notification)) {
+                courseActivities.add(notification);
+            }
+        }
+        return courseActivities;
+    }
+
+    private boolean isCourseActivity(Notification notification) {
+        if (notification == null || notification.getTitle() == null) {
+            return false;
+        }
+
+        String title = notification.getTitle().toLowerCase(Locale.ROOT);
+        return title.contains("course")
+                || title.contains("khóa")
+                || title.contains("approved")
+                || title.contains("rejected")
+                || title.contains("purchase")
+                || title.contains("purchased")
+                || title.contains("duyệt")
+                || title.contains("từ chối")
+                || title.contains("mua");
+    }
+
     private void showCourses() {
         View root = inflateContent(R.layout.activity_instructor_course_list);
+        TabLayout tabLayout = root.findViewById(R.id.tabLayout);
+        View courseListContainer = root.findViewById(R.id.courseListContainer);
+        View reviewsContainer = root.findViewById(R.id.reviewsContainer);
+
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.my_courses)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.course_reviews)));
+
         RecyclerView rvInstructorCourses = root.findViewById(R.id.rvInstructorCourses);
         ProgressBar progressBar = root.findViewById(R.id.progressBar);
         TextView tvEmpty = root.findViewById(R.id.tvEmpty);
@@ -274,7 +377,51 @@ public class InstructorMainActivity extends AppCompatActivity
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             }
         });
-        instructorViewModel.refreshCourses();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    courseListContainer.setVisibility(View.VISIBLE);
+                    reviewsContainer.setVisibility(View.GONE);
+                    instructorViewModel.refreshCourses();
+                } else {
+                    courseListContainer.setVisibility(View.GONE);
+                    reviewsContainer.setVisibility(View.VISIBLE);
+                    String initialCourseId = pendingReviewCourseId;
+                    pendingReviewCourseId = null;
+                    setupReviewsTabViews(root, initialCourseId);
+                }
+            }
+
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
+        if (pendingShowReviewsTab || pendingReviewCourseId != null) {
+            pendingShowReviewsTab = false;
+            TabLayout.Tab tab = tabLayout.getTabAt(1);
+            if (tab != null) {
+                tab.select();
+            }
+        } else {
+            instructorViewModel.refreshCourses();
+        }
+    }
+
+    private void setupReviewsTabViews(View root, String initialCourseId) {
+        spReviewCourseFilter = root.findViewById(R.id.spReviewCourseFilter);
+        tvReviewCourseName = root.findViewById(R.id.tvReviewCourseName);
+        tvAverageRating = root.findViewById(R.id.tvAverageRating);
+        tvReviewCount = root.findViewById(R.id.tvReviewCount);
+        tvEmptyReviews = root.findViewById(R.id.tvEmptyReviews);
+        rvReviews = root.findViewById(R.id.rvReviews);
+
+        reviewAdapter = new InstructorReviewAdapter();
+        rvReviews.setLayoutManager(new LinearLayoutManager(this));
+        rvReviews.setAdapter(reviewAdapter);
+
+        loadInstructorReviews(initialCourseId);
     }
 
     private void showStudents() {
@@ -286,10 +433,9 @@ public class InstructorMainActivity extends AppCompatActivity
         pendingStudentCourseId = null;
         RecyclerView rvStudents = root.findViewById(R.id.rvStudents);
         EditText etSearch = root.findViewById(R.id.etSearch);
-        Spinner spCourseFilter = root.findViewById(R.id.spCourseFilter);
+        MaterialAutoCompleteTextView spCourseFilter = root.findViewById(R.id.spCourseFilter);
         TextView tvEmptyStudents = root.findViewById(R.id.tvEmptyStudents);
         TextView tvTotalEnrollments = root.findViewById(R.id.tvTotalEnrollments);
-        TextView tvUniqueStudents = root.findViewById(R.id.tvUniqueStudents);
         TextView tvAverageProgress = root.findViewById(R.id.tvAverageProgress);
         TextView tvCompletedEnrollments = root.findViewById(R.id.tvCompletedEnrollments);
         StudentAdapter adapter = new StudentAdapter();
@@ -308,7 +454,6 @@ public class InstructorMainActivity extends AppCompatActivity
         studentListViewModel.getCourses().observe(this, courses ->
                 setupStudentCourseFilter(spCourseFilter, courses, studentListViewModel.getSelectedCourseIdValue()));
         studentListViewModel.getTotalEnrollments().observe(this, tvTotalEnrollments::setText);
-        studentListViewModel.getUniqueStudents().observe(this, tvUniqueStudents::setText);
         studentListViewModel.getAverageProgress().observe(this, tvAverageProgress::setText);
         studentListViewModel.getCompletedEnrollments().observe(this, tvCompletedEnrollments::setText);
         studentListViewModel.getErrorMessage().observe(this, message -> {
@@ -336,7 +481,7 @@ public class InstructorMainActivity extends AppCompatActivity
         pendingRevenueCourseId = null;
         BarChart barChart = root.findViewById(R.id.barChart);
         PieChart pieChart = root.findViewById(R.id.pieChart);
-        Spinner spRevenueCourseFilter = root.findViewById(R.id.spRevenueCourseFilter);
+        MaterialAutoCompleteTextView spRevenueCourseFilter = root.findViewById(R.id.spRevenueCourseFilter);
         TextView tvTotalRevenue = root.findViewById(R.id.tvTotalRevenue);
         TextView tvTotalTransactions = root.findViewById(R.id.tvTotalTransactions);
         TextView tvAverageRevenue = root.findViewById(R.id.tvAverageRevenue);
@@ -384,24 +529,21 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void showReviews() {
-        View root = inflateContent(R.layout.activity_instructor_reviews);
-        String initialCourseId = pendingReviewCourseId;
-        pendingReviewCourseId = null;
-
-        View btnBack = root.findViewById(R.id.btnBack);
-        spReviewCourseFilter = root.findViewById(R.id.spReviewCourseFilter);
-        tvReviewCourseName = root.findViewById(R.id.tvReviewCourseName);
-        tvAverageRating = root.findViewById(R.id.tvAverageRating);
-        tvReviewCount = root.findViewById(R.id.tvReviewCount);
-        tvEmptyReviews = root.findViewById(R.id.tvEmptyReviews);
-        rvReviews = root.findViewById(R.id.rvReviews);
-
-        reviewAdapter = new InstructorReviewAdapter();
-        rvReviews.setLayoutManager(new LinearLayoutManager(this));
-        rvReviews.setAdapter(reviewAdapter);
-
-        btnBack.setOnClickListener(v -> bottomNav.setSelectedItemId(R.id.nav_instructor_courses));
-        loadInstructorReviews(initialCourseId);
+        pendingShowReviewsTab = true;
+        if (bottomNav.getSelectedItemId() == R.id.nav_instructor_courses) {
+            pendingShowReviewsTab = false;
+            TabLayout tabLayout = findViewById(R.id.tabLayout);
+            if (tabLayout != null) {
+                TabLayout.Tab tab = tabLayout.getTabAt(1);
+                if (tab != null) {
+                    tab.select();
+                }
+            } else {
+                showCourses();
+            }
+        } else {
+            bottomNav.setSelectedItemId(R.id.nav_instructor_courses);
+        }
     }
 
     private void loadInstructorReviews(String initialCourseId) {
@@ -485,23 +627,22 @@ public class InstructorMainActivity extends AppCompatActivity
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
         adapter.setDropDownViewResource(R.layout.spinner_item);
-        spReviewCourseFilter.setOnItemSelectedListener(null);
+        spReviewCourseFilter.setOnItemClickListener(null);
+        setupDropdownOpenBehavior(spReviewCourseFilter);
         spReviewCourseFilter.setAdapter(adapter);
 
         int selectedIndex = findCourseIndex(ids, selectedReviewCourseId);
-        spReviewCourseFilter.setSelection(selectedIndex, false);
+        spReviewCourseFilter.setText(labels.get(selectedIndex), false);
         selectedReviewCourseId = ids.get(selectedIndex);
 
-        spReviewCourseFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spReviewCourseFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0 && position < ids.size()) {
                     selectedReviewCourseId = ids.get(position);
                     applyReviewFilter();
                 }
             }
-
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -560,14 +701,19 @@ public class InstructorMainActivity extends AppCompatActivity
         TextView tvFullName = root.findViewById(R.id.tvFullName);
         TextView tvEmail = root.findViewById(R.id.tvEmail);
         TextView tvBio = root.findViewById(R.id.tvBio);
+        ImageView ivAvatar = root.findViewById(R.id.ivAvatar);
         View btnEditProfile = root.findViewById(R.id.btnEditProfile);
         View btnLogout = root.findViewById(R.id.btnLogout);
         setupAccountLanguage(root);
         applyAccountLanguageText(root);
-        tvFullName.setText(R.string.loading);
-        tvEmail.setText("");
-        if (tvBio != null) {
-            tvBio.setText(R.string.loading);
+
+        boolean hasCachedProfile = bindCachedAccountProfile(tvFullName, tvEmail, tvBio, ivAvatar, R.string.instructor_fallback);
+        if (!hasCachedProfile) {
+            tvFullName.setText(R.string.loading);
+            tvEmail.setText("");
+            if (tvBio != null) {
+                tvBio.setText(R.string.loading);
+            }
         }
 
         String userId = sessionManager.getUserId();
@@ -576,23 +722,32 @@ public class InstructorMainActivity extends AppCompatActivity
             return;
         }
 
-        userRepository.getById(userId, new UserRepository.RepositoryCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                if (user == null) return;
+        if (!hasCachedProfile || !sessionManager.isProfileLoadedMemory()) {
+            userRepository.getById(userId, new UserRepository.RepositoryCallback<User>() {
+                @Override
+                public void onSuccess(User user) {
+                    if (user == null) return;
 
-                tvFullName.setText(user.getFullName() != null ? user.getFullName() : getString(R.string.instructor_fallback));
-                tvEmail.setText(user.getEmail() != null ? user.getEmail() : "");
-                if (tvBio != null) {
-                    tvBio.setText(hasValue(user.getBio()) ? user.getBio() : getString(R.string.no_bio_available));
+                    sessionManager.saveProfile(user.getFullName(), user.getEmail(), user.getBio(), user.getAvatarUrl());
+                    runOnUiThread(() -> bindAccountProfile(
+                            tvFullName,
+                            tvEmail,
+                            tvBio,
+                            ivAvatar,
+                            user.getFullName(),
+                            user.getEmail(),
+                            user.getBio(),
+                            user.getAvatarUrl(),
+                            R.string.instructor_fallback
+                    ));
                 }
-            }
 
-            @Override
-            public void onError(String message) {
-                Toast.makeText(InstructorMainActivity.this, R.string.error_loading_account, Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(InstructorMainActivity.this, R.string.error_loading_account, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         btnEditProfile.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
         btnLogout.setOnClickListener(v -> {
@@ -602,6 +757,54 @@ public class InstructorMainActivity extends AppCompatActivity
             startActivity(intent);
             finish();
         });
+    }
+
+    private boolean bindCachedAccountProfile(TextView tvFullName, TextView tvEmail, TextView tvBio,
+                                             ImageView ivAvatar, int fallbackNameRes) {
+        String cachedFullName = sessionManager.getFullName();
+        String cachedEmail = sessionManager.getEmail();
+        String cachedBio = sessionManager.getBio();
+        String cachedAvatarUrl = sessionManager.getAvatarUrl();
+        if (!hasValue(cachedFullName) && !hasValue(cachedEmail)
+                && !hasValue(cachedBio) && !hasValue(cachedAvatarUrl)) {
+            return false;
+        }
+
+        bindAccountProfile(
+                tvFullName,
+                tvEmail,
+                tvBio,
+                ivAvatar,
+                cachedFullName,
+                cachedEmail,
+                cachedBio,
+                cachedAvatarUrl,
+                fallbackNameRes
+        );
+        return true;
+    }
+
+    private void bindAccountProfile(TextView tvFullName, TextView tvEmail, TextView tvBio, ImageView ivAvatar,
+                                    String fullName, String email, String bio, String avatarUrl,
+                                    int fallbackNameRes) {
+        tvFullName.setText(hasValue(fullName) ? fullName : getString(fallbackNameRes));
+        tvEmail.setText(hasValue(email) ? email : "");
+        if (tvBio != null) {
+            tvBio.setText(hasValue(bio) ? bio : getString(R.string.no_bio_available));
+        }
+        if (ivAvatar == null) {
+            return;
+        }
+        if (hasValue(avatarUrl)) {
+            Glide.with(this)
+                    .load(avatarUrl)
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_camera_24)
+                    .error(R.drawable.ic_camera_24)
+                    .into(ivAvatar);
+        } else {
+            ivAvatar.setImageResource(R.drawable.ic_camera_24);
+        }
     }
 
     private void setupAccountLanguage(View root) {
@@ -672,17 +875,16 @@ public class InstructorMainActivity extends AppCompatActivity
         final int actionStudents = 1;
         final int actionRevenue = 2;
         final int actionReviews = 3;
-        final int actionStatus = 4;
-        final int actionEdit = 5;
-        final int actionDelete = 6;
+        final int actionEdit = 4;
+        final int actionDelete = 5;
 
         PopupMenu popupMenu = new PopupMenu(this, anchor);
         popupMenu.getMenu().add(0, actionStudents, 0, getString(R.string.manage_students));
         popupMenu.getMenu().add(0, actionRevenue, 1, getString(R.string.view_revenue));
         popupMenu.getMenu().add(0, actionReviews, 2, getString(R.string.view_reviews));
-        popupMenu.getMenu().add(0, actionStatus, 3, getString(R.string.edit_course_status));
-        popupMenu.getMenu().add(0, actionEdit, 4, getString(R.string.edit_course_action));
-        popupMenu.getMenu().add(0, actionDelete, 5, getString(R.string.delete_course));
+        popupMenu.getMenu().add(0, actionEdit, 3, getString(R.string.edit_course_action));
+        popupMenu.getMenu().add(0, actionDelete, 4, getString(R.string.delete_course));
+
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == actionStudents) {
@@ -691,8 +893,6 @@ public class InstructorMainActivity extends AppCompatActivity
                 openRevenueForCourse(course);
             } else if (itemId == actionReviews) {
                 openReviewsForCourse(course);
-            } else if (itemId == actionStatus) {
-                showEditStatusDialog(course);
             } else if (itemId == actionEdit) {
                 openEditCourse(course);
             } else if (itemId == actionDelete) {
@@ -789,7 +989,7 @@ public class InstructorMainActivity extends AppCompatActivity
                 .show();
     }
 
-    private void setupStudentCourseFilter(Spinner spinner, List<Course> courses, String selectedCourseId) {
+    private void setupStudentCourseFilter(MaterialAutoCompleteTextView dropdown, List<Course> courses, String selectedCourseId) {
         List<String> labels = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         labels.add(getString(R.string.all_courses));
@@ -805,22 +1005,21 @@ public class InstructorMainActivity extends AppCompatActivity
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
         adapter.setDropDownViewResource(R.layout.spinner_item);
-        spinner.setOnItemSelectedListener(null);
-        spinner.setAdapter(adapter);
+        dropdown.setOnItemClickListener(null);
+        setupDropdownOpenBehavior(dropdown);
+        dropdown.setAdapter(adapter);
 
         int selectedIndex = findCourseIndex(ids, selectedCourseId);
-        spinner.setSelection(selectedIndex, false);
+        dropdown.setText(labels.get(selectedIndex), false);
         studentListViewModel.setCourseFilter(ids.get(selectedIndex));
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        dropdown.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0 && position < ids.size()) {
                     studentListViewModel.setCourseFilter(ids.get(position));
                 }
             }
-
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -864,7 +1063,7 @@ public class InstructorMainActivity extends AppCompatActivity
         }
     }
 
-    private void setupRevenueCourseFilter(Spinner spinner, List<Course> courses, String selectedCourseId) {
+    private void setupRevenueCourseFilter(MaterialAutoCompleteTextView dropdown, List<Course> courses, String selectedCourseId) {
         List<String> labels = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         labels.add(getString(R.string.all_courses));
@@ -880,22 +1079,31 @@ public class InstructorMainActivity extends AppCompatActivity
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
         adapter.setDropDownViewResource(R.layout.spinner_item);
-        spinner.setOnItemSelectedListener(null);
-        spinner.setAdapter(adapter);
+        dropdown.setOnItemClickListener(null);
+        setupDropdownOpenBehavior(dropdown);
+        dropdown.setAdapter(adapter);
 
         int selectedIndex = findCourseIndex(ids, selectedCourseId);
-        spinner.setSelection(selectedIndex, false);
+        dropdown.setText(labels.get(selectedIndex), false);
         revenueViewModel.setCourseFilter(ids.get(selectedIndex));
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        dropdown.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0 && position < ids.size()) {
                     revenueViewModel.setCourseFilter(ids.get(position));
                 }
             }
+        });
+    }
 
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
+    private void setupDropdownOpenBehavior(MaterialAutoCompleteTextView dropdown) {
+        if (dropdown == null) return;
+        dropdown.setOnClickListener(v -> dropdown.showDropDown());
+        dropdown.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                dropdown.showDropDown();
+            }
         });
     }
 
@@ -1006,7 +1214,6 @@ public class InstructorMainActivity extends AppCompatActivity
         studentListViewModel.getStudents().removeObservers(this);
         studentListViewModel.getCourses().removeObservers(this);
         studentListViewModel.getTotalEnrollments().removeObservers(this);
-        studentListViewModel.getUniqueStudents().removeObservers(this);
         studentListViewModel.getAverageProgress().removeObservers(this);
         studentListViewModel.getCompletedEnrollments().removeObservers(this);
         studentListViewModel.getErrorMessage().removeObservers(this);

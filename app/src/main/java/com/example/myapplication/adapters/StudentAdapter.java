@@ -62,6 +62,9 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
                 holder.itemView.getContext(),
                 row.isCompleted() ? R.color.status_success : R.color.status_warning
         ));
+        holder.tvStatus.setBackgroundResource(
+                row.isCompleted() ? R.drawable.bg_status_success : R.drawable.bg_status_warning
+        );
         holder.tvAvatar.setText(studentName.substring(0, 1).toUpperCase(Locale.US));
         holder.pbProgress.setProgress(row.getProgressPercent());
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="8dp"
@@ -27,19 +28,23 @@
         android:text="@string/lesson_title_placeholder"
         android:textAppearance="@style/TextAppearance.App.Body" />
 
-    <TextView
+    <ImageView
         android:id="@+id/btnEditLesson"
-        android:layout_width="54dp"
+        android:layout_width="36dp"
         android:layout_height="36dp"
-        android:gravity="center"
-        android:text="@string/edit"
-        android:textAppearance="@style/TextAppearance.App.Action" />
+        android:padding="8dp"
+        android:src="@drawable/ic_edit_24"
+        app:tint="@color/accent_light"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/edit" />
 
-    <TextView
+    <ImageView
         android:id="@+id/btnDeleteLesson"
-        android:layout_width="64dp"
+        android:layout_width="36dp"
         android:layout_height="36dp"
-        android:gravity="center"
-        android:text="@string/delete"
-        android:textAppearance="@style/TextAppearance.App.Action.Danger" />
+        android:padding="8dp"
+        android:src="@drawable/ic_delete_24"
+        app:tint="@color/status_error"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/delete" />
 </LinearLayout>

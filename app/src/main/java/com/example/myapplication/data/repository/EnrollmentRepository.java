@@ -51,6 +51,20 @@ public class EnrollmentRepository {
         });
     }
 
+    public void getByCourseId(String courseId, RepositoryCallback<List<Enrollment>> callback) {
+        enrollmentApi.getByCourseId("eq." + courseId).enqueue(new Callback<List<Enrollment>>() {
+            @Override
+            public void onResponse(Call<List<Enrollment>> call, Response<List<Enrollment>> response) {
+                if (response.isSuccessful()) callback.onSuccess(response.body());
+                else callback.onError("Error: " + response.code());
+            }
+            @Override
+            public void onFailure(Call<List<Enrollment>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     public void insert(Enrollment enrollment, RepositoryCallback<Void> callback) {
         // CHỈ GỬI CÁC TRƯỜNG CƠ BẢN LÊN SUPABASE (Tránh lỗi dư thừa cột)
         java.util.Map<String, Object> payload = new java.util.HashMap<>();

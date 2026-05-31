@@ -14,6 +14,16 @@ public class SessionManager {
     private static final String KEY_TOKEN = "access_token";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_ROLE = "user_role";
+    private static final String KEY_FULL_NAME = "profile_full_name";
+    private static final String KEY_EMAIL = "profile_email";
+    private static final String KEY_BIO = "profile_bio";
+    private static final String KEY_AVATAR_URL = "profile_avatar_url";
+
+    private static String cachedFullNameStatic = null;
+    private static String cachedEmailStatic = null;
+    private static String cachedBioStatic = null;
+    private static String cachedAvatarUrlStatic = null;
+    private static boolean isProfileLoadedStatic = false;
 
     private final SharedPreferences prefs;
 
@@ -22,11 +32,81 @@ public class SessionManager {
     }
 
     public void saveSession(String token, String userId, String role) {
-        prefs.edit()
+        String currentUserId = prefs.getString(KEY_USER_ID, null);
+        boolean userChanged = hasValue(currentUserId) && !currentUserId.equals(userId);
+
+        SharedPreferences.Editor editor = prefs.edit()
             .putString(KEY_TOKEN, token)
             .putString(KEY_USER_ID, userId)
-            .putString(KEY_ROLE, role)
+            .putString(KEY_ROLE, role);
+
+        if (userChanged) {
+            editor.remove(KEY_FULL_NAME)
+                    .remove(KEY_EMAIL)
+                    .remove(KEY_BIO)
+                    .remove(KEY_AVATAR_URL);
+            cachedFullNameStatic = null;
+            cachedEmailStatic = null;
+            cachedBioStatic = null;
+            cachedAvatarUrlStatic = null;
+            isProfileLoadedStatic = false;
+        }
+
+        editor.apply();
+    }
+
+    public void saveProfile(String fullName, String email, String bio, String avatarUrl) {
+        prefs.edit()
+            .putString(KEY_FULL_NAME, fullName)
+            .putString(KEY_EMAIL, email)
+            .putString(KEY_BIO, bio)
+            .putString(KEY_AVATAR_URL, avatarUrl)
             .apply();
+
+        cachedFullNameStatic = fullName;
+        cachedEmailStatic = email;
+        cachedBioStatic = bio;
+        cachedAvatarUrlStatic = avatarUrl;
+        isProfileLoadedStatic = true;
+    }
+
+    public boolean isProfileLoadedMemory() {
+        return isProfileLoadedStatic
+                || hasValue(getFullName())
+                || hasValue(getEmail())
+                || hasValue(getBio())
+                || hasValue(getAvatarUrl());
+    }
+
+    public String getFullName() {
+        if (cachedFullNameStatic == null) {
+            cachedFullNameStatic = prefs.getString(KEY_FULL_NAME, null);
+            if (cachedFullNameStatic != null) {
+                isProfileLoadedStatic = true;
+            }
+        }
+        return cachedFullNameStatic;
+    }
+
+    public String getEmail() {
+        if (cachedEmailStatic == null) {
+            cachedEmailStatic = prefs.getString(KEY_EMAIL, null);
+        }
+        return cachedEmailStatic;
+    }
+
+    public String getBio() {
+        if (cachedBioStatic == null) {
+            cachedBioStatic = prefs.getString(KEY_BIO, null);
+        }
+        return cachedBioStatic;
+    }
+
+    public String getAvatarUrl() {
+        if (cachedAvatarUrlStatic == null) {
+            cachedAvatarUrlStatic = prefs.getString(KEY_AVATAR_URL, null);
+        }
+        return cachedAvatarUrlStatic;
     }
 
     public String getToken() {
@@ -55,6 +135,11 @@ public class SessionManager {
 
     public void clear() {
         prefs.edit().clear().apply();
+        cachedFullNameStatic = null;
+        cachedEmailStatic = null;
+        cachedBioStatic = null;
+        cachedAvatarUrlStatic = null;
+        isProfileLoadedStatic = false;
     }
 
     private boolean hasValue(String value) {

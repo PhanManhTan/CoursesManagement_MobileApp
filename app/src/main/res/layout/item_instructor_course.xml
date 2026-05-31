@@ -65,7 +65,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="$49.99"
+                android:text="0 VND"
                 android:textColor="@color/accent_light"
                 android:textSize="15sp"
                 android:textStyle="bold" />

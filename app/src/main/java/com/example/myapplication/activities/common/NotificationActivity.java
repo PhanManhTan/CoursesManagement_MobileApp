@@ -18,6 +18,7 @@ import com.example.myapplication.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NotificationActivity extends AppCompatActivity {
@@ -92,6 +93,11 @@ public class NotificationActivity extends AppCompatActivity {
                     notificationList.clear();
                     if (data != null) {
                         notificationList.addAll(data);
+                        Collections.sort(notificationList, (a, b) -> {
+                            String dateA = a != null && a.getCreatedAt() != null ? a.getCreatedAt() : "";
+                            String dateB = b != null && b.getCreatedAt() != null ? b.getCreatedAt() : "";
+                            return dateB.compareTo(dateA);
+                        });
                     }
                     adapter.setNotifications(notificationList);
                     BottomNavigationHelper.updateNotificationBadge(NotificationActivity.this, bottomNav);

@@ -8,14 +8,23 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.myapplication.data.repository.CourseRepository;
 import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.data.repository.ReviewRepository;
+import com.example.myapplication.data.repository.ChapterRepository;
+import com.example.myapplication.data.repository.LessonRepository;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Enrollment;
 import com.example.myapplication.models.Review;
+import com.example.myapplication.models.Chapter;
+import com.example.myapplication.models.Lesson;
+import com.example.myapplication.utils.CurrencyFormatter;
 import com.example.myapplication.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 public class InstructorViewModel extends AndroidViewModel {
     private final CourseRepository courseRepository;
@@ -56,7 +65,7 @@ public class InstructorViewModel extends AndroidViewModel {
             instructorCourses.setValue(new ArrayList<>());
             if (includeStats) {
                 totalStudents.setValue("0");
-                monthlyRevenue.setValue("$0");
+                monthlyRevenue.setValue(CurrencyFormatter.formatVndRaw(0));
                 avgRating.setValue("0.0 ★");
                 liveCourses.setValue("0");
             }
@@ -80,12 +89,74 @@ public class InstructorViewModel extends AndroidViewModel {
                 statsRefreshQueued = false;
                 loading.setValue(false);
                 List<Course> safeCourses = courses != null ? courses : new ArrayList<>();
-                instructorCourses.setValue(safeCourses);
-                liveCourses.setValue(String.valueOf(countLiveCourses(safeCourses)));
-                if (shouldRefreshStats) {
-                    fetchEnrollmentStats(safeCourses);
-                    fetchReviewStats(safeCourses);
-                }
+
+                ChapterRepository chapterRepository = new ChapterRepository(getApplication());
+                LessonRepository lessonRepository = new LessonRepository(getApplication());
+
+                chapterRepository.getAll(new ChapterRepository.RepositoryCallback<List<Chapter>>() {
+                    @Override
+                    public void onSuccess(List<Chapter> allChapters) {
+                        lessonRepository.getAll(new LessonRepository.RepositoryCallback<List<Lesson>>() {
+                            @Override
+                            public void onSuccess(List<Lesson> allLessons) {
+                                Map<String, List<Chapter>> chaptersByCourse = new HashMap<>();
+                                for (Chapter chapter : allChapters) {
+                                    if (chapter.getCourseId() != null) {
+                                        chaptersByCourse.computeIfAbsent(chapter.getCourseId(), k -> new ArrayList<>()).add(chapter);
+                                    }
+                                }
+
+                                Map<String, List<Lesson>> lessonsByChapter = new HashMap<>();
+                                for (Lesson lesson : allLessons) {
+                                    if (lesson.getChapterId() != null) {
+                                        lessonsByChapter.computeIfAbsent(lesson.getChapterId(), k -> new ArrayList<>()).add(lesson);
+                                    }
+                                }
+
+                                for (Course course : safeCourses) {
+                                    int count = 0;
+                                    List<Chapter> courseChapters = chaptersByCourse.get(course.getId());
+                                    if (courseChapters != null) {
+                                        for (Chapter chapter : courseChapters) {
+                                            List<Lesson> chapterLessons = lessonsByChapter.get(chapter.getId());
+                                            if (chapterLessons != null) {
+                                                count += chapterLessons.size();
+                                            }
+                                        }
+                                    }
+                                    course.setLessonCount(count);
+                                }
+
+                                instructorCourses.setValue(safeCourses);
+                                liveCourses.setValue(String.valueOf(countLiveCourses(safeCourses)));
+                                if (shouldRefreshStats) {
+                                    fetchEnrollmentStats(safeCourses);
+                                    fetchReviewStats(safeCourses);
+                                }
+                            }
+
+                            @Override
+                            public void onError(String message) {
+                                instructorCourses.setValue(safeCourses);
+                                liveCourses.setValue(String.valueOf(countLiveCourses(safeCourses)));
+                                if (shouldRefreshStats) {
+                                    fetchEnrollmentStats(safeCourses);
+                                    fetchReviewStats(safeCourses);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        instructorCourses.setValue(safeCourses);
+                        liveCourses.setValue(String.valueOf(countLiveCourses(safeCourses)));
+                        if (shouldRefreshStats) {
+                            fetchEnrollmentStats(safeCourses);
+                            fetchReviewStats(safeCourses);
+                        }
+                    }
+                });
             }
             @Override public void onError(String message) {
                 coursesRequestInFlight = false;
@@ -96,7 +167,7 @@ public class InstructorViewModel extends AndroidViewModel {
                 if (includeStats) {
                     liveCourses.setValue("0");
                     totalStudents.setValue("0");
-                    monthlyRevenue.setValue("$0");
+                    monthlyRevenue.setValue(CurrencyFormatter.formatVndRaw(0));
                     avgRating.setValue("0.0 ★");
                 }
             }
@@ -187,10 +258,14 @@ public class InstructorViewModel extends AndroidViewModel {
                             if (enrollment.getCourseId() != null && enrollment.getCourseId().equals(course.getId())) {
                                 studentCount++;
 
-                                // Fallback: If enrollment has no price, use the course price
+                                // Fallback: If enrollment has no price, use course discount or original price
                                 double amount = enrollment.getPaidAmount();
                                 if (amount <= 0) {
-                                    amount = course.getPrice();
+                                    if (course.getDiscountPrice() > 0) {
+                                        amount = course.getDiscountPrice();
+                                    } else {
+                                        amount = course.getPrice();
+                                    }
                                 }
                                 if (isCurrentMonthEnrollment(enrollment)) {
                                     monthlyTotal += amount;
@@ -201,29 +276,58 @@ public class InstructorViewModel extends AndroidViewModel {
                 }
 
                 totalStudents.setValue(String.valueOf(studentCount));
-                monthlyRevenue.setValue(String.format(Locale.US, "$%.0f", monthlyTotal));
+                monthlyRevenue.setValue(CurrencyFormatter.formatVndRaw(monthlyTotal));
             }
             @Override public void onError(String message) {
                 totalStudents.setValue("0");
-                monthlyRevenue.setValue("$0");
+                monthlyRevenue.setValue(CurrencyFormatter.formatVndRaw(0));
             }
         });
     }
 
     private boolean isCurrentMonthEnrollment(Enrollment enrollment) {
-        String date = enrollment.getCreatedAt() != null ? enrollment.getCreatedAt() : enrollment.getEnrolledAt();
-        if (date == null || date.length() < 7) {
+        String dateStr = enrollment.getCreatedAt() != null ? enrollment.getCreatedAt() : enrollment.getEnrolledAt();
+        if (dateStr == null || dateStr.trim().isEmpty()) {
             return false;
         }
 
         try {
-            int year = Integer.parseInt(date.substring(0, 4));
-            int month = Integer.parseInt(date.substring(5, 7));
-            Calendar now = Calendar.getInstance();
-            return year == now.get(Calendar.YEAR) && month == now.get(Calendar.MONTH) + 1;
-        } catch (NumberFormatException e) {
+            Date date = parseIso8601(dateStr);
+            if (date == null) {
+                return false;
+            }
+            Calendar enrollmentCal = Calendar.getInstance();
+            enrollmentCal.setTime(date);
+
+            Calendar thirtyDaysAgo = Calendar.getInstance();
+            thirtyDaysAgo.add(Calendar.DAY_OF_YEAR, -30);
+
+            // Match any enrollment from the last 30 days
+            return !enrollmentCal.before(thirtyDaysAgo);
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    private Date parseIso8601(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return null;
+        }
+        String[] patterns = {
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "yyyy-MM-dd'T'HH:mm:ssXXX",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd"
+        };
+        for (String pattern : patterns) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+                return sdf.parse(dateStr);
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 
     private void fetchReviewStats(List<Course> courses) {

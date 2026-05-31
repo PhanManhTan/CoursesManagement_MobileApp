@@ -16,6 +16,7 @@ import com.example.myapplication.models.ChapterWithLessons;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Lesson;
 import com.example.myapplication.models.Quiz;
+import com.example.myapplication.utils.CourseContentNotifier;
 import com.example.myapplication.utils.SessionManager;
 
 import org.json.JSONArray;
@@ -44,6 +45,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     private final ChapterRepository chapterRepository;
     private final LessonRepository lessonRepository;
     private final QuizRepository quizRepository;
+    private final CourseContentNotifier courseContentNotifier;
     private final SessionManager sessionManager;
     private final MutableLiveData<Course> course = new MutableLiveData<>();
     private final MutableLiveData<List<Lesson>> lessons = new MutableLiveData<>();
@@ -62,6 +64,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         chapterRepository = new ChapterRepository(application);
         lessonRepository = new LessonRepository(application);
         quizRepository = new QuizRepository(application);
+        courseContentNotifier = new CourseContentNotifier(application);
         sessionManager = new SessionManager(application);
         lessons.setValue(new ArrayList<>());
         chapterDrafts.setValue(new ArrayList<>());
@@ -377,6 +380,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                     chapter.setOrderIndex(savedChapter.getOrderIndex());
                 }
                 loadedChapterIds.add(savedChapter.getId());
+                courseContentNotifier.notifyChapterAdded(current, chapter);
                 callback.onSuccess(chapter);
             }
 
@@ -598,7 +602,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    saveChapterAt(savedCourse.getId(), chaptersToSave, 0);
+                    saveChapterAt(savedCourse, chaptersToSave, 0);
                 }));
     }
 
@@ -654,7 +658,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         });
     }
 
-    private void saveChapterAt(String courseId, List<ChapterWithLessons> chaptersToSave, int index) {
+    private void saveChapterAt(Course savedCourse, List<ChapterWithLessons> chaptersToSave, int index) {
         if (index >= chaptersToSave.size()) {
             loadedChapterIds.clear();
             loadedLessonIds.clear();
@@ -677,16 +681,16 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         ChapterWithLessons draft = chaptersToSave.get(index);
         Chapter chapter = draft.getChapter();
-        chapter.setCourseId(courseId);
+        chapter.setCourseId(savedCourse.getId());
         chapter.setOrderIndex(index + 1);
 
         if (hasValue(chapter.getId())) {
             chapterRepository.update(chapter.getId(), chapter, new ChapterRepository.RepositoryCallback<Void>() {
                 @Override
                 public void onSuccess(Void data) {
-                    saveLessonsForChapter(chapter, draft.getLessons(), 0,
+                    saveLessonsForChapter(savedCourse, chapter, draft.getLessons(), 0,
                             () -> publishChapterDrafts(chaptersToSave),
-                            () -> saveChapterAt(courseId, chaptersToSave, index + 1));
+                            () -> saveChapterAt(savedCourse, chaptersToSave, index + 1));
                 }
 
                 @Override
@@ -699,10 +703,11 @@ public class EditCourseViewModel extends AndroidViewModel {
                 @Override
                 public void onSuccess(Chapter savedChapter) {
                     chapter.setId(savedChapter.getId());
+                    courseContentNotifier.notifyChapterAdded(savedCourse, chapter);
                     publishChapterDrafts(chaptersToSave);
-                    saveLessonsForChapter(chapter, draft.getLessons(), 0,
+                    saveLessonsForChapter(savedCourse, chapter, draft.getLessons(), 0,
                             () -> publishChapterDrafts(chaptersToSave),
-                            () -> saveChapterAt(courseId, chaptersToSave, index + 1));
+                            () -> saveChapterAt(savedCourse, chaptersToSave, index + 1));
                 }
 
                 @Override
@@ -713,7 +718,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
     }
 
-    private void saveLessonsForChapter(Chapter chapter, List<Lesson> chapterLessons, int lessonIndex,
+    private void saveLessonsForChapter(Course savedCourse, Chapter chapter, List<Lesson> chapterLessons, int lessonIndex,
                                        Runnable onDraftChanged, Runnable onComplete) {
         if (chapterLessons == null || lessonIndex >= chapterLessons.size()) {
             onComplete.run();
@@ -722,7 +727,7 @@ public class EditCourseViewModel extends AndroidViewModel {
 
         Lesson lesson = chapterLessons.get(lessonIndex);
         if (lesson != null && hasValue(lesson.getId()) && loadedLessonIds.contains(lesson.getId())) {
-            saveLessonsForChapter(chapter, chapterLessons, lessonIndex + 1, onDraftChanged, onComplete);
+            saveLessonsForChapter(savedCourse, chapter, chapterLessons, lessonIndex + 1, onDraftChanged, onComplete);
             return;
         }
 
@@ -737,7 +742,7 @@ public class EditCourseViewModel extends AndroidViewModel {
                 @Override
                 public void onSuccess(Void data) {
                     saveQuizzesForLesson(lesson, () ->
-                            saveLessonsForChapter(chapter, chapterLessons, lessonIndex + 1, onDraftChanged, onComplete));
+                            saveLessonsForChapter(savedCourse, chapter, chapterLessons, lessonIndex + 1, onDraftChanged, onComplete));
                 }
 
                 @Override
@@ -753,8 +758,10 @@ public class EditCourseViewModel extends AndroidViewModel {
             public void onSuccess(Lesson savedLesson) {
                 lesson.setId(savedLesson.getId());
                 onDraftChanged.run();
-                updateInsertedLessonContentAndQuizzes(lesson, () ->
-                        saveLessonsForChapter(chapter, chapterLessons, lessonIndex + 1, onDraftChanged, onComplete));
+                updateInsertedLessonContentAndQuizzes(lesson, () -> {
+                    courseContentNotifier.notifyLessonAdded(savedCourse, lesson);
+                    saveLessonsForChapter(savedCourse, chapter, chapterLessons, lessonIndex + 1, onDraftChanged, onComplete);
+                });
             }
 
             @Override
@@ -804,7 +811,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             ensureDefaultChapter(savedCourse.getId(), new ChapterRepository.RepositoryCallback<Chapter>() {
                 @Override
                 public void onSuccess(Chapter chapter) {
-                    saveLessonAt(chapter, lessonsToSave, 0);
+                    saveLessonAt(savedCourse, chapter, lessonsToSave, 0);
                 }
 
                 @Override
@@ -884,7 +891,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         });
     }
 
-    private void saveLessonAt(Chapter chapter, List<Lesson> lessonsToSave, int index) {
+    private void saveLessonAt(Course savedCourse, Chapter chapter, List<Lesson> lessonsToSave, int index) {
         if (index >= lessonsToSave.size()) {
             loadedLessonIds.clear();
             for (Lesson lesson : lessonsToSave) {
@@ -908,7 +915,7 @@ public class EditCourseViewModel extends AndroidViewModel {
             lessonRepository.update(lesson.getId(), lesson, new LessonRepository.RepositoryCallback<Void>() {
                 @Override
                 public void onSuccess(Void data) {
-                    saveQuizzesForLesson(lesson, () -> saveLessonAt(chapter, lessonsToSave, index + 1));
+                    saveQuizzesForLesson(lesson, () -> saveLessonAt(savedCourse, chapter, lessonsToSave, index + 1));
                 }
 
                 @Override
@@ -921,7 +928,10 @@ public class EditCourseViewModel extends AndroidViewModel {
                 @Override
                 public void onSuccess(Lesson savedLesson) {
                     lesson.setId(savedLesson.getId());
-                    updateInsertedLessonContentAndQuizzes(lesson, () -> saveLessonAt(chapter, lessonsToSave, index + 1));
+                    updateInsertedLessonContentAndQuizzes(lesson, () -> {
+                        courseContentNotifier.notifyLessonAdded(savedCourse, lesson);
+                        saveLessonAt(savedCourse, chapter, lessonsToSave, index + 1);
+                    });
                 }
 
                 @Override

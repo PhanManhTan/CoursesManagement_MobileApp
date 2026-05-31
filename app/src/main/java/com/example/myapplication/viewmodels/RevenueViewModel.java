@@ -11,6 +11,10 @@ import com.example.myapplication.R;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Enrollment;
 import com.example.myapplication.utils.SessionManager;
+import com.example.myapplication.utils.CurrencyFormatter;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieEntry;
 import java.util.ArrayList;
@@ -31,7 +35,7 @@ public class RevenueViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Course>> courses = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> totalRevenue = new MutableLiveData<>();
     private final MutableLiveData<String> totalTransactions = new MutableLiveData<>("0");
-    private final MutableLiveData<String> averageTransactionValue = new MutableLiveData<>("$0.00");
+    private final MutableLiveData<String> averageTransactionValue = new MutableLiveData<>("0 VND");
     private final MutableLiveData<String> selectedCourseName = new MutableLiveData<>();
     private List<Course> allCourses = new ArrayList<>();
     private List<Enrollment> allEnrollments = new ArrayList<>();
@@ -128,9 +132,15 @@ public class RevenueViewModel extends AndroidViewModel {
             courseRevenueMap.put(title, courseRevenueMap.getOrDefault(title, 0f) + (float) amount);
 
             try {
-                String date = hasValue(enrollment.getCreatedAt()) ? enrollment.getCreatedAt() : enrollment.getEnrolledAt();
-                if (date != null && date.length() >= 7) {
-                    int month = Integer.parseInt(date.substring(5, 7));
+                String dateStr = hasValue(enrollment.getCreatedAt()) ? enrollment.getCreatedAt() : enrollment.getEnrolledAt();
+                Date date = parseIso8601(dateStr);
+                if (date != null) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(date);
+                    int month = cal.get(Calendar.MONTH) + 1;
+                    monthlyRevenueMap.put(month, monthlyRevenueMap.getOrDefault(month, 0f) + (float) amount);
+                } else if (dateStr != null && dateStr.length() >= 7) {
+                    int month = Integer.parseInt(dateStr.substring(5, 7));
                     monthlyRevenueMap.put(month, monthlyRevenueMap.getOrDefault(month, 0f) + (float) amount);
                 }
             } catch (Exception ignored) {}
@@ -158,11 +168,35 @@ public class RevenueViewModel extends AndroidViewModel {
             return secondDate.compareTo(firstDate);
         });
         recentTransactions.setValue(transactions);
-        totalRevenue.setValue(String.format(Locale.US, "$%.2f", total));
+        totalRevenue.setValue(CurrencyFormatter.formatVnd(total));
         totalTransactions.setValue(String.valueOf(transactions.size()));
         double average = transactions.isEmpty() ? 0 : total / transactions.size();
-        averageTransactionValue.setValue(String.format(Locale.US, "$%.2f", average));
+        averageTransactionValue.setValue(CurrencyFormatter.formatVnd(average));
         selectedCourseName.setValue(resolveSelectedCourseName());
+    }
+
+    private Date parseIso8601(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            dateStr = dateStr.replaceAll("\\.(\\d{3})\\d+", ".$1");
+        } catch (Exception ignored) {}
+        String[] patterns = {
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "yyyy-MM-dd'T'HH:mm:ssXXX",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd"
+        };
+        for (String pattern : patterns) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+                return sdf.parse(dateStr);
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 
     private double resolveAmount(Enrollment enrollment, Course course) {
@@ -206,9 +240,9 @@ public class RevenueViewModel extends AndroidViewModel {
         pieEntries.setValue(new ArrayList<>());
         recentTransactions.setValue(new ArrayList<>());
         courses.setValue(new ArrayList<>());
-        totalRevenue.setValue("$0.00");
+        totalRevenue.setValue(CurrencyFormatter.formatVnd(0));
         totalTransactions.setValue("0");
-        averageTransactionValue.setValue("$0.00");
+        averageTransactionValue.setValue(CurrencyFormatter.formatVnd(0));
         selectedCourseName.setValue(getApplication().getString(R.string.all_courses));
     }
 
