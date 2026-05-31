@@ -83,6 +83,25 @@ public class CourseDetailActivity extends AppCompatActivity {
         }
 
         initViews();
+
+        if ("admin".equalsIgnoreCase(sessionManager.getRole())) {
+            btnAddToCart.setVisibility(View.GONE);
+            btnEnroll.setVisibility(View.GONE);
+            btnCartContainer.setVisibility(View.GONE);
+
+            View layoutBottomBar = findViewById(R.id.layoutBottomBar);
+            if (layoutBottomBar != null) {
+                layoutBottomBar.setVisibility(View.GONE);
+            }
+
+            View scrollDetail = findViewById(R.id.scrollDetail);
+            if (scrollDetail != null) {
+                androidx.constraintlayout.widget.ConstraintLayout.LayoutParams params =
+                        (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) scrollDetail.getLayoutParams();
+                params.bottomMargin = 0;
+                scrollDetail.setLayoutParams(params);
+            }
+        }
         initRepositories();
         setupRecyclerViews();
 
@@ -140,6 +159,11 @@ public class CourseDetailActivity extends AppCompatActivity {
     }
 
     private void updateCartBadge() {
+        if ("admin".equalsIgnoreCase(sessionManager.getRole())) {
+            tvCartBadge.setVisibility(View.GONE);
+            btnAddToCart.setVisibility(View.GONE);
+            return;
+        }
         if (userId == null) {
             tvCartBadge.setVisibility(View.GONE);
             return;
@@ -198,7 +222,11 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Course course) {
                 if (course != null) {
-                    if ("pending".equalsIgnoreCase(course.getStatus()) || "rejected".equalsIgnoreCase(course.getStatus())) {
+                    boolean isAdmin = "admin".equalsIgnoreCase(sessionManager.getRole());
+                    boolean isOwner = course.getInstructorId() != null && course.getInstructorId().equals(userId);
+                    
+                    if (("pending".equalsIgnoreCase(course.getStatus()) || "rejected".equalsIgnoreCase(course.getStatus())) 
+                            && !isAdmin && !isOwner) {
                         runOnUiThread(() -> {
                             Toast.makeText(CourseDetailActivity.this, R.string.course_not_found, Toast.LENGTH_SHORT).show();
                             finish();
@@ -317,6 +345,9 @@ public class CourseDetailActivity extends AppCompatActivity {
     }
 
     private void checkEnrollmentStatus() {
+        if ("admin".equalsIgnoreCase(sessionManager.getRole())) {
+            return;
+        }
         if (userId == null || courseId == null) {
             return;
         }

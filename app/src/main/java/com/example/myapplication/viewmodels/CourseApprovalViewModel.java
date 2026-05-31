@@ -34,6 +34,23 @@ public class CourseApprovalViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Fetch active approved courses.
+     */
+    public void fetchApprovedCourses() {
+        repository.getByStatus("approved", new CourseRepository.RepositoryCallback<List<Course>>() {
+            @Override
+            public void onSuccess(List<Course> data) {
+                pendingCourses.setValue(data);
+            }
+
+            @Override
+            public void onError(String message) {
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
     public void approveCourse(Course course) {
         course.setStatus("approved");
         repository.update(course.getId(), course, new CourseRepository.RepositoryCallback<Void>() {
