@@ -42,11 +42,32 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         notifyDataSetChanged();
     }
 
+    public int getCorrectAnswersCount() {
+        int correctCount = 0;
+        for (int i = 0; i < quizList.size(); i++) {
+            Quiz quiz = quizList.get(i);
+            int selectedIndex = selectedAnswers.get(i, -1);
+            int correctIndex = -1;
+            if (quiz.getCorrectAnswer() != null && !quiz.getCorrectAnswer().isEmpty()) {
+                correctIndex = quiz.getCorrectAnswer().toUpperCase().charAt(0) - 'A';
+            }
+            if (selectedIndex != -1 && selectedIndex == correctIndex) {
+                correctCount++;
+            }
+        }
+        return correctCount;
+    }
+
+    public int getTotalQuestionsCount() {
+        return quizList.size();
+    }
+
     public void resetQuiz() {
         this.isSubmitted = false;
         this.selectedAnswers.clear();
         notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override

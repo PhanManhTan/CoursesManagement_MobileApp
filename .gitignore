@@ -17,3 +17,4 @@ Planning.xlsx
 .env
 supabase/.temp/
 
+app/google-services.json

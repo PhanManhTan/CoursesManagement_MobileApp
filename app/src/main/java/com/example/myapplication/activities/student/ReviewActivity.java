@@ -24,6 +24,7 @@ public class ReviewActivity extends AppCompatActivity {
     private Button btnSubmit;
 
     private ReviewRepository reviewRepository;
+    private com.example.myapplication.data.repository.EnrollmentRepository enrollmentRepository;
     private SessionManager sessionManager;
 
     private String courseId;
@@ -39,10 +40,11 @@ public class ReviewActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         userId = sessionManager.getUserId();
         reviewRepository = new ReviewRepository(this);
+        enrollmentRepository = new com.example.myapplication.data.repository.EnrollmentRepository(this);
 
         initViews();
         setupListeners();
-        checkExistingReview();
+        checkEnrollmentAndExistingReview();
     }
 
     private void initViews() {
@@ -58,10 +60,42 @@ public class ReviewActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(v -> submitReview());
     }
 
+    private void checkEnrollmentAndExistingReview() {
+        if (userId == null || courseId == null) {
+            Toast.makeText(this, "Missing user or course details.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        btnSubmit.setEnabled(false);
+        btnSubmit.setText(R.string.loading);
+
+        enrollmentRepository.checkEnrollment(userId, courseId, new com.example.myapplication.data.repository.EnrollmentRepository.RepositoryCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean isEnrolled) {
+                if (isEnrolled == null || !isEnrolled) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(ReviewActivity.this, "You must enroll in this course to leave a review.", Toast.LENGTH_LONG).show();
+                        finish();
+                    });
+                    return;
+                }
+                checkExistingReview();
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    Toast.makeText(ReviewActivity.this, "Failed to verify enrollment: " + message, Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }
+        });
+    }
+
     private void checkExistingReview() {
         if (userId == null || courseId == null) return;
 
-        // Disable submit button while fetching to prevent duplicate submissions
         btnSubmit.setEnabled(false);
         btnSubmit.setText(R.string.loading);
 
@@ -73,12 +107,12 @@ public class ReviewActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                // Review not found, allow user to submit
                 btnSubmit.setEnabled(true);
                 btnSubmit.setText(R.string.submit_review_upper);
             }
         });
     }
+
 
     private void lockUIWithExistingReview(Review review) {
         ratingCourse.setRating(review.getRating());

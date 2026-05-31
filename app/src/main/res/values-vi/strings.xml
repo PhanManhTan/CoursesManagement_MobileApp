@@ -214,7 +214,7 @@
     <string name="upload_video">Tải video lên</string>
     <string name="upload_thumbnail">Tải ảnh lên</string>
     <string name="upload">Tải lên</string>
-    <string name="change">Đổi</string>
+    <string name="change">Chương</string>
     <string name="no_file_selected">Chưa chọn tệp</string>
     <string name="no_files">Chưa có tệp</string>
 
@@ -515,4 +515,13 @@
     <string name="vnd_price_format">%1$,.0f VND</string>
     <string name="price_zero_vnd">0 VND</string>
     <string name="lesson_count_with_duration_format">%1$d bài học • %2$s</string>
+    <string name="tab_pending_approvals">Chờ duyệt</string>
+    <string name="tab_active_courses">Hoạt động</string>
+
+    <string name="enroll_for_free">Đăng ký miễn phí</string>
+    <string name="processing_enrollment">Đang xử lý đăng ký...</string>
+    <string name="enrollment_successful_notif">Đăng ký thành công 🎉</string>
+    <string name="payment_successful_notif">Thanh toán thành công 🎉</string>
+    <string name="enrollment_success_db_message">Bạn đã đăng ký thành công khóa học! Chúc bạn học tập tốt.</string>
+    <string name="open_app_to_learn">Mở ứng dụng để bắt đầu học ngay!</string>
 </resources>

@@ -62,6 +62,9 @@ public class CourseDetailActivity extends AppCompatActivity {
     private ReviewAdapter reviewAdapter;
     private String courseId;
     private String userId;
+    private List<Cart> currentCartItems = new java.util.ArrayList<>();
+    private boolean isEnrolled = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,25 @@ public class CourseDetailActivity extends AppCompatActivity {
         }
 
         initViews();
+
+        if ("admin".equalsIgnoreCase(sessionManager.getRole())) {
+            btnAddToCart.setVisibility(View.GONE);
+            btnEnroll.setVisibility(View.GONE);
+            btnCartContainer.setVisibility(View.GONE);
+
+            View layoutBottomBar = findViewById(R.id.layoutBottomBar);
+            if (layoutBottomBar != null) {
+                layoutBottomBar.setVisibility(View.GONE);
+            }
+
+            View scrollDetail = findViewById(R.id.scrollDetail);
+            if (scrollDetail != null) {
+                androidx.constraintlayout.widget.ConstraintLayout.LayoutParams params =
+                        (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) scrollDetail.getLayoutParams();
+                params.bottomMargin = 0;
+                scrollDetail.setLayoutParams(params);
+            }
+        }
         initRepositories();
         setupRecyclerViews();
 
@@ -137,6 +159,11 @@ public class CourseDetailActivity extends AppCompatActivity {
     }
 
     private void updateCartBadge() {
+        if ("admin".equalsIgnoreCase(sessionManager.getRole())) {
+            tvCartBadge.setVisibility(View.GONE);
+            btnAddToCart.setVisibility(View.GONE);
+            return;
+        }
         if (userId == null) {
             tvCartBadge.setVisibility(View.GONE);
             return;
@@ -145,12 +172,28 @@ public class CourseDetailActivity extends AppCompatActivity {
         cartRepository.getByUserId(userId, new CartRepository.RepositoryCallback<List<Cart>>() {
             @Override
             public void onSuccess(List<Cart> data) {
+                currentCartItems = data != null ? data : new java.util.ArrayList<>();
                 runOnUiThread(() -> {
                     if (data != null && !data.isEmpty()) {
                         tvCartBadge.setText(String.valueOf(data.size()));
                         tvCartBadge.setVisibility(View.VISIBLE);
                     } else {
                         tvCartBadge.setVisibility(View.GONE);
+                    }
+
+                    boolean inCart = false;
+                    for (Cart item : currentCartItems) {
+                        if (courseId != null && courseId.equals(item.getCourseId())) {
+                            inCart = true;
+                            break;
+                        }
+                    }
+                    if (inCart) {
+                        btnAddToCart.setText("In Cart");
+                        btnAddToCart.setEnabled(false);
+                    } else {
+                        btnAddToCart.setText(R.string.add_to_cart);
+                        btnAddToCart.setEnabled(true);
                     }
                 });
             }
@@ -179,6 +222,17 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Course course) {
                 if (course != null) {
+                    boolean isAdmin = "admin".equalsIgnoreCase(sessionManager.getRole());
+                    boolean isOwner = course.getInstructorId() != null && course.getInstructorId().equals(userId);
+                    
+                    if (("pending".equalsIgnoreCase(course.getStatus()) || "rejected".equalsIgnoreCase(course.getStatus())) 
+                            && !isAdmin && !isOwner) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(CourseDetailActivity.this, R.string.course_not_found, Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
+                        return;
+                    }
                     runOnUiThread(() -> {
                         displayCourseDetails(course);
                         loadInstructorDetails(course.getInstructorId());
@@ -189,10 +243,14 @@ public class CourseDetailActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, getString(R.string.error_with_message, message), Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> {
+                    Toast.makeText(CourseDetailActivity.this, getString(R.string.error_with_message, message), Toast.LENGTH_SHORT).show();
+                    finish();
+                });
             }
         });
     }
+
 
     private void displayCourseDetails(Course course) {
         tvCourseTitle.setText(course.getTitle());
@@ -287,13 +345,17 @@ public class CourseDetailActivity extends AppCompatActivity {
     }
 
     private void checkEnrollmentStatus() {
+        if ("admin".equalsIgnoreCase(sessionManager.getRole())) {
+            return;
+        }
         if (userId == null || courseId == null) {
             return;
         }
 
         enrollmentRepository.checkEnrollment(userId, courseId, new EnrollmentRepository.RepositoryCallback<Boolean>() {
             @Override
-            public void onSuccess(Boolean isEnrolled) {
+            public void onSuccess(Boolean enrolled) {
+                isEnrolled = enrolled != null ? enrolled : false;
                 runOnUiThread(() -> {
                     if (isEnrolled) {
                         btnEnroll.setText(R.string.owned);
@@ -314,6 +376,18 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (userId == null) {
             Toast.makeText(this, R.string.login_to_add_cart, Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        if (isEnrolled) {
+            Toast.makeText(this, "You have already enrolled in this course!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (Cart item : currentCartItems) {
+            if (courseId != null && courseId.equals(item.getCourseId())) {
+                Toast.makeText(this, "Course is already in your cart!", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         Cart cartItem = new Cart(null, userId, courseId);
@@ -338,6 +412,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void loadChapters() {
         chapterRepository.getByCourseId(courseId, new ChapterRepository.RepositoryCallback<List<Chapter>>() {

@@ -1,6 +1,7 @@
 package com.example.myapplication.activities.common;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,62 +22,93 @@ import java.util.Collections;
 import java.util.List;
 
 public class NotificationActivity extends AppCompatActivity {
+
+    private NotificationAdapter adapter;
+    private List<Notification> notificationList = new ArrayList<>();
+    private NotificationRepository notificationRepository;
+    private SessionManager sessionManager;
+    private BottomNavigationView bottomNav;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_activity);
 
+        sessionManager = new SessionManager(this);
+        notificationRepository = new NotificationRepository(this);
+
         RecyclerView rvNotifications = findViewById(R.id.rvNotifications);
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
 
-        List<Notification> notifications = new ArrayList<>();
-        NotificationAdapter adapter = new NotificationAdapter(notifications);
+        adapter = new NotificationAdapter(notificationList);
+        adapter.setOnNotificationClickListener(notification -> {
+            if (!notification.isRead()) {
+                markAsRead(notification);
+            }
+        });
         rvNotifications.setAdapter(adapter);
-        loadNotifications(notifications, adapter);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_notification);
         BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
-            public void handleOnBackPressed() {
-            }
+            public void handleOnBackPressed() { }
         });
+
+        loadNotifications();
     }
 
-    private void loadNotifications(List<Notification> notifications, NotificationAdapter adapter) {
-        SessionManager sessionManager = new SessionManager(this);
-        String userId = sessionManager.getUserId();
-        if (userId == null || userId.trim().isEmpty()) {
-            return;
-        }
-
-        NotificationRepository repository = new NotificationRepository(this);
-        repository.getByUserId(userId, new NotificationRepository.RepositoryCallback<List<Notification>>() {
+    private void markAsRead(Notification notification) {
+        notificationRepository.markAsRead(notification.getId(), new NotificationRepository.RepositoryCallback<Void>() {
             @Override
-            public void onSuccess(List<Notification> data) {
+            public void onSuccess(Void data) {
                 runOnUiThread(() -> {
-                    notifications.clear();
-                    if (data != null) {
-                        notifications.addAll(data);
-                        Collections.sort(notifications, (a, b) -> {
-                            String dateA = a != null && a.getCreatedAt() != null ? a.getCreatedAt() : "";
-                            String dateB = b != null && b.getCreatedAt() != null ? b.getCreatedAt() : "";
-                            return dateB.compareTo(dateA);
-                        });
-                    }
+                    notification.setRead(true);
                     adapter.notifyDataSetChanged();
+                    BottomNavigationHelper.updateNotificationBadge(NotificationActivity.this, bottomNav);
                 });
             }
 
             @Override
             public void onError(String message) {
+                // Keep it silent or show toast
+            }
+        });
+    }
+
+    private void loadNotifications() {
+        String userId = sessionManager.getUserId();
+        if (userId == null) {
+            Toast.makeText(this, R.string.please_login_first, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        notificationRepository.getByUserId(userId, new NotificationRepository.RepositoryCallback<List<Notification>>() {
+            @Override
+            public void onSuccess(List<Notification> data) {
                 runOnUiThread(() -> {
-                    notifications.clear();
-                    adapter.notifyDataSetChanged();
+                    notificationList.clear();
+                    if (data != null) {
+                        notificationList.addAll(data);
+                        Collections.sort(notificationList, (a, b) -> {
+                            String dateA = a != null && a.getCreatedAt() != null ? a.getCreatedAt() : "";
+                            String dateB = b != null && b.getCreatedAt() != null ? b.getCreatedAt() : "";
+                            return dateB.compareTo(dateA);
+                        });
+                    }
+                    adapter.setNotifications(notificationList);
+                    BottomNavigationHelper.updateNotificationBadge(NotificationActivity.this, bottomNav);
                 });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() ->
+                        Toast.makeText(NotificationActivity.this, "Failed to load notifications: " + message, Toast.LENGTH_SHORT).show()
+                );
             }
         });
     }

@@ -38,7 +38,13 @@ public class RetrofitClient {
     public static Retrofit getClient(Context context) {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY); // Luôn bật BODY để debug
+            if (BuildConfig.DEBUG) {
+                logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            } else {
+                logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+            }
+            logging.redactHeader("apikey");
+            logging.redactHeader("Authorization");
 
             Context appContext = context.getApplicationContext();
             SessionManager sessionManager = new SessionManager(appContext);

@@ -1,6 +1,5 @@
 package com.example.myapplication.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,23 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
     private List<Notification> notificationList;
+    private OnNotificationClickListener listener;
+
+    public interface OnNotificationClickListener {
+        void onNotificationClick(Notification notification);
+    }
 
     public NotificationAdapter(List<Notification> notificationList) {
         this.notificationList = notificationList;
+    }
+
+    public void setOnNotificationClickListener(OnNotificationClickListener listener) {
+        this.listener = listener;
+    }
+
+    public void setNotifications(List<Notification> notificationList) {
+        this.notificationList = notificationList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -32,11 +45,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         NotificationLocalizer.localize(holder.itemView.getContext(), notification, holder.tvTitle, holder.tvMessage);
 
+        holder.itemView.setBackgroundResource(R.drawable.bg_rounded_dark);
+
         if (!notification.isRead()) {
             holder.tvTitle.setAlpha(1.0f);
+            holder.tvMessage.setAlpha(1.0f);
+            holder.itemView.setBackgroundTintList(null);
         } else {
-            holder.tvTitle.setAlpha(0.6f);
+            holder.tvTitle.setAlpha(0.5f);
+            holder.tvMessage.setAlpha(0.5f);
+            holder.itemView.setAlpha(0.8f);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onNotificationClick(notification);
+            }
+        });
     }
 
     @Override
