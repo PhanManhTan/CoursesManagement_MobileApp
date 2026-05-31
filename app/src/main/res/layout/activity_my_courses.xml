@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Courses"
+            android:text="@string/my_courses_nav"
             android:textColor="@color/text_primary"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -36,9 +36,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" android:textAllCaps="false" android:backgroundTint="@color/accent" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ongoing" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Completed" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary"/>
+            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/all" android:textAllCaps="false" android:backgroundTint="@color/accent" android:layout_marginEnd="10dp"/>
+            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ongoing" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary" android:layout_marginEnd="10dp"/>
+            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/completed" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary"/>
         </LinearLayout>
     </HorizontalScrollView>
 

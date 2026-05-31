@@ -22,7 +22,7 @@
             android:layout_width="145dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Discover"
+            android:text="@string/discover"
             android:textColor="@color/text_primary"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -47,7 +47,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Type the course..."
+                android:hint="@string/type_course_hint"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/ic_app_background"
                 android:backgroundTint="@color/accent_light" />
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Find"
+                android:text="@string/find"
                 android:backgroundTint="@color/accent_muted"
                 android:textColor="@color/text_primary" />
         </LinearLayout>

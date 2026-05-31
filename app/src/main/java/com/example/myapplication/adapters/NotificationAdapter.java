@@ -26,6 +26,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         this.listener = listener;
     }
 
+    public void setNotifications(List<Notification> notificationList) {
+        this.notificationList = notificationList;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,19 +45,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvTitle.setText(notification.getTitle());
         holder.tvMessage.setText(notification.getMessage());
 
-        // Luôn giữ background resource để có khung (rounded corners và stroke)
         holder.itemView.setBackgroundResource(R.drawable.bg_rounded_dark);
 
         if (!notification.isRead()) {
-            // Thông báo chưa đọc: Hiện rõ, có thể đổi màu nền hoặc stroke để nhấn mạnh
             holder.tvTitle.setAlpha(1.0f);
             holder.tvMessage.setAlpha(1.0f);
-            holder.itemView.setBackgroundTintList(null); // Trở về mặc định của drawable
+            holder.itemView.setBackgroundTintList(null);
         } else {
-            // Thông báo đã đọc: Làm mờ đi
             holder.tvTitle.setAlpha(0.5f);
             holder.tvMessage.setAlpha(0.5f);
-            // Làm mờ cả khung nếu muốn
             holder.itemView.setAlpha(0.8f);
         }
 

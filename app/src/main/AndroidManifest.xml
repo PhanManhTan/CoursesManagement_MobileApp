@@ -7,11 +7,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <application
+        android:name=".CoursesApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/icon_app"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/icon_app_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
@@ -27,45 +29,42 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.auth.OnboardingActivity" android:exported="true" />
-        <activity android:name=".activities.auth.LoginActivity" android:exported="true" />
-        <activity android:name=".activities.auth.RegisterActivity" android:exported="true" />
-        <activity android:name=".activities.auth.OtpVerifyActivity" android:exported="true" />
-        <activity android:name=".activities.auth.ForgotPasswordActivity" android:exported="true" />
-        <activity android:name=".activities.auth.SetNewPasswordActivity" android:exported="true" />
+        <activity android:name=".activities.auth.OnboardingActivity" android:exported="false" />
+        <activity android:name=".activities.auth.LoginActivity" android:exported="false" />
+        <activity android:name=".activities.auth.RegisterActivity" android:exported="false" />
+        <activity android:name=".activities.auth.OtpVerifyActivity" android:exported="false" />
+        <activity android:name=".activities.auth.ForgotPasswordActivity" android:exported="false" />
+        <activity android:name=".activities.auth.SetNewPasswordActivity" android:exported="false" />
 
-        <activity android:name=".activities.common.HomeActivity" android:exported="true" />
+        <activity android:name=".activities.common.HomeActivity" android:exported="false" />
 
         <!-- ── Student Activities ── -->
-        <activity android:name="com.example.myapplication.activities.student.CourseListActivity" android:exported="true" />
-        <activity android:name=".activities.student.CourseDetailActivity" android:exported="true" />
-        <activity android:name=".activities.student.LearningActivity" android:exported="true" />
-        <activity android:name=".activities.student.MyCoursesActivity" android:exported="true" />
-        <activity android:name=".activities.student.SearchActivity" android:exported="true" />
+        <activity android:name="com.example.myapplication.activities.student.CourseListActivity" android:exported="false" />
+        <activity android:name=".activities.student.CourseDetailActivity" android:exported="false" />
+        <activity android:name=".activities.student.LearningActivity" android:exported="false" />
+        <activity android:name=".activities.student.MyCoursesActivity" android:exported="false" />
+        <activity android:name=".activities.student.SearchActivity" android:exported="false" />
+        <activity android:name=".activities.student.ReviewActivity" android:exported="false"/>
 
         <!-- ── Instructor Activities ── -->
         <activity android:name=".activities.instructor.InstructorMainActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
-        <activity android:name="com.example.myapplication.activities.instructor.CourseListActivity" android:exported="false" />
         <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
         <activity android:name=".activities.instructor.EditLessonActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.StudentListActivity" android:exported="false" />
-        <activity android:name=".activities.instructor.RevenueActivity" android:exported="false" />
 
         <!-- ── Admin Activities ── -->
-        <activity android:name=".activities.admin.AdminDashboardActivity" android:exported="false" />
-        <activity android:name=".activities.admin.UserManageActivity" android:exported="false" />
-        <activity android:name=".activities.admin.CourseApprovalActivity" android:exported="false" />
-        <activity android:name=".activities.admin.ReportActivity" android:exported="false" />
+        <activity
+            android:name=".activities.admin.AdminMainActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
 
         <!-- ── Common Activities ── -->
-        <activity android:name=".activities.common.AccountActivity" android:exported="true" />
-        <activity android:name=".activities.common.CartActivity" android:exported="true" />
-        <activity android:name=".activities.common.CheckoutActivity" android:exported="true" />
-        <activity android:name=".activities.common.EditProfileActivity" android:exported="true" />
-        <activity android:name=".activities.common.NotificationActivity" android:exported="true" />
-        <activity android:name=".activities.common.PaymentResultActivity" android:exported="true" />
-        <activity android:name=".activities.common.VNPAYActivity" android:exported="true" />/>
+        <activity android:name=".activities.common.AccountActivity" android:exported="false" />
+        <activity android:name=".activities.common.CartActivity" android:exported="false" />
+        <activity android:name=".activities.common.CheckoutActivity" android:exported="false" />
+        <activity android:name=".activities.common.EditProfileActivity" android:exported="false" />
+        <activity android:name=".activities.common.NotificationActivity" android:exported="false" />
+        <activity android:name=".activities.common.PaymentResultActivity" android:exported="false" />
+        <activity android:name=".activities.common.VNPAYActivity" android:exported="false" />
         <!-- Firebase Cloud Messaging Service -->
         <service
             android:name=".services.MyFirebaseMessagingService"

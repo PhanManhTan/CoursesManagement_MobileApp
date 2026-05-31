@@ -17,6 +17,7 @@ import com.example.myapplication.adapters.MyCourseAdapter;
 import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.models.Enrollment;
 import com.example.myapplication.utils.BottomNavigationHelper;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -35,6 +36,7 @@ public class MyCoursesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_courses);
 
@@ -76,6 +78,13 @@ public class MyCoursesActivity extends AppCompatActivity {
             }
             startActivity(intent);
         });
+
+        myCourseAdapter.setOnReviewClickListener(enrollment -> {
+            Intent intent = new Intent(this, ReviewActivity.class);
+            intent.putExtra("COURSE_ID", enrollment.getCourseId());
+            startActivity(intent);
+        });
+
         rvMyCourses.setAdapter(myCourseAdapter);
         rvMyCourses.setHasFixedSize(true);
     }
@@ -108,7 +117,7 @@ public class MyCoursesActivity extends AppCompatActivity {
     private void loadMyCourses() {
         String userId = sessionManager.getUserId();
         if (userId == null) {
-            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_login_first, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -121,7 +130,7 @@ public class MyCoursesActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(MyCoursesActivity.this, "Error loading courses: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyCoursesActivity.this, getString(R.string.error_loading_courses, message), Toast.LENGTH_SHORT).show();
             }
         });
     }

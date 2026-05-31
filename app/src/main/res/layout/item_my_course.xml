@@ -30,7 +30,7 @@
             android:id="@+id/tvCourseName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Course Title"
+            android:text="@string/course_title_placeholder"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:id="@+id/tvAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="by Author"
+            android:text="@string/by_author_placeholder"
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
@@ -51,7 +51,7 @@
                 android:id="@+id/tvPercent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="65% COMPLETE"
+                android:text="@string/progress_complete_placeholder"
                 android:textColor="@color/accent_light"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="12/24 Lessons"
+                android:text="@string/progress_lessons_placeholder"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
         </RelativeLayout>
@@ -73,5 +73,16 @@
             android:layout_marginTop="4dp"
             android:progress="65"
             android:progressDrawable="@drawable/custom_progress_bar" />
+
+        <Button
+            android:id="@+id/btnReview"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/review_course"
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            android:visibility="gone"
+            app:backgroundTint="@color/accent" />
     </LinearLayout>
 </LinearLayout>

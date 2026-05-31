@@ -10,8 +10,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import com.example.myapplication.R;
-import com.example.myapplication.activities.admin.CourseApprovalActivity;
-import com.example.myapplication.activities.admin.ReportActivity;
+import com.example.myapplication.activities.admin.AdminMainActivity;
+import com.example.myapplication.utils.LanguageManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -24,7 +24,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FCM_Service";
     private static final String CHANNEL_ID = "admin_notifications_channel";
-    private static final String CHANNEL_NAME = "Admin Tasks Channel";
 
     @Override
     public void onNewToken(@NonNull String token) {
@@ -57,21 +56,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         // Fallbacks for empty fields
-        if (title == null) title = "New Admin Action Needed";
-        if (body == null) body = "Please check dashboard details.";
+        Context localizedContext = LanguageManager.getLocalizedContext(this);
+        if (title == null) title = localizedContext.getString(R.string.fcm_fallback_title);
+        if (body == null) body = localizedContext.getString(R.string.fcm_fallback_body);
 
         sendLocalNotification(title, body, type);
     }
 
     private void sendLocalNotification(String title, String body, String type) {
-        Intent intent;
+        Intent intent = new Intent(this, AdminMainActivity.class);
         if ("course_pending_approval".equalsIgnoreCase(type)) {
-            intent = new Intent(this, CourseApprovalActivity.class);
+            intent.putExtra("TARGET_TAB", "course_pending_approval");
         } else if ("course_violation_report".equalsIgnoreCase(type)) {
-            intent = new Intent(this, ReportActivity.class);
-        } else {
-            // Default fallback is to launch application dashboard/main
-            intent = new Intent(this, com.example.myapplication.activities.admin.AdminDashboardActivity.class);
+            intent.putExtra("TARGET_TAB", "course_violation_report");
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -83,15 +80,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         );
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Context localizedContext = LanguageManager.getLocalizedContext(this);
 
         // Define channel for Android Oreo and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
-                    CHANNEL_NAME,
+                    localizedContext.getString(R.string.fcm_channel_name),
                     NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Notifications related to administrative actions and approvals");
+            channel.setDescription(localizedContext.getString(R.string.fcm_channel_description));
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }

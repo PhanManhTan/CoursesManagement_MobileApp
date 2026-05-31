@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="Course Details"
+            android:text="@string/course_details"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -100,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Course Title"
+                android:text="@string/course_title_placeholder"
                 android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -135,7 +135,7 @@
                     android:id="@+id/tvPerDiscount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0% OFF"
+                    android:text="@string/discount_off_placeholder"
                     android:textColor="@color/accent_light" />
             </LinearLayout>
 
@@ -165,7 +165,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="12 Hours"
+                        android:text="@string/course_duration_placeholder"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
@@ -213,7 +213,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="IT"
+                        android:text="@string/na_value"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
@@ -240,7 +240,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="About the course"
+                    android:text="@string/about_course"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -250,7 +250,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Description..."
+                    android:text="@string/description_placeholder"
                     android:textColor="@color/text_primary" />
             </LinearLayout>
 
@@ -279,7 +279,7 @@
                         android:id="@+id/tvTeacherName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Instructor Name"
+                        android:text="@string/instructor_name_placeholder"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -288,7 +288,7 @@
                         android:id="@+id/textView6"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Senior Developer"
+                        android:text="@string/instructor_role_placeholder"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -301,11 +301,28 @@
                 android:layout_marginBottom="16dp"
                 tools:listitem="@layout/item_chapter" />
 
+            <TextView
+                android:id="@+id/tvReviewsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/student_reviews"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvReviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Action Bar -->
     <LinearLayout
+        android:id="@+id/layoutBottomBar"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:orientation="horizontal"
@@ -320,7 +337,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Add to Cart"
+            android:text="@string/add_to_cart"
             android:textColor="@color/text_primary"
             android:backgroundTint="@color/bg_primary"
             app:strokeWidth="1dp"
@@ -331,7 +348,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Enroll Now"
+            android:text="@string/enroll_now"
             android:backgroundTint="@color/accent_pressed"
             android:textColor="@color/text_primary" />
     </LinearLayout>

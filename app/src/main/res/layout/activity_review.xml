@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Write a Review"
+            android:text="@string/write_review"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -51,7 +51,7 @@
             android:id="@+id/ratingTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="How was your experience?"
+            android:text="@string/review_experience_question"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -61,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Tap to rate your satisfaction"
+            android:text="@string/tap_rate_satisfaction"
             android:textColor="@color/text_secondary" />
 
         <RatingBar
@@ -87,7 +87,7 @@
             android:id="@+id/labelComment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your Feedback:"
+            android:text="@string/your_feedback"
             android:textColor="@color/accent_light" />
 
         <EditText
@@ -97,7 +97,7 @@
             android:layout_marginTop="6dp"
             android:background="@color/bg_tertiary"
             android:gravity="top"
-            android:hint="Write something..."
+            android:hint="@string/write_something_hint"
             android:inputType="textMultiLine"
             android:padding="8dp"
             android:textColor="@color/text_primary"
@@ -110,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:backgroundTint="@color/accent_muted"
-            android:text="SUBMIT REVIEW" />
+            android:text="@string/submit_review_upper" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

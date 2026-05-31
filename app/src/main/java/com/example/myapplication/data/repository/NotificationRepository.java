@@ -66,11 +66,34 @@ public class NotificationRepository {
         });
     }
 
-    // Cập nhật trạng thái đã đọc
+    // Cập nhật trạng thái đã đọc bằng Map
     public void markAsRead(String notificationId, RepositoryCallback<Void> callback) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("is_read", true);
-        notificationApi.update("eq." + notificationId, payload).enqueue(new Callback<Void>() {
+        notificationApi.updatePartial("eq." + notificationId, payload).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
+            }
+            @Override public void onFailure(Call<Void> call, Throwable t) { callback.onError(t.getMessage()); }
+        });
+    }
+
+    // Cập nhật nguyên object (từ branch cũ)
+    public void update(String id, Notification notification, RepositoryCallback<Void> callback) {
+        notificationApi.update("eq." + id, notification).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) callback.onSuccess(null);
+                else callback.onError("Error: " + response.code());
+            }
+            @Override public void onFailure(Call<Void> call, Throwable t) { callback.onError(t.getMessage()); }
+        });
+    }
+
+    public void delete(String id, RepositoryCallback<Void> callback) {
+        notificationApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) callback.onSuccess(null);

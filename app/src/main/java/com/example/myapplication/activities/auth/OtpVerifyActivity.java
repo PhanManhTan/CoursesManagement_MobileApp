@@ -1,6 +1,7 @@
 package com.example.myapplication.activities.auth;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 import retrofit2.Call;
@@ -46,6 +47,7 @@ public class OtpVerifyActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otp_verify);
 
@@ -89,15 +91,15 @@ public class OtpVerifyActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
-                            Toast.makeText(OtpVerifyActivity.this, "OTP resent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(OtpVerifyActivity.this, R.string.otp_resent, Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(OtpVerifyActivity.this, "Failed to resend OTP", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(OtpVerifyActivity.this, R.string.failed_resend_otp, Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(OtpVerifyActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(OtpVerifyActivity.this, getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -137,7 +139,7 @@ public class OtpVerifyActivity extends AppCompatActivity {
         countDownTimer = new CountDownTimer(60_000, 1_000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                tvCountdown.setText("Resend in " + (millisUntilFinished / 1000) + "s");
+                tvCountdown.setText(getString(R.string.resend_countdown, millisUntilFinished / 1000));
             }
 
             @Override
@@ -154,14 +156,14 @@ public class OtpVerifyActivity extends AppCompatActivity {
         for (EditText field : otpFields) {
             String digit = field.getText().toString().trim();
             if (digit.isEmpty()) {
-                Toast.makeText(this, "Please enter the complete OTP", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.complete_otp_required, Toast.LENGTH_SHORT).show();
                 return;
             }
             otp.append(digit);
         }
 
         btnVerify.setEnabled(false);
-        btnVerify.setText("Verifying...");
+        btnVerify.setText(R.string.verifying);
 
         AuthApi authApi = RetrofitClient.getClient(this).create(AuthApi.class);
         
@@ -180,7 +182,7 @@ public class OtpVerifyActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<AuthApi.LoginResponse> call, Response<AuthApi.LoginResponse> response) {
                 btnVerify.setEnabled(true);
-                btnVerify.setText("Verify");
+                btnVerify.setText(R.string.verify);
 
                 if (response.isSuccessful() && response.body() != null) {
 
@@ -189,7 +191,7 @@ public class OtpVerifyActivity extends AppCompatActivity {
                     // Sử dụng SessionManager để lưu token đồng bộ với RetrofitClient
                     sessionManager.saveSession(accessToken, response.body().getUser().getId(), "student");
 
-                    Toast.makeText(OtpVerifyActivity.this, "Verified successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OtpVerifyActivity.this, R.string.verified_success, Toast.LENGTH_SHORT).show();
 
                     if (MODE_FORGOT.equals(mode)) {
                         Intent intent = new Intent(OtpVerifyActivity.this, SetNewPasswordActivity.class);
@@ -205,15 +207,15 @@ public class OtpVerifyActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    Toast.makeText(OtpVerifyActivity.this, "OTP invalid or expired", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OtpVerifyActivity.this, R.string.otp_invalid_expired, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthApi.LoginResponse> call, Throwable t) {
                 btnVerify.setEnabled(true);
-                btnVerify.setText("Verify");
-                Toast.makeText(OtpVerifyActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnVerify.setText(R.string.verify);
+                Toast.makeText(OtpVerifyActivity.this, getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }

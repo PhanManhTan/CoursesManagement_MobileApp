@@ -1,10 +1,19 @@
 package com.example.myapplication.data.remote;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.example.myapplication.BuildConfig;
+import com.example.myapplication.R;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.utils.SessionManager;
+
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -23,22 +32,32 @@ public class RetrofitClient {
 
     public static void setAuthErrorListener(AuthErrorListener listener) {
         authErrorListener = listener;
-        if (listener != null) {
-            handlingAuthError.set(false);
-        }
+        handlingAuthError.set(false);
     }
 
     public static Retrofit getClient(Context context) {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY); // Luôn bật BODY để debug
+            if (BuildConfig.DEBUG) {
+                logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            } else {
+                logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+            }
+            logging.redactHeader("apikey");
+            logging.redactHeader("Authorization");
 
-            SessionManager sessionManager = new SessionManager(context.getApplicationContext());
+            Context appContext = context.getApplicationContext();
+            SessionManager sessionManager = new SessionManager(appContext);
             String apiKey = BuildConfig.SUPABASE_API_KEY;
 
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(chain -> {
                         Request original = chain.request();
+                        boolean authEndpoint = isAuthEndpoint(original);
+                        if (!authEndpoint && !sessionManager.isLoggedIn()) {
+                            handleAuthError(appContext, "Missing or expired session before " + original.url().encodedPath());
+                        }
+
                         String token = sessionManager.getToken();
 
                         Request.Builder builder = original.newBuilder()
@@ -53,12 +72,8 @@ public class RetrofitClient {
                         }
 
                         okhttp3.Response response = chain.proceed(builder.build());
-                        if (response.code() == 401 && handlingAuthError.compareAndSet(false, true)) {
-                            Log.w(TAG, "Received 401 from " + original.url().encodedPath());
-                            AuthErrorListener listener = authErrorListener;
-                            if (listener != null) {
-                                listener.onAuthError();
-                            }
+                        if (!authEndpoint && response.code() == 401) {
+                            handleAuthError(appContext, "Received 401 from " + original.url().encodedPath());
                         }
                         return response;
                     })
@@ -83,5 +98,31 @@ public class RetrofitClient {
                     .build();
         }
         return retrofit;
+    }
+
+    private static boolean isAuthEndpoint(Request request) {
+        String path = request.url().encodedPath();
+        return path != null && path.startsWith("/auth/v1/");
+    }
+
+    private static void handleAuthError(Context context, String reason) {
+        if (!handlingAuthError.compareAndSet(false, true)) {
+            return;
+        }
+
+        Log.w(TAG, reason);
+        new SessionManager(context).clear();
+        AuthErrorListener listener = authErrorListener;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (listener != null) {
+                listener.onAuthError();
+                return;
+            }
+
+            Toast.makeText(context, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(context, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            context.startActivity(intent);
+        });
     }
 }

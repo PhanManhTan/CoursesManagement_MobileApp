@@ -20,12 +20,17 @@ public interface NotificationApi {
     @GET("notifications")
     Call<List<Notification>> getUnreadByUserId(@Query("user_id") String userIdFilter, @Query("is_read") String isReadFilter);
 
-    // Dùng Map để insert an toàn (tránh truyền id null)
+    @GET("notifications?select=*")
+    Call<List<Notification>> getAll();
+
     @POST("notifications")
     Call<Void> insert(@Body Map<String, Object> payload);
 
     @PATCH("notifications")
-    Call<Void> update(@Query("id") String idFilter, @Body Map<String, Object> payload);
+    Call<Void> updatePartial(@Query("id") String idFilter, @Body Map<String, Object> payload);
+
+    @PATCH("notifications")
+    Call<Void> update(@Query("id") String idFilter, @Body Notification notification);
 
     @DELETE("notifications")
     Call<Void> delete(@Query("id") String idFilter);

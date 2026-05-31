@@ -13,6 +13,7 @@ import com.example.myapplication.adapters.NotificationAdapter;
 import com.example.myapplication.data.repository.NotificationRepository;
 import com.example.myapplication.models.Notification;
 import com.example.myapplication.utils.BottomNavigationHelper;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -29,6 +30,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_activity);
 
@@ -78,7 +80,10 @@ public class NotificationActivity extends AppCompatActivity {
 
     private void loadNotifications() {
         String userId = sessionManager.getUserId();
-        if (userId == null) return;
+        if (userId == null) {
+            Toast.makeText(this, R.string.please_login_first, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         notificationRepository.getByUserId(userId, new NotificationRepository.RepositoryCallback<List<Notification>>() {
             @Override
@@ -88,7 +93,7 @@ public class NotificationActivity extends AppCompatActivity {
                     if (data != null) {
                         notificationList.addAll(data);
                     }
-                    adapter.notifyDataSetChanged();
+                    adapter.setNotifications(notificationList);
                     BottomNavigationHelper.updateNotificationBadge(NotificationActivity.this, bottomNav);
                 });
             }
@@ -96,7 +101,7 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 runOnUiThread(() ->
-                        Toast.makeText(NotificationActivity.this, "Lỗi tải thông báo: " + message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(NotificationActivity.this, "Failed to load notifications: " + message, Toast.LENGTH_SHORT).show()
                 );
             }
         });

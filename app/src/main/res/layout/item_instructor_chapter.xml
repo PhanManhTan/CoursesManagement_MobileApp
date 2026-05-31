@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="Chapter 1: Title"
+            android:text="@string/instructor_chapter_placeholder"
             android:textAppearance="@style/TextAppearance.App.Subtitle" />
 
             <TextView
@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="0 lessons"
+            android:text="@string/lesson_count_zero"
             android:textAppearance="@style/TextAppearance.App.Caption" />
         </LinearLayout>
 

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
+import com.example.myapplication.utils.LanguageManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forget_password);
 
@@ -45,18 +47,18 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            etEmail.setError("Email is required");
+            etEmail.setError(getString(R.string.email_required));
             etEmail.requestFocus();
             return;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Enter a valid email");
+            etEmail.setError(getString(R.string.valid_email_required));
             etEmail.requestFocus();
             return;
         }
 
         btnSendOtp.setEnabled(false);
-        btnSendOtp.setText("Sending...");
+        btnSendOtp.setText(R.string.sending);
 
         AuthApi authApi = RetrofitClient.getClient(this).create(AuthApi.class);
         
@@ -67,25 +69,25 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 btnSendOtp.setEnabled(true);
-                btnSendOtp.setText("Send OTP");
+                btnSendOtp.setText(R.string.send_otp);
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(ForgotPasswordActivity.this, "Check your email for OTP", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForgotPasswordActivity.this, R.string.check_email_otp, Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(ForgotPasswordActivity.this, OtpVerifyActivity.class);
                     intent.putExtra(OtpVerifyActivity.EXTRA_EMAIL, email);
                     intent.putExtra(OtpVerifyActivity.EXTRA_MODE, OtpVerifyActivity.MODE_FORGOT);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(ForgotPasswordActivity.this, "Failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForgotPasswordActivity.this, getString(R.string.failed_code, response.code()), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 btnSendOtp.setEnabled(true);
-                btnSendOtp.setText("Send OTP");
-                Toast.makeText(ForgotPasswordActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnSendOtp.setText(R.string.send_otp);
+                Toast.makeText(ForgotPasswordActivity.this, getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -22,13 +22,13 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/outline_arrow_back_24"
             app:tint="@color/white"
-            android:contentDescription="Back" />
+            android:contentDescription="@string/back" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Checkout"
+            android:text="@string/checkout_title"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"/>
@@ -37,7 +37,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Payment Method"
+        android:text="@string/payment_method"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/text_primary"
@@ -74,7 +74,7 @@
             android:id="@+id/tvOrderSummary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Order Summary"
+            android:text="@string/order_summary"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"/>
 
@@ -92,7 +92,7 @@
         android:id="@+id/btnPayNow"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="PAY NOW"
+        android:text="@string/pay_now_upper"
         android:textColor="@color/text_primary"
         android:backgroundTint="@color/accent_pressed"
         android:textStyle="bold"/>

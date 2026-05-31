@@ -25,4 +25,13 @@ public interface ReviewApi {
 
     @DELETE("reviews")
     Call<Void> delete(@Query("id") String idFilter);
+
+    @GET("reviews?select=*")
+    Call<List<Review>> getReviewByUserAndCourse(
+            @Query("user_id") String userIdFilter,
+            @Query("course_id") String courseIdFilter
+    );
+
+    @GET("reviews?select=*")
+    Call<List<Review>> getByCourseId(@Query("course_id") String courseIdFilter);
 }

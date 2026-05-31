@@ -17,6 +17,7 @@ import com.example.myapplication.adapters.CartAdapter;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.models.Cart;
 import com.example.myapplication.models.Course;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class CartActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cart_activity);
 
@@ -49,7 +51,7 @@ public class CartActivity extends AppCompatActivity {
         // Trong file CartActivity.java
         btnCheckout.setOnClickListener(v -> {
             if (cartItems.isEmpty()) {
-                Toast.makeText(this, "Your cart is empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.cart_empty, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -109,7 +111,16 @@ public class CartActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     cartItems.clear();
                     if (data != null) {
-                        cartItems.addAll(data);
+                        for (Cart item : data) {
+                            if (item.getCourse() != null) {
+                                cartItems.add(item);
+                            } else {
+                                cartRepository.removeFromCart(item.getId(), new CartRepository.RepositoryCallback<Void>() {
+                                    @Override public void onSuccess(Void d) {}
+                                    @Override public void onError(String m) {}
+                                });
+                            }
+                        }
                     }
                     adapter.notifyDataSetChanged();
                     calculateTotal();
@@ -118,10 +129,11 @@ public class CartActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(CartActivity.this, "Failed to load cart: " + message, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CartActivity.this, getString(R.string.failed_load_cart, message), Toast.LENGTH_SHORT).show());
             }
         });
     }
+
 
     private void removeFromCart(String cartId, int position) {
         cartRepository.removeFromCart(cartId, new CartRepository.RepositoryCallback<Void>() {
@@ -132,13 +144,13 @@ public class CartActivity extends AppCompatActivity {
                     adapter.notifyItemRemoved(position);
                     adapter.notifyItemRangeChanged(position, cartItems.size());
                     calculateTotal();
-                    Toast.makeText(CartActivity.this, "Item removed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CartActivity.this, R.string.item_removed, Toast.LENGTH_SHORT).show();
                 });
             }
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(CartActivity.this, "Failed to remove item: " + message, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CartActivity.this, getString(R.string.failed_remove_item, message), Toast.LENGTH_SHORT).show());
             }
         });
     }

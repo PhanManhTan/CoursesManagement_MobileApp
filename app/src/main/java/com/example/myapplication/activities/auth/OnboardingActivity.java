@@ -13,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.OnboardingAdapter;
+import com.example.myapplication.utils.LanguageManager;
 
 public class OnboardingActivity extends AppCompatActivity {
 
@@ -20,17 +21,8 @@ public class OnboardingActivity extends AppCompatActivity {
     private Button btnNext;
     private TextView tvSkip, tvDots;
 
-    private final String[] titles = {
-            "Learn Anytime, Anywhere",
-            "Expert Instructors",
-            "Track Your Progress"
-    };
-
-    private final String[] descriptions = {
-            "Access thousands of courses from your phone. Study at your own pace, on your own schedule.",
-            "Learn from industry professionals with real-world experience in their fields.",
-            "Monitor your learning journey with detailed progress tracking and certificates."
-    };
+    private String[] titles;
+    private String[] descriptions;
 
     private final int[] images = {
             R.mipmap.icon_app,
@@ -42,6 +34,7 @@ public class OnboardingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
@@ -51,6 +44,17 @@ public class OnboardingActivity extends AppCompatActivity {
         tvSkip = findViewById(R.id.tvSkip);
         tvDots = findViewById(R.id.tvDots);
 
+        titles = new String[]{
+                getString(R.string.onboarding_title_learn_anytime),
+                getString(R.string.onboarding_title_expert_instructors),
+                getString(R.string.onboarding_title_track_progress)
+        };
+        descriptions = new String[]{
+                getString(R.string.onboarding_desc_learn_anytime),
+                getString(R.string.onboarding_desc_expert_instructors),
+                getString(R.string.onboarding_desc_track_progress)
+        };
+
         viewPager.setAdapter(new OnboardingAdapter(titles, descriptions, images));
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -58,10 +62,10 @@ public class OnboardingActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 tvDots.setText(dots[position]);
                 if (position == titles.length - 1) {
-                    btnNext.setText("Get Started");
+                    btnNext.setText(R.string.get_started);
                     tvSkip.setVisibility(View.INVISIBLE);
                 } else {
-                    btnNext.setText("Next");
+                    btnNext.setText(R.string.next);
                     tvSkip.setVisibility(View.VISIBLE);
                 }
             }

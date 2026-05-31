@@ -50,12 +50,22 @@ public class ContentLearningAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof LessonViewHolder) {
-            String[] titles = {"Introduction", "Core Concepts", "Advanced Patterns", "Best Practices", "Final Project"};
-            ((LessonViewHolder) holder).tvTitle.setText("Lesson " + (position + 1) + ": " + titles[position % titles.length]);
+            String[] titles = {
+                    holder.itemView.getContext().getString(R.string.sample_lesson_intro),
+                    holder.itemView.getContext().getString(R.string.sample_lesson_core_concepts),
+                    holder.itemView.getContext().getString(R.string.sample_lesson_advanced_patterns),
+                    holder.itemView.getContext().getString(R.string.sample_lesson_best_practices),
+                    holder.itemView.getContext().getString(R.string.sample_lesson_final_project)
+            };
+            ((LessonViewHolder) holder).tvTitle.setText(holder.itemView.getContext().getString(
+                    R.string.lesson_display_format,
+                    position + 1,
+                    titles[position % titles.length]
+            ));
         } else if (holder instanceof DiscussionViewHolder) {
-            ((DiscussionViewHolder) holder).tvUser.setText("User " + (position + 1));
+            ((DiscussionViewHolder) holder).tvUser.setText(holder.itemView.getContext().getString(R.string.sample_user_format, position + 1));
         } else if (holder instanceof FileViewHolder) {
-            ((FileViewHolder) holder).tvName.setText("Document_0" + (position + 1) + ".pdf");
+            ((FileViewHolder) holder).tvName.setText(holder.itemView.getContext().getString(R.string.sample_document_format, position + 1));
         }
     }
 

@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.InstructorChapterAdapter;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.SupabaseStorageRepository;
 import com.example.myapplication.models.Chapter;
 import com.example.myapplication.models.ChapterWithLessons;
@@ -37,6 +38,8 @@ import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Lesson;
 import com.example.myapplication.models.LessonEditorData;
 import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.utils.LanguageManager;
+import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.viewmodels.EditCourseViewModel;
 import com.google.android.material.button.MaterialButton;
 
@@ -76,10 +79,17 @@ public class EditCourseActivity extends AppCompatActivity {
     private boolean hasUnsavedChanges;
     private boolean isStructureLoading;
     private boolean isSaving;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
         registerLaunchers();
         setContentView(R.layout.activity_instructor_course_detail);
 
@@ -159,7 +169,7 @@ public class EditCourseActivity extends AppCompatActivity {
         viewModel.getSaveSuccess().observe(this, saved -> {
             if (Boolean.TRUE.equals(saved)) {
                 hasUnsavedChanges = false;
-                Toast.makeText(this, "Course saved successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.course_saved_success, Toast.LENGTH_SHORT).show();
                 viewModel.resetSaveState();
                 setResult(RESULT_OK);
                 finish();
@@ -167,7 +177,7 @@ public class EditCourseActivity extends AppCompatActivity {
         });
         viewModel.getErrorMessage().observe(this, message -> {
             if (message != null && !message.isEmpty()) {
-                showEditorError("Course editor error", message);
+                showEditorError(getString(R.string.course_editor_error), message);
                 viewModel.resetSaveState();
             }
         });
@@ -275,13 +285,13 @@ public class EditCourseActivity extends AppCompatActivity {
         ));
 
         new AlertDialog.Builder(this)
-                .setTitle(editing ? "Edit chapter" : "Add chapter")
+                .setTitle(editing ? getString(R.string.edit_chapter_dialog) : getString(R.string.add_chapter_dialog))
                 .setView(wrapper)
                 .setNegativeButton(getString(R.string.cancel), null)
                 .setPositiveButton(editing ? getString(R.string.save) : getString(R.string.add), (dialog, which) -> {
                     String title = input.getText().toString().trim();
                     if (!hasValue(title)) {
-                        title = "Chapter " + (editing ? chapterPosition + 1 : chapterList.size() + 1);
+                        title = getString(R.string.default_chapter_title, editing ? chapterPosition + 1 : chapterList.size() + 1);
                     }
                     if (editing) {
                         chapterList.get(chapterPosition).getChapter().setTitle(title);
@@ -304,13 +314,13 @@ public class EditCourseActivity extends AppCompatActivity {
         Chapter chapter = chapterList.get(chapterPosition).getChapter();
         String title = chapter != null && hasValue(chapter.getTitle())
                 ? chapter.getTitle()
-                : "this chapter";
+                : getString(R.string.this_chapter);
 
         new AlertDialog.Builder(this)
-                .setTitle("Delete chapter")
-                .setMessage("Delete " + title + " and all lessons inside it? Save the course after deleting to sync this change.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_chapter)
+                .setMessage(getString(R.string.delete_chapter_confirm, title))
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     chapterList.remove(chapterPosition);
                     refreshChapterList();
                     markDirty();
@@ -334,7 +344,7 @@ public class EditCourseActivity extends AppCompatActivity {
         if (!isValidChapterPosition(chapterPosition)) return;
 
         Chapter chapter = chapterList.get(chapterPosition).getChapter();
-        Toast.makeText(this, "Saving chapter before opening lesson...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.saving_chapter_before_lesson, Toast.LENGTH_SHORT).show();
         viewModel.saveChapterDraft(chapter, chapterPosition + 1, new EditCourseViewModel.ChapterSaveCallback() {
             @Override
             public void onSuccess(Chapter savedChapter) {
@@ -346,7 +356,7 @@ public class EditCourseActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                runIfActive(() -> showEditorError("Chapter save failed", message));
+                runIfActive(() -> showEditorError(getString(R.string.chapter_save_failed), message));
             }
         });
     }
@@ -362,7 +372,7 @@ public class EditCourseActivity extends AppCompatActivity {
             lesson = chapterList.get(chapterPosition).getLessons().get(lessonPosition);
         } else {
             lesson = new Lesson();
-            lesson.setTitle("Lesson " + (chapterList.get(chapterPosition).getLessons().size() + 1));
+            lesson.setTitle(getString(R.string.default_lesson_title, chapterList.get(chapterPosition).getLessons().size() + 1));
             lesson.setOrderIndex(chapterList.get(chapterPosition).getLessons().size() + 1);
         }
 
@@ -371,8 +381,11 @@ public class EditCourseActivity extends AppCompatActivity {
             lesson.setChapterId(chapter.getId());
         }
 
+        LessonEditorData editorData = LessonEditorData.fromLesson(lesson);
+        editorData.setCourseId(resolveCourseStorageId());
+
         Intent intent = new Intent(this, EditLessonActivity.class);
-        intent.putExtra(EditLessonActivity.EXTRA_LESSON_DATA, LessonEditorData.fromLesson(lesson));
+        intent.putExtra(EditLessonActivity.EXTRA_LESSON_DATA, editorData);
         editLessonLauncher.launch(intent);
     }
 
@@ -406,9 +419,6 @@ public class EditCourseActivity extends AppCompatActivity {
             if (!lessonSynced) {
                 markDirty();
             }
-            Toast.makeText(this,
-                    lessonSynced ? "Lesson saved" : "Lesson updated in course draft. Save the course to sync.",
-                    Toast.LENGTH_SHORT).show();
         } else {
             lesson = new Lesson();
             editorData.applyToLesson(lesson);
@@ -418,9 +428,6 @@ public class EditCourseActivity extends AppCompatActivity {
             if (!lessonSynced) {
                 markDirty();
             }
-            Toast.makeText(this,
-                    lessonSynced ? "Lesson saved" : "Lesson added to course draft. Save the course to sync.",
-                    Toast.LENGTH_SHORT).show();
         }
         clearPendingLessonTarget();
     }
@@ -431,13 +438,13 @@ public class EditCourseActivity extends AppCompatActivity {
         Lesson lesson = chapterList.get(chapterPosition).getLessons().get(lessonPosition);
         String title = lesson != null && hasValue(lesson.getTitle())
                 ? lesson.getTitle()
-                : "this lesson";
+                : getString(R.string.this_lesson);
 
         new AlertDialog.Builder(this)
-                .setTitle("Delete lesson")
-                .setMessage("Delete " + title + "? Save the course after deleting to sync this change.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_lesson)
+                .setMessage(getString(R.string.delete_lesson_confirm, title))
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     chapterList.get(chapterPosition).getLessons().remove(lessonPosition);
                     chapterAdapter.notifyItemChanged(chapterPosition);
                     updateChapterCount();
@@ -448,7 +455,7 @@ public class EditCourseActivity extends AppCompatActivity {
 
     private void attemptSave() {
         if (isStructureLoading) {
-            Toast.makeText(this, "Course structure is still loading", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.course_structure_loading, Toast.LENGTH_SHORT).show();
             return;
         }
         if (isSaving) {
@@ -460,12 +467,12 @@ public class EditCourseActivity extends AppCompatActivity {
         String priceText = etPrice.getText().toString().trim();
 
         if (TextUtils.isEmpty(title)) {
-            etTitle.setError("Course title is required");
+            etTitle.setError(getString(R.string.course_title_required));
             etTitle.requestFocus();
             return;
         }
         if (TextUtils.isEmpty(description)) {
-            etDescription.setError("Description is required");
+            etDescription.setError(getString(R.string.description_required));
             etDescription.requestFocus();
             return;
         }
@@ -474,17 +481,17 @@ public class EditCourseActivity extends AppCompatActivity {
         try {
             price = TextUtils.isEmpty(priceText) ? 0 : Double.parseDouble(priceText);
         } catch (NumberFormatException e) {
-            etPrice.setError("Invalid price");
+            etPrice.setError(getString(R.string.invalid_price));
             etPrice.requestFocus();
             return;
         }
 
         if (pendingUploadCount > 0) {
-            Toast.makeText(this, "Please wait for uploads to finish", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.wait_uploads_finish, Toast.LENGTH_SHORT).show();
             return;
         }
         if (hasLocalMediaUrl(currentThumbnailUrl) || hasUnuploadedLessonMedia()) {
-            Toast.makeText(this, "Some media files are not uploaded yet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.media_not_uploaded, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!validateLessonVideos()) {
@@ -522,7 +529,7 @@ public class EditCourseActivity extends AppCompatActivity {
         try {
             pickImageLauncher.launch("image/*");
         } catch (Exception e) {
-            Toast.makeText(this, "Cannot open image picker", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.cannot_open_image_picker, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -531,7 +538,7 @@ public class EditCourseActivity extends AppCompatActivity {
         beginMediaUpload();
         currentThumbnailUrl = imageUri.toString();
         setThumbnailUploadState(true);
-        storageRepository.upload(imageUri, fileName, "courses/thumbnails", new SupabaseStorageRepository.RepositoryCallback<String>() {
+        storageRepository.uploadToFolder(imageUri, fileName, buildCourseMediaFolder("thumbnails"), new SupabaseStorageRepository.RepositoryCallback<String>() {
             @Override
             public void onSuccess(String url) {
                 runIfActive(() -> {
@@ -540,7 +547,7 @@ public class EditCourseActivity extends AppCompatActivity {
                             .load(currentThumbnailUrl)
                             .placeholder(R.drawable.image_courses)
                             .into(ivThumbnailPreview);
-                    Toast.makeText(EditCourseActivity.this, "Thumbnail uploaded", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditCourseActivity.this, R.string.thumbnail_uploaded, Toast.LENGTH_SHORT).show();
                     setThumbnailUploadState(false);
                     markDirty();
                     finishMediaUpload();
@@ -552,7 +559,7 @@ public class EditCourseActivity extends AppCompatActivity {
                 runIfActive(() -> {
                     currentThumbnailUrl = null;
                     ivThumbnailPreview.setImageResource(R.drawable.image_courses);
-                    Toast.makeText(EditCourseActivity.this, message, Toast.LENGTH_SHORT).show();
+                    showUploadError(message);
                     setThumbnailUploadState(false);
                     finishMediaUpload();
                 });
@@ -570,7 +577,7 @@ public class EditCourseActivity extends AppCompatActivity {
         for (ChapterWithLessons draft : chapterList) {
             lessonCount += draft.getLessons().size();
         }
-        tvChapterCount.setText(String.format(Locale.US, "%d chapters • %d lessons", chapterList.size(), lessonCount));
+        tvChapterCount.setText(getString(R.string.chapter_lesson_count_format, chapterList.size(), lessonCount));
     }
 
     private void normalizeOrderIndexes() {
@@ -611,10 +618,10 @@ public class EditCourseActivity extends AppCompatActivity {
                 if (lesson == null) continue;
 
                 if (!hasValue(lesson.getLocalVideoUri()) && !hasValue(lesson.getVideoUrl())) {
-                    String lessonName = hasValue(lesson.getTitle()) ? lesson.getTitle().trim() : "this lesson";
+                    String lessonName = hasValue(lesson.getTitle()) ? lesson.getTitle().trim() : getString(R.string.this_lesson);
                     showEditorError(
-                            "Lesson video required",
-                            "Add a video before saving \"" + lessonName + "\". Attachments and quizzes are optional."
+                            getString(R.string.lesson_video_required),
+                            getString(R.string.lesson_video_required_message, lessonName)
                     );
                     return false;
                 }
@@ -713,7 +720,7 @@ public class EditCourseActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(displayName)) {
             displayName = uri.getLastPathSegment();
         }
-        return TextUtils.isEmpty(displayName) ? "Selected file" : displayName;
+        return TextUtils.isEmpty(displayName) ? getString(R.string.selected_file) : displayName;
     }
 
     private void runIfActive(Runnable action) {
@@ -758,14 +765,14 @@ public class EditCourseActivity extends AppCompatActivity {
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("Unsaved changes")
-                .setMessage("Save your changes before leaving?")
-                .setPositiveButton("Save", (dialog, which) -> attemptSave())
-                .setNegativeButton("Discard", (dialog, which) -> {
+                .setTitle(R.string.unsaved_changes)
+                .setMessage(R.string.save_changes_before_leaving)
+                .setPositiveButton(R.string.save, (dialog, which) -> attemptSave())
+                .setNegativeButton(R.string.discard, (dialog, which) -> {
                     hasUnsavedChanges = false;
                     exitAction.run();
                 })
-                .setNeutralButton("Cancel", null)
+                .setNeutralButton(R.string.cancel, null)
                 .show();
     }
 
@@ -776,8 +783,17 @@ public class EditCourseActivity extends AppCompatActivity {
         return current != null ? current.getId() : null;
     }
 
+    private String resolveCourseStorageId() {
+        String courseId = getCurrentCourseId();
+        return hasValue(courseId) ? courseId : "draft";
+    }
+
+    private String buildCourseMediaFolder(String mediaType) {
+        return "courses/" + resolveCourseStorageId() + "/" + mediaType;
+    }
+
     private void showEditorError(String title, String message) {
-        String rawDetail = hasValue(message) ? message : "Unknown error";
+        String rawDetail = hasValue(message) ? message : getString(R.string.unknown_error);
         String detail = ApiErrorFormatter.fromMessage(rawDetail);
         Log.e(TAG, title + ": " + rawDetail);
         Toast.makeText(this, detail, Toast.LENGTH_LONG).show();
@@ -792,11 +808,36 @@ public class EditCourseActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void showUploadError(String message) {
+        String rawDetail = hasValue(message) ? message : getString(R.string.unknown_error);
+        String detail = ApiErrorFormatter.fromMessage(rawDetail);
+        Log.e(TAG, "Upload failed: " + rawDetail);
+        Toast.makeText(this, detail, Toast.LENGTH_LONG).show();
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.upload_failed_title)
+                .setMessage(detail)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
     private String valueOrEmpty(String value) {
         return value != null ? value : "";
     }
 
     private boolean hasValue(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    private void redirectToLogin() {
+        sessionManager.clear();
+        Toast.makeText(this, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

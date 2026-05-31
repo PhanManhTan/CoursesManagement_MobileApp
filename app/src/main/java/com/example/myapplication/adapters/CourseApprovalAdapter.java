@@ -18,6 +18,7 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
     public interface OnApprovalListener {
         void onApprove(Course course);
         void onReject(Course course);
+        void onCourseClick(Course course);
     }
 
     private List<Course> courses = new ArrayList<>();
@@ -54,7 +55,7 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
             instructorDisplay = "ID: " + instructorDisplay.substring(0, 8) + "...";
         }
         holder.tvInstructor.setText(instructorDisplay);
-        holder.tvPrice.setText("$" + course.getPrice());
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.usd_price_format, course.getPrice()));
 
         // Using Glide for thumbnail loading
         if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
@@ -67,12 +68,31 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
             holder.ivThumb.setImageResource(R.drawable.image_courses);
         }
 
-        holder.btnApprove.setOnClickListener(v -> {
-            if (listener != null) listener.onApprove(course);
-        });
+        if ("approved".equalsIgnoreCase(course.getStatus())) {
+            if (holder.layoutActionButtons != null) {
+                holder.layoutActionButtons.setVisibility(View.GONE);
+            }
+        } else {
+            if (holder.layoutActionButtons != null) {
+                holder.layoutActionButtons.setVisibility(View.VISIBLE);
+            }
+            holder.btnApprove.setOnClickListener(v -> {
+                if (listener != null) listener.onApprove(course);
+            });
 
-        holder.btnReject.setOnClickListener(v -> {
-            if (listener != null) listener.onReject(course);
+            holder.btnReject.setOnClickListener(v -> {
+                if (listener != null) listener.onReject(course);
+            });
+        }
+
+        if (holder.btnPreview != null) {
+            holder.btnPreview.setOnClickListener(v -> {
+                if (listener != null) listener.onCourseClick(course);
+            });
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onCourseClick(course);
         });
     }
 
@@ -84,7 +104,8 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
     static class CourseViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvInstructor, tvPrice;
         ImageView ivThumb;
-        MaterialButton btnApprove, btnReject;
+        MaterialButton btnApprove, btnReject, btnPreview;
+        View layoutActionButtons;
 
         public CourseViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -94,6 +115,8 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
             ivThumb = itemView.findViewById(R.id.ivCourseThumb);
             btnApprove = itemView.findViewById(R.id.btnApprove);
             btnReject = itemView.findViewById(R.id.btnReject);
+            btnPreview = itemView.findViewById(R.id.btnPreview);
+            layoutActionButtons = itemView.findViewById(R.id.layoutActionButtons);
         }
     }
 }

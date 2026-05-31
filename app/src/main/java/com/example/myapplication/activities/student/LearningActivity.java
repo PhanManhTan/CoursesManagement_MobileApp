@@ -2,11 +2,17 @@ package com.example.myapplication.activities.student;
 
 import static com.google.android.material.internal.ViewUtils.showKeyboard;
 
+import android.app.DownloadManager;
+import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,40 +27,45 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.DiscussionAdapter;
 import com.example.myapplication.adapters.LearningChapterAdapter;
+import com.example.myapplication.adapters.QuizAdapter;
 import com.example.myapplication.data.repository.ChapterRepository;
 import com.example.myapplication.data.repository.CommentRepository;
 import com.example.myapplication.data.repository.LessonProgressRepository;
 import com.example.myapplication.data.repository.LessonRepository;
+import com.example.myapplication.data.repository.QuizRepository;
 import com.example.myapplication.models.Chapter;
 import com.example.myapplication.models.Comment;
 import com.example.myapplication.models.LearningDataWrapper.LearningChapter;
 import com.example.myapplication.models.LearningDataWrapper.LearningLesson;
 import com.example.myapplication.models.Lesson;
 import com.example.myapplication.models.LessonProgress;
+import com.example.myapplication.models.Quiz;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import android.content.Context;
-import android.graphics.Rect;
-import android.view.MotionEvent;
-import android.view.inputmethod.InputMethodManager;
 
 public class LearningActivity extends AppCompatActivity implements LearningChapterAdapter.OnLessonClickListener, DiscussionAdapter.OnReplyClickListener {
+
+    private enum TabState { LESSONS, DISCUSSIONS, QUIZZES, FILES }
 
     private VideoView vvCourse;
     private RecyclerView rvContent;
     private ImageView btnBack;
     private TextView tvCourseTitle;
-    private Button btnListLess, btnDiscuss;
-    private LinearLayout layoutCommentInput;
+    private Button btnListLess, btnDiscuss, btnQuizz, btnFiles, btnAddDiscussion, btnDownloadFile;
+
+    private LinearLayout layoutCommentInput, layoutQuizControls, layoutFiles;
     private EditText etCommentInput;
     private ImageView btnSendComment;
-    private Button btnAddDiscussion;
+    private Button btnSubmitQuiz, btnResetQuiz;
+    private TextView tvFileName;
 
     private LearningChapterAdapter chapterAdapter;
     private DiscussionAdapter discussionAdapter;
+    private QuizAdapter quizAdapter;
     private List<LearningChapter> chapterList;
     private LearningLesson currentPlayingLesson;
 
@@ -71,10 +82,12 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     private LessonRepository lessonRepository;
     private LessonProgressRepository progressRepository;
     private CommentRepository commentRepository;
+    private QuizRepository quizRepository;
     private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learning);
 
@@ -84,16 +97,27 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         tvCourseTitle = findViewById(R.id.tvCourseTitle);
         btnListLess = findViewById(R.id.btnListLess);
         btnDiscuss = findViewById(R.id.btnDiscuss);
+        btnQuizz = findViewById(R.id.btnQuizz);
+        btnFiles = findViewById(R.id.btnFiles);
         btnAddDiscussion = findViewById(R.id.btnAddDiscussion);
+
         layoutCommentInput = findViewById(R.id.layoutCommentInput);
+        layoutQuizControls = findViewById(R.id.layoutQuizControls);
+        layoutFiles = findViewById(R.id.layoutFiles);
+
         etCommentInput = findViewById(R.id.etCommentInput);
         btnSendComment = findViewById(R.id.btnSendComment);
+        btnSubmitQuiz = findViewById(R.id.btnSubmitQuiz);
+        btnResetQuiz = findViewById(R.id.btnResetQuiz);
+        btnDownloadFile = findViewById(R.id.btnDownloadFile);
+        tvFileName = findViewById(R.id.tvFileName);
 
         btnBack.setOnClickListener(v -> finish());
 
         rvContent.setLayoutManager(new LinearLayoutManager(this));
         chapterAdapter = new LearningChapterAdapter(this, this);
         discussionAdapter = new DiscussionAdapter(this, this);
+        quizAdapter = new QuizAdapter(this);
         rvContent.setAdapter(chapterAdapter);
 
         android.widget.MediaController mediaController = new android.widget.MediaController(this);
@@ -101,7 +125,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         vvCourse.setMediaController(mediaController);
 
         vvCourse.setOnErrorListener((mp, what, extra) -> {
-            Toast.makeText(LearningActivity.this, "Video not found or network error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LearningActivity.this, R.string.video_not_found_network, Toast.LENGTH_SHORT).show();
             return true;
         });
 
@@ -119,29 +143,59 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     }
 
     private void setupTabButtons() {
-        updateTabUI(true);
+        updateTabUI(TabState.LESSONS);
 
-        btnListLess.setOnClickListener(v -> updateTabUI(true));
+        btnListLess.setOnClickListener(v -> updateTabUI(TabState.LESSONS));
 
         btnDiscuss.setOnClickListener(v -> {
             if (currentPlayingLesson == null) {
-                Toast.makeText(this, "Please select a lesson first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_lesson_first, Toast.LENGTH_SHORT).show();
                 return;
             }
-            updateTabUI(false);
+            updateTabUI(TabState.DISCUSSIONS);
             loadComments();
+        });
+
+        btnQuizz.setOnClickListener(v -> {
+            if (currentPlayingLesson == null) {
+                Toast.makeText(this, R.string.select_lesson_first, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            updateTabUI(TabState.QUIZZES);
+            loadQuizzes();
+        });
+
+        btnFiles.setOnClickListener(v -> {
+            if (currentPlayingLesson == null) {
+                Toast.makeText(this, R.string.select_lesson_first, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            updateTabUI(TabState.FILES);
+            loadFileUi();
         });
 
         btnAddDiscussion.setOnClickListener(v -> {
             layoutCommentInput.setVisibility(View.VISIBLE);
             replyingParentId = null;
-            etCommentInput.setHint("Add a discussion...");
+            etCommentInput.setHint(R.string.add_discussion_hint);
             etCommentInput.requestFocus();
             showKeyboard(etCommentInput);
         });
 
         btnSendComment.setOnClickListener(v -> postComment());
+        btnSubmitQuiz.setOnClickListener(v -> {
+            quizAdapter.submitQuiz();
+            int correct = quizAdapter.getCorrectAnswersCount();
+            int total = quizAdapter.getTotalQuestionsCount();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.quiz)
+                .setMessage("You answered " + correct + " out of " + total + " questions correctly!")
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+        });
+        btnResetQuiz.setOnClickListener(v -> quizAdapter.resetQuiz());
     }
+
 
     private void initData() {
         sessionManager = new SessionManager(this);
@@ -156,7 +210,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         }
 
         if (courseId == null || userId == null) {
-            Toast.makeText(this, "Missing required information", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.missing_required_information, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -165,8 +219,70 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         lessonRepository = new LessonRepository(this);
         progressRepository = new LessonProgressRepository(this);
         commentRepository = new CommentRepository(this);
+        quizRepository = new QuizRepository(this);
 
         loadLearningData();
+    }
+
+    private void loadFileUi() {
+        if (currentPlayingLesson == null || currentPlayingLesson.getLesson() == null) return;
+
+        String docUrl = currentPlayingLesson.getLesson().getDocumentUrl();
+
+        if (docUrl != null && !docUrl.trim().isEmpty() && !docUrl.trim().equalsIgnoreCase("null")) {
+            tvFileName.setText(R.string.document_attached_lesson);
+            btnDownloadFile.setVisibility(View.VISIBLE);
+            btnDownloadFile.setOnClickListener(v -> downloadFile(docUrl));
+        } else {
+            tvFileName.setText(R.string.no_files_for_lesson);
+            btnDownloadFile.setVisibility(View.GONE);
+        }
+    }
+
+    private void downloadFile(String url) {
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            String fileName = url.substring(url.lastIndexOf('/') + 1);
+            if (fileName.isEmpty() || !fileName.contains(".")) {
+                fileName = "lesson_document.pdf";
+            }
+            request.setTitle(getString(R.string.download_course_file));
+            request.setDescription(fileName);
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            if (manager != null) {
+                manager.enqueue(request);
+                Toast.makeText(this, R.string.download_started, Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, getString(R.string.download_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadQuizzes() {
+        if (currentPlayingLesson == null) return;
+        String lessonId = currentPlayingLesson.getLesson().getId();
+        quizRepository.getByLessonId(lessonId, new QuizRepository.RepositoryCallback<List<Quiz>>() {
+            @Override
+            public void onSuccess(List<Quiz> quizzes) {
+                if (quizzes != null && !quizzes.isEmpty()) {
+                    quizAdapter.submitList(quizzes);
+                    layoutQuizControls.setVisibility(View.VISIBLE);
+                } else {
+                    quizAdapter.submitList(new ArrayList<>());
+                    layoutQuizControls.setVisibility(View.GONE);
+                    Toast.makeText(LearningActivity.this, R.string.no_quizzes_for_lesson, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(LearningActivity.this, getString(R.string.failed_load_quizzes, message), Toast.LENGTH_SHORT).show();
+                layoutQuizControls.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void loadComments() {
@@ -182,7 +298,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Failed to load comments", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, R.string.failed_load_comments, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -209,7 +325,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Failed to post comment", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, R.string.failed_post_comment, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -252,7 +368,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     public void onReplyClick(Comment parentComment) {
         layoutCommentInput.setVisibility(View.VISIBLE);
         replyingParentId = parentComment.getId();
-        etCommentInput.setHint("Reply to " + parentComment.getUsers().getFullName() + "...");
+        etCommentInput.setHint(getString(R.string.reply_to_format, parentComment.getUsers().getFullName()));
         etCommentInput.requestFocus();
         showKeyboard(etCommentInput);
     }
@@ -289,20 +405,15 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
                         progress.setId(data.getId());
                     }
                 }
-
                 @Override
-                public void onError(String message) {
-                }
+                public void onError(String message) {}
             });
         } else {
             progressRepository.update(progress.getId(), progress, new LessonProgressRepository.RepositoryCallback<Void>() {
                 @Override
-                public void onSuccess(Void data) {
-                }
-
+                public void onSuccess(Void data) {}
                 @Override
-                public void onError(String message) {
-                }
+                public void onError(String message) {}
             });
         }
     }
@@ -314,22 +425,18 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             @Override
             public void onSuccess(List<Chapter> chapters) {
                 if (chapters == null || chapters.isEmpty()) {
-                    Toast.makeText(LearningActivity.this, "Course has no content", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LearningActivity.this, R.string.course_has_no_content, Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 Collections.sort(chapters, (c1, c2) -> Integer.compare(c1.getOrderIndex(), c2.getOrderIndex()));
-
                 AtomicInteger pendingChapters = new AtomicInteger(chapters.size());
-
                 for (Chapter chapter : chapters) {
                     loadLessonsForChapter(chapter, pendingChapters);
                 }
             }
-
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, getString(R.string.error_with_message, message), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -342,18 +449,15 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
                 Collections.sort(lessons, (l1, l2) -> Integer.compare(l1.getOrderIndex(), l2.getOrderIndex()));
 
                 List<LearningLesson> learningLessons = new ArrayList<>();
-
                 if (lessons.isEmpty()) {
                     addChapterToAdapter(chapter, learningLessons, pendingChapters);
                     return;
                 }
-
                 AtomicInteger pendingLessons = new AtomicInteger(lessons.size());
                 for (Lesson lesson : lessons) {
                     loadProgressForLesson(lesson, learningLessons, chapter, pendingLessons, pendingChapters);
                 }
             }
-
             @Override
             public void onError(String message) {
                 addChapterToAdapter(chapter, new ArrayList<>(), pendingChapters);
@@ -367,7 +471,6 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             public void onSuccess(LessonProgress progress) {
                 processLessonData(lesson, progress, learningLessons, chapter, pendingLessons, pendingChapters);
             }
-
             @Override
             public void onError(String message) {
                 LessonProgress emptyProgress = new LessonProgress();
@@ -382,7 +485,6 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
     private void processLessonData(Lesson lesson, LessonProgress progress, List<LearningLesson> learningLessons, Chapter chapter, AtomicInteger pendingLessons, AtomicInteger pendingChapters) {
         learningLessons.add(new LearningLesson(lesson, progress, true));
-
         if (pendingLessons.decrementAndGet() == 0) {
             Collections.sort(learningLessons, (l1, l2) -> Integer.compare(l1.getLesson().getOrderIndex(), l2.getLesson().getOrderIndex()));
             addChapterToAdapter(chapter, learningLessons, pendingChapters);
@@ -391,7 +493,6 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
     private void addChapterToAdapter(Chapter chapter, List<LearningLesson> learningLessons, AtomicInteger pendingChapters) {
         chapterList.add(new LearningChapter(chapter, learningLessons));
-
         if (pendingChapters.decrementAndGet() == 0) {
             Collections.sort(chapterList, (c1, c2) -> Integer.compare(c1.getChapter().getOrderIndex(), c2.getChapter().getOrderIndex()));
             runOnUiThread(() -> chapterAdapter.setData(chapterList));
@@ -409,13 +510,13 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         lastSavedSeconds = currentPlayingLesson.getProgress() != null ? currentPlayingLesson.getProgress().getWatchTimeSeconds() : 0;
 
         replyingParentId = null;
-        etCommentInput.setHint("Add a comment...");
+        etCommentInput.setHint(R.string.add_comment_hint);
 
         String videoUrl = learningLesson.getLesson().getVideoUrl();
 
         if (videoUrl == null || videoUrl.trim().isEmpty()) {
             vvCourse.stopPlayback();
-            Toast.makeText(this, "No video available for this lesson", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_video_for_lesson, Toast.LENGTH_SHORT).show();
         } else {
             vvCourse.setVideoURI(Uri.parse(videoUrl));
             vvCourse.setOnPreparedListener(mp -> {
@@ -426,26 +527,48 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             });
         }
 
-        if (rvContent.getAdapter() instanceof DiscussionAdapter) {
+        if (rvContent.getVisibility() == View.VISIBLE && rvContent.getAdapter() instanceof DiscussionAdapter) {
             loadComments();
+        } else if (rvContent.getVisibility() == View.VISIBLE && rvContent.getAdapter() instanceof QuizAdapter) {
+            loadQuizzes();
+        } else if (layoutFiles.getVisibility() == View.VISIBLE) {
+            loadFileUi();
         }
     }
 
-    private void updateTabUI(boolean isListLessonActive) {
-        if (isListLessonActive) {
-            btnListLess.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
-            btnDiscuss.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
+    private void updateTabUI(TabState state) {
+        btnListLess.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
+        btnDiscuss.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
+        btnQuizz.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
+        btnFiles.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
 
-            rvContent.setAdapter(chapterAdapter);
-            layoutCommentInput.setVisibility(View.GONE);
-            btnAddDiscussion.setVisibility(View.GONE);
-        } else {
-            btnListLess.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
-            btnDiscuss.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
+        layoutCommentInput.setVisibility(View.GONE);
+        layoutQuizControls.setVisibility(View.GONE);
+        btnAddDiscussion.setVisibility(View.GONE);
+        rvContent.setVisibility(View.GONE);
+        layoutFiles.setVisibility(View.GONE);
 
-            rvContent.setAdapter(discussionAdapter);
-            layoutCommentInput.setVisibility(View.GONE);
-            btnAddDiscussion.setVisibility(View.VISIBLE);
+        switch (state) {
+            case LESSONS:
+                btnListLess.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
+                rvContent.setVisibility(View.VISIBLE);
+                rvContent.setAdapter(chapterAdapter);
+                break;
+            case DISCUSSIONS:
+                btnDiscuss.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
+                rvContent.setVisibility(View.VISIBLE);
+                rvContent.setAdapter(discussionAdapter);
+                btnAddDiscussion.setVisibility(View.VISIBLE);
+                break;
+            case QUIZZES:
+                btnQuizz.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
+                rvContent.setVisibility(View.VISIBLE);
+                rvContent.setAdapter(quizAdapter);
+                break;
+            case FILES:
+                btnFiles.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
+                layoutFiles.setVisibility(View.VISIBLE);
+                break;
         }
     }
 

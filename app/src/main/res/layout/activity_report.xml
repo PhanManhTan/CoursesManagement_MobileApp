@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="System Reports"
+            android:text="@string/system_reports"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -52,14 +52,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Annual Total Revenue"
+                android:text="@string/annual_total_revenue"
                 android:textColor="@color/accent_light"
                 android:textSize="14sp" />
             <TextView
                 android:id="@+id/tvTotalAnnualRevenue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$1,245,678"
+                android:text="$0.00"
                 android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -93,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="User Reports &amp; Flags"
+            android:text="@string/user_reports_flags"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -105,22 +105,9 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvReportTitle" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/bg_primary"
-        app:itemIconTint="#FFFFFF"
-        app:itemTextColor="#FFFFFF"
-        app:labelVisibilityMode="unlabeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/admin_nav_menu"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

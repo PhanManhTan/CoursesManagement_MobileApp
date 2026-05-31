@@ -14,10 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
 import com.example.myapplication.activities.common.HomeActivity;
-import com.example.myapplication.activities.admin.AdminDashboardActivity;
+import com.example.myapplication.activities.admin.AdminMainActivity;
 import com.example.myapplication.activities.instructor.InstructorMainActivity;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 import java.util.List;
@@ -38,9 +39,11 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        RetrofitClient.setAuthErrorListener(null);
         sessionManager = new SessionManager(this);
         authApi = RetrofitClient.getClient(this).create(AuthApi.class);
 
@@ -54,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             String registeredEmail = getIntent().getStringExtra(OtpVerifyActivity.EXTRA_EMAIL);
             if (registeredEmail != null) {
                 etEmail.setText(registeredEmail);
-                Toast.makeText(this, "Registration successful! Please log in.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.registration_success_login, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -77,23 +80,23 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            etEmail.setError("Email is required");
+            etEmail.setError(getString(R.string.email_required));
             etEmail.requestFocus();
             return;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Enter a valid email");
+            etEmail.setError(getString(R.string.valid_email_required));
             etEmail.requestFocus();
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            etPassword.setError("Password is required");
+            etPassword.setError(getString(R.string.password_required));
             etPassword.requestFocus();
             return;
         }
 
         btnLogin.setEnabled(false);
-        btnLogin.setText("Logging in...");
+        btnLogin.setText(R.string.logging_in);
 
         AuthApi.LoginRequest request = new AuthApi.LoginRequest(email, password);
         authApi.signIn(request).enqueue(new Callback<AuthApi.LoginResponse>() {
@@ -110,16 +113,16 @@ public class LoginActivity extends AppCompatActivity {
                     fetchRealRoleAndRedirect(userId, email, accessToken);
                 } else {
                     btnLogin.setEnabled(true);
-                    btnLogin.setText("Login");
-                    Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+                    btnLogin.setText(R.string.login);
+                    Toast.makeText(LoginActivity.this, R.string.invalid_email_or_password, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthApi.LoginResponse> call, Throwable t) {
                 btnLogin.setEnabled(true);
-                btnLogin.setText("Login");
-                Toast.makeText(LoginActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnLogin.setText(R.string.login);
+                Toast.makeText(LoginActivity.this, getString(R.string.error_with_message, t.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -130,10 +133,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<AuthApi.UserProfile>> call, Response<List<AuthApi.UserProfile>> response) {
                 btnLogin.setEnabled(true);
-                btnLogin.setText("Login");
+                btnLogin.setText(R.string.login);
 
                 if (!response.isSuccessful() || response.body() == null || response.body().isEmpty()) {
-                    handleSessionVerificationFailed("Session expired. Please log in again.");
+                    handleSessionVerificationFailed(getString(R.string.session_expired_login_again));
                     return;
                 }
 
@@ -147,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // 🔥 Check if BANNED
                 if ("banned".equals(status)) {
-                    Toast.makeText(LoginActivity.this, "Your account is banned. Please contact support.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, R.string.account_banned_contact_support, Toast.LENGTH_LONG).show();
                     sessionManager.clear(); // Clear the temporary session
                     return;
                 }
@@ -155,11 +158,11 @@ public class LoginActivity extends AppCompatActivity {
                 // Safe session update
                 sessionManager.saveSession(token, userId, role);
 
-                Toast.makeText(LoginActivity.this, "Login as: " + role, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, getString(R.string.login_as_role, getRoleLabel(role)), Toast.LENGTH_SHORT).show();
 
                 Intent intent;
                 if ("admin".equals(role)) {
-                    intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                    intent = new Intent(LoginActivity.this, AdminMainActivity.class);
                 } else if ("instructor".equals(role)) {
                     intent = new Intent(LoginActivity.this, InstructorMainActivity.class);
                 } else {
@@ -176,11 +179,21 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<AuthApi.UserProfile>> call, Throwable t) {
                 btnLogin.setEnabled(true);
-                btnLogin.setText("Login");
+                btnLogin.setText(R.string.login);
                 Log.e("LOGIN_DEBUG", "API Failure: " + t.getMessage());
-                handleSessionVerificationFailed("Session expired. Please log in again.");
+                handleSessionVerificationFailed(getString(R.string.session_expired_login_again));
             }
         });
+    }
+
+    private String getRoleLabel(String role) {
+        if ("admin".equals(role)) {
+            return getString(R.string.admin_role);
+        }
+        if ("instructor".equals(role)) {
+            return getString(R.string.instructor_fallback);
+        }
+        return getString(R.string.student_fallback);
     }
 
     private String normalizeValue(String value, String fallback) {

@@ -10,10 +10,11 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
-import com.example.myapplication.activities.admin.AdminDashboardActivity;
+import com.example.myapplication.activities.admin.AdminMainActivity;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.activities.auth.OnboardingActivity;
 import com.example.myapplication.activities.instructor.InstructorMainActivity;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 public class SplashActivity extends AppCompatActivity {
@@ -25,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
@@ -71,7 +73,7 @@ public class SplashActivity extends AppCompatActivity {
 
         String normalizedRole = role.trim().toLowerCase();
         if ("admin".equals(normalizedRole)) {
-            return new Intent(SplashActivity.this, AdminDashboardActivity.class);
+            return new Intent(SplashActivity.this, AdminMainActivity.class);
         } else if ("instructor".equals(normalizedRole)) {
             return new Intent(SplashActivity.this, InstructorMainActivity.class);
         }

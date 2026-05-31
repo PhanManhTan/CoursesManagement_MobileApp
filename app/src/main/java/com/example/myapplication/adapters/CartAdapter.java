@@ -44,7 +44,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         if (course != null) {
             holder.tvTitle.setText(course.getTitle());
-            holder.tvInstructor.setText("Instructor: " + course.getInstructorId());
+            holder.tvInstructor.setText(holder.itemView.getContext().getString(R.string.instructor_label_format, course.getInstructorId()));
             holder.tvPrice.setText(String.format("%,.0fđ", course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice()));
 
             if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {

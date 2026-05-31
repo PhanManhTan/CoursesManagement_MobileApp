@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.CategoryAdapter;
 import com.example.myapplication.adapters.CourseAdapter;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.models.Cart;
 import com.example.myapplication.utils.BottomNavigationHelper;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.viewmodels.HomeViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -28,6 +30,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvWelcome, tvCartBadge;
     private View btnCartContainer;
     private RecyclerView rvCategories, rvFeaturedCourses;
+    private TextView tvEmptyCategories, tvEmptyFeaturedCourses;
     private CategoryAdapter categoryAdapter;
     private CourseAdapter courseAdapter;
     private HomeViewModel homeViewModel;
@@ -36,10 +39,16 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
         sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
+
         cartRepository = new CartRepository(this);
 
         tvWelcome = findViewById(R.id.tvWelcome);
@@ -48,24 +57,43 @@ public class HomeActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
         rvCategories = findViewById(R.id.rvCategories);
         rvFeaturedCourses = findViewById(R.id.rvFeaturedCourses);
+        tvEmptyCategories = findViewById(R.id.tvEmptyCategories);
+        tvEmptyFeaturedCourses = findViewById(R.id.tvEmptyFeaturedCourses);
 
         setupRecyclerViews();
-        
+
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        homeViewModel.getCategories().observe(this, categories -> categoryAdapter.setCategories(categories));
-        homeViewModel.getFeaturedCourses().observe(this, courses -> courseAdapter.setCourses(courses));
+        homeViewModel.getCategories().observe(this, categories -> {
+            categoryAdapter.setCategories(categories);
+            if (categories == null || categories.isEmpty()) {
+                tvEmptyCategories.setVisibility(View.VISIBLE);
+                rvCategories.setVisibility(View.GONE);
+            } else {
+                tvEmptyCategories.setVisibility(View.GONE);
+                rvCategories.setVisibility(View.VISIBLE);
+            }
+        });
+        homeViewModel.getFeaturedCourses().observe(this, courses -> {
+            courseAdapter.setCourses(courses);
+            if (courses == null || courses.isEmpty()) {
+                tvEmptyFeaturedCourses.setVisibility(View.VISIBLE);
+                rvFeaturedCourses.setVisibility(View.GONE);
+            } else {
+                tvEmptyFeaturedCourses.setVisibility(View.GONE);
+                rvFeaturedCourses.setVisibility(View.VISIBLE);
+            }
+        });
 
         String email = getIntent().getStringExtra("email");
         if (email != null && !email.isEmpty()) {
             String name = email.split("@")[0];
-            tvWelcome.setText("Welcome, " + capitalize(name));
+            tvWelcome.setText(getString(R.string.welcome_user, capitalize(name)));
         }
 
         btnCartContainer.setOnClickListener(v -> {
             startActivity(new Intent(this, CartActivity.class));
         });
 
-        // ĐỒNG BỘ: Sử dụng Helper thay vì set listener thủ công
         bottomNav.setSelectedItemId(R.id.nav_home);
         BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
     }
@@ -73,9 +101,20 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
         updateCartBadge();
-        // Cập nhật badge thông báo mỗi khi quay lại Home
         BottomNavigationHelper.updateNotificationBadge(this, bottomNav);
+    }
+
+    private void redirectToLogin() {
+        sessionManager.clear();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void updateCartBadge() {

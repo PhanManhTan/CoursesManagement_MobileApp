@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Design Courses"
+            android:text="@string/design_courses"
             android:textColor="@color/text_primary"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -50,7 +50,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sort by:"
+            android:text="@string/sort_by"
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Newest"
+            android:text="@string/newest"
             android:textColor="@color/accent_light"
             android:textSize="14sp"
             android:textStyle="bold" />
