@@ -111,7 +111,16 @@ public class CartActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     cartItems.clear();
                     if (data != null) {
-                        cartItems.addAll(data);
+                        for (Cart item : data) {
+                            if (item.getCourse() != null) {
+                                cartItems.add(item);
+                            } else {
+                                cartRepository.removeFromCart(item.getId(), new CartRepository.RepositoryCallback<Void>() {
+                                    @Override public void onSuccess(Void d) {}
+                                    @Override public void onError(String m) {}
+                                });
+                            }
+                        }
                     }
                     adapter.notifyDataSetChanged();
                     calculateTotal();
@@ -124,6 +133,7 @@ public class CartActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void removeFromCart(String cartId, int position) {
         cartRepository.removeFromCart(cartId, new CartRepository.RepositoryCallback<Void>() {

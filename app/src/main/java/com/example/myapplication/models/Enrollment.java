@@ -48,7 +48,12 @@ public class Enrollment {
     public String getEnrolledAt() { return enrolledAt; }
     public void setEnrolledAt(String enrolledAt) { this.enrolledAt = enrolledAt; }
 
-    public double getPaidAmount() { return paidAmount; }
+    public double getPaidAmount() { 
+        if (paidAmount <= 0.0 && course != null) {
+            return course.getDiscountPrice() > 0.0 ? course.getDiscountPrice() : course.getPrice();
+        }
+        return paidAmount; 
+    }
     public void setPaidAmount(double paidAmount) { this.paidAmount = paidAmount; }
 
     public String getCreatedAt() { return createdAt; }

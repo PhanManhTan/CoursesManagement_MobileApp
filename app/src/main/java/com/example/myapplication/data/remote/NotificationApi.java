@@ -8,21 +8,23 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface NotificationApi {
-    @GET("notifications")
-    Call<List<Notification>> getAll();
 
-    @GET("notifications/{id}")
-    Call<Notification> getById(@Path("id") String id);
+    @GET("notifications?select=*")
+    Call<List<Notification>> getByUserId(@Query("user_id") String userIdFilter);
+
+    @GET("notifications?select=*")
+    Call<List<Notification>> getAll();
 
     @POST("notifications")
     Call<Void> insert(@Body Notification notification);
 
-    @PATCH("notifications/{id}")
-    Call<Void> update(@Path("id") String id, @Body Notification notification);
+    @PATCH("notifications")
+    Call<Void> update(@Query("id") String idFilter, @Body Notification notification);
 
-    @DELETE("notifications/{id}")
-    Call<Void> delete(@Path("id") String id);
+    @DELETE("notifications")
+    Call<Void> delete(@Query("id") String idFilter);
 }
+

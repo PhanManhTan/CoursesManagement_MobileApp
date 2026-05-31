@@ -183,9 +183,19 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         });
 
         btnSendComment.setOnClickListener(v -> postComment());
-        btnSubmitQuiz.setOnClickListener(v -> quizAdapter.submitQuiz());
+        btnSubmitQuiz.setOnClickListener(v -> {
+            quizAdapter.submitQuiz();
+            int correct = quizAdapter.getCorrectAnswersCount();
+            int total = quizAdapter.getTotalQuestionsCount();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.quiz)
+                .setMessage("You answered " + correct + " out of " + total + " questions correctly!")
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+        });
         btnResetQuiz.setOnClickListener(v -> quizAdapter.resetQuiz());
     }
+
 
     private void initData() {
         sessionManager = new SessionManager(this);

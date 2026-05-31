@@ -32,14 +32,14 @@ public class NotificationRepository {
         });
     }
 
-    public void getById(String id, RepositoryCallback<Notification> callback) {
-        notificationApi.getById(id).enqueue(new Callback<Notification>() {
+    public void getByUserId(String userId, RepositoryCallback<List<Notification>> callback) {
+        notificationApi.getByUserId("eq." + userId).enqueue(new Callback<List<Notification>>() {
             @Override
-            public void onResponse(Call<Notification> call, Response<Notification> response) {
+            public void onResponse(Call<List<Notification>> call, Response<List<Notification>> response) {
                 if (response.isSuccessful()) callback.onSuccess(response.body());
                 else callback.onError("Error: " + response.code());
             }
-            @Override public void onFailure(Call<Notification> call, Throwable t) { callback.onError(t.getMessage()); }
+            @Override public void onFailure(Call<List<Notification>> call, Throwable t) { callback.onError(t.getMessage()); }
         });
     }
 
@@ -55,7 +55,7 @@ public class NotificationRepository {
     }
 
     public void update(String id, Notification notification, RepositoryCallback<Void> callback) {
-        notificationApi.update(id, notification).enqueue(new Callback<Void>() {
+        notificationApi.update("eq." + id, notification).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) callback.onSuccess(null);
@@ -66,7 +66,7 @@ public class NotificationRepository {
     }
 
     public void delete(String id, RepositoryCallback<Void> callback) {
-        notificationApi.delete(id).enqueue(new Callback<Void>() {
+        notificationApi.delete("eq." + id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) callback.onSuccess(null);
@@ -75,4 +75,5 @@ public class NotificationRepository {
             @Override public void onFailure(Call<Void> call, Throwable t) { callback.onError(t.getMessage()); }
         });
     }
+
 }

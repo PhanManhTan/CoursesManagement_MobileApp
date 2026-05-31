@@ -497,4 +497,7 @@
     <string name="usd_price_format">$%1$.2f</string>
     <string name="vnd_price_format">đ%1$,.0f</string>
     <string name="lesson_count_with_duration_format">%1$d Lessons • %2$s</string>
+    <string name="empty_categories">No categories available</string>
+    <string name="empty_featured_courses">No featured courses available</string>
 </resources>
+
