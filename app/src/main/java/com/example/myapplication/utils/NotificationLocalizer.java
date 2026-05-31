@@ -5,6 +5,9 @@ import android.widget.TextView;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Notification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NotificationLocalizer {
 
     public static void localize(Context context, Notification notification, TextView tvTitle, TextView tvMessage) {
@@ -21,6 +24,46 @@ public class NotificationLocalizer {
         }
 
         String titleLower = title.toLowerCase();
+
+        // New chapter notification
+        if (titleLower.contains("chapter") || titleLower.contains("chương")) {
+            if (tvTitle != null) {
+                tvTitle.setText(localizedContext.getString(R.string.notification_new_chapter_title));
+            }
+            if (tvMessage != null) {
+                List<String> values = extractQuotedValues(message);
+                if (values.size() >= 2) {
+                    tvMessage.setText(localizedContext.getString(
+                            R.string.notification_new_chapter_body,
+                            values.get(0),
+                            values.get(1)
+                    ));
+                } else {
+                    tvMessage.setText(message);
+                }
+            }
+            return;
+        }
+
+        // New lesson notification
+        if (titleLower.contains("lesson") || titleLower.contains("bài học")) {
+            if (tvTitle != null) {
+                tvTitle.setText(localizedContext.getString(R.string.notification_new_lesson_title));
+            }
+            if (tvMessage != null) {
+                List<String> values = extractQuotedValues(message);
+                if (values.size() >= 2) {
+                    tvMessage.setText(localizedContext.getString(
+                            R.string.notification_new_lesson_body,
+                            values.get(0),
+                            values.get(1)
+                    ));
+                } else {
+                    tvMessage.setText(message);
+                }
+            }
+            return;
+        }
 
         // Course purchased notification
         if (titleLower.contains("purchase") || titleLower.contains("purchased") || titleLower.contains("mua")) {
@@ -101,5 +144,23 @@ public class NotificationLocalizer {
 
         if (tvTitle != null) tvTitle.setText(title);
         if (tvMessage != null) tvMessage.setText(message);
+    }
+
+    private static List<String> extractQuotedValues(String message) {
+        List<String> values = new ArrayList<>();
+        if (message == null) {
+            return values;
+        }
+
+        int start = message.indexOf("\"");
+        while (start != -1 && start < message.length() - 1) {
+            int end = message.indexOf("\"", start + 1);
+            if (end == -1) {
+                break;
+            }
+            values.add(message.substring(start + 1, end));
+            start = message.indexOf("\"", end + 1);
+        }
+        return values;
     }
 }

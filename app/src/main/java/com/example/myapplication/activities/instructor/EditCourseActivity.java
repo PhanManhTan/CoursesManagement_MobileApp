@@ -383,6 +383,7 @@ public class EditCourseActivity extends AppCompatActivity {
 
         LessonEditorData editorData = LessonEditorData.fromLesson(lesson);
         editorData.setCourseId(resolveCourseStorageId());
+        editorData.setCourseTitle(resolveCourseTitle());
 
         Intent intent = new Intent(this, EditLessonActivity.class);
         intent.putExtra(EditLessonActivity.EXTRA_LESSON_DATA, editorData);
@@ -786,6 +787,17 @@ public class EditCourseActivity extends AppCompatActivity {
     private String resolveCourseStorageId() {
         String courseId = getCurrentCourseId();
         return hasValue(courseId) ? courseId : "draft";
+    }
+
+    private String resolveCourseTitle() {
+        Course current = viewModel != null && viewModel.getCourse() != null
+                ? viewModel.getCourse().getValue()
+                : null;
+        if (current != null && hasValue(current.getTitle())) {
+            return current.getTitle();
+        }
+
+        return etTitle != null ? etTitle.getText().toString().trim() : "";
     }
 
     private String buildCourseMediaFolder(String mediaType) {

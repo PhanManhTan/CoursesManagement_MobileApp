@@ -55,7 +55,7 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
         holder.tvCourseName.setText(course.getTitle());
         String duration = course.getDuration() != null ? course.getDuration() : context.getString(R.string.na_value);
         holder.tvLessonCount.setText(context.getString(R.string.lesson_count_with_duration_format, course.getLessonCount(), duration));
-        holder.tvPrice.setText(context.getString(R.string.usd_price_format, course.getPrice()));
+        holder.tvPrice.setText(context.getString(R.string.vnd_price_format, course.getPrice()));
         bindStatus(context, holder.tvStatus, course.getStatus());
 
         if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {

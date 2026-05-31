@@ -36,7 +36,7 @@
         <activity android:name=".activities.auth.ForgotPasswordActivity" android:exported="true" />
         <activity android:name=".activities.auth.SetNewPasswordActivity" android:exported="true" />
 
-        <activity android:name=".activities.common.HomeActivity" android:exported="true" />
+        <activity android:name=".activities.common.HomeActivity" android:exported="true" android:windowSoftInputMode="adjustPan" />
 
         <!-- ── Student Activities ── -->
         <activity android:name="com.example.myapplication.activities.student.CourseListActivity" android:exported="true" />
@@ -47,7 +47,7 @@
         <activity android:name=".activities.student.ReviewActivity" android:exported="true"/>
 
         <!-- ── Instructor Activities ── -->
-        <activity android:name=".activities.instructor.InstructorMainActivity" android:exported="false" />
+        <activity android:name=".activities.instructor.InstructorMainActivity" android:exported="false" android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
         <activity android:name="com.example.myapplication.activities.instructor.CourseListActivity" android:exported="false" />
         <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
@@ -59,7 +59,8 @@
         <activity
             android:name=".activities.admin.AdminMainActivity"
             android:exported="false"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan" />
 
         <!-- ── Common Activities ── -->
         <activity android:name=".activities.common.AccountActivity" android:exported="true" />

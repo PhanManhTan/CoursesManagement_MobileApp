@@ -5,18 +5,23 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import com.example.myapplication.R;
 import com.example.myapplication.data.repository.CourseRepository;
+import com.example.myapplication.data.repository.NotificationRepository;
 import com.example.myapplication.models.Course;
+import com.example.myapplication.models.Notification;
 import java.util.List;
 
 public class CourseApprovalViewModel extends AndroidViewModel {
     private final CourseRepository repository;
+    private final NotificationRepository notificationRepository;
     private final MutableLiveData<List<Course>> pendingCourses = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public CourseApprovalViewModel(@NonNull Application application) {
         super(application);
         repository = new CourseRepository(application);
+        notificationRepository = new NotificationRepository(application);
         fetchPendingCourses();
     }
 
@@ -34,11 +39,26 @@ public class CourseApprovalViewModel extends AndroidViewModel {
         });
     }
 
+    public void fetchApprovedCourses() {
+        repository.getByStatus("approved", new CourseRepository.RepositoryCallback<List<Course>>() {
+            @Override
+            public void onSuccess(List<Course> data) {
+                pendingCourses.setValue(data);
+            }
+
+            @Override
+            public void onError(String message) {
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
     public void approveCourse(Course course) {
         course.setStatus("approved");
         repository.update(course.getId(), course, new CourseRepository.RepositoryCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
+                notifyInstructorCourseApproved(course);
                 fetchPendingCourses(); // Refresh list
             }
 
@@ -47,6 +67,37 @@ public class CourseApprovalViewModel extends AndroidViewModel {
                 errorMessage.setValue(message);
             }
         });
+    }
+
+    private void notifyInstructorCourseApproved(Course course) {
+        if (course == null || !hasValue(course.getInstructorId())) {
+            return;
+        }
+
+        String courseTitle = hasValue(course.getTitle())
+                ? course.getTitle().trim()
+                : getApplication().getString(R.string.untitled_course);
+        Notification notification = new Notification(
+                null,
+                course.getInstructorId(),
+                getApplication().getString(R.string.notification_course_approved_title),
+                getApplication().getString(R.string.notification_course_approved_body, courseTitle),
+                false,
+                null
+        );
+
+        notificationRepository.insert(notification, new NotificationRepository.RepositoryCallback<Void>() {
+            @Override public void onSuccess(Void data) {}
+
+            @Override
+            public void onError(String message) {
+                errorMessage.setValue(getApplication().getString(R.string.notification_create_failed, message));
+            }
+        });
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     public void rejectCourse(Course course) {

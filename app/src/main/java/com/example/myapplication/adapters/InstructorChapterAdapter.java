@@ -118,8 +118,8 @@ public class InstructorChapterAdapter extends RecyclerView.Adapter<InstructorCha
             View row = inflater.inflate(R.layout.item_instructor_chapter_lesson, holder.llLessonRows, false);
             TextView tvLessonIndex = row.findViewById(R.id.tvLessonIndex);
             TextView tvLessonTitle = row.findViewById(R.id.tvLessonTitle);
-            TextView btnEditLesson = row.findViewById(R.id.btnEditLesson);
-            TextView btnDeleteLesson = row.findViewById(R.id.btnDeleteLesson);
+            View btnEditLesson = row.findViewById(R.id.btnEditLesson);
+            View btnDeleteLesson = row.findViewById(R.id.btnDeleteLesson);
 
             tvLessonIndex.setText(holder.itemView.getContext().getString(R.string.default_lesson_title, i + 1));
             String lessonTitle = hasValue(lesson.getTitle()) ? lesson.getTitle().trim() : "";
@@ -157,8 +157,8 @@ public class InstructorChapterAdapter extends RecyclerView.Adapter<InstructorCha
         TextView tvChapterTitle;
         TextView tvLessonCount;
         TextView tvEmptyLessons;
-        TextView btnEditChapter;
-        TextView btnDeleteChapter;
+        View btnEditChapter;
+        View btnDeleteChapter;
         LinearLayout llLessonRows;
         Button btnAddLesson;
 

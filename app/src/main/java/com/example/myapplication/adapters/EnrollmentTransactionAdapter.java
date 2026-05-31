@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Enrollment;
+import com.example.myapplication.utils.CurrencyFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +42,7 @@ public class EnrollmentTransactionAdapter extends RecyclerView.Adapter<Enrollmen
 
         holder.tvCourseTitle.setText(courseName);
         holder.tvDate.setText(date);
-        holder.tvAmount.setText(String.format(Locale.US, "+$%.2f", enrollment.getPaidAmount()));
+        holder.tvAmount.setText("+" + CurrencyFormatter.formatVnd(enrollment.getPaidAmount()));
     }
 
     @Override

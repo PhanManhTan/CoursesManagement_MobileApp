@@ -36,6 +36,7 @@ import com.example.myapplication.data.repository.SupabaseStorageRepository;
 import com.example.myapplication.models.LessonEditorData;
 import com.example.myapplication.models.Quiz;
 import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.utils.CourseContentNotifier;
 import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
@@ -61,6 +62,7 @@ public class EditLessonActivity extends AppCompatActivity {
     private SupabaseStorageRepository storageRepository;
     private LessonRepository lessonRepository;
     private QuizRepository quizRepository;
+    private CourseContentNotifier courseContentNotifier;
     private ActivityResultLauncher<String> pickVideoLauncher;
     private ActivityResultLauncher<String[]> pickAttachmentLauncher;
     private LessonEditorData lessonData;
@@ -86,6 +88,7 @@ public class EditLessonActivity extends AppCompatActivity {
         storageRepository = new SupabaseStorageRepository(this);
         lessonRepository = new LessonRepository(this);
         quizRepository = new QuizRepository(this);
+        courseContentNotifier = new CourseContentNotifier(this);
 
         initViews();
         bindData();
@@ -348,7 +351,7 @@ public class EditLessonActivity extends AppCompatActivity {
             lessonRepository.update(lesson.getId(), lesson, new LessonRepository.RepositoryCallback<Void>() {
                 @Override
                 public void onSuccess(Void data) {
-                    saveQuizzesForLesson(lesson.getId());
+                    saveQuizzesForLesson(lesson.getId(), false);
                 }
 
                 @Override
@@ -378,7 +381,7 @@ public class EditLessonActivity extends AppCompatActivity {
                 lessonRepository.update(savedLesson.getId(), updatedLesson, new LessonRepository.RepositoryCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
-                        saveQuizzesForLesson(savedLesson.getId());
+                        saveQuizzesForLesson(savedLesson.getId(), true);
                     }
 
                     @Override
@@ -414,13 +417,16 @@ public class EditLessonActivity extends AppCompatActivity {
         return lesson;
     }
 
-    private void saveQuizzesForLesson(String lessonId) {
+    private void saveQuizzesForLesson(String lessonId, boolean notifyStudents) {
         normalizeQuizLessonIds(lessonId);
         quizRepository.replaceForLesson(lessonId, lessonData.getQuizzes(), new QuizRepository.RepositoryCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
                 runIfActive(() -> {
                     setSavingState(false);
+                    if (notifyStudents) {
+                        notifyStudentsAboutNewLesson();
+                    }
                     Toast.makeText(EditLessonActivity.this, R.string.lesson_saved_success, Toast.LENGTH_SHORT).show();
                     returnLessonResult(true);
                 });
@@ -434,6 +440,17 @@ public class EditLessonActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void notifyStudentsAboutNewLesson() {
+        if (courseContentNotifier == null) {
+            return;
+        }
+        courseContentNotifier.notifyLessonAdded(
+                lessonData.getCourseId(),
+                lessonData.getCourseTitle(),
+                lessonData.getTitle()
+        );
     }
 
     private void showSaveError(String title, String message) {

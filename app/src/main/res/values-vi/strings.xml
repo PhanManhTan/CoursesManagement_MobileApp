@@ -378,6 +378,7 @@
     <string name="no_enrolled_students_found">Không tìm thấy học viên đã ghi danh</string>
     <string name="all_courses">Tất cả khóa học</string>
     <string name="untitled_course">Khóa học chưa đặt tên</string>
+    <string name="untitled_chapter">Chương chưa đặt tên</string>
     <string name="student_name_placeholder">Tên học viên</string>
     <string name="student_email_placeholder">email@example.com</string>
     <string name="course_title_placeholder">Tên khóa học</string>
@@ -420,6 +421,10 @@
     <string name="notification_course_rejected_body">Khóa "%1$s" của bạn đã bị từ chối. Vui lòng kiểm tra và cập nhật trước khi gửi lại.</string>
     <string name="notification_course_purchased_title">Có học viên mua khóa học</string>
     <string name="notification_course_purchased_body">Một học viên đã mua "%1$s" với giá %2$s.</string>
+    <string name="notification_new_chapter_title">Có chương mới</string>
+    <string name="notification_new_chapter_body">Chương mới "%1$s" đã được thêm vào "%2$s".</string>
+    <string name="notification_new_lesson_title">Có bài học mới</string>
+    <string name="notification_new_lesson_body">Bài học mới "%1$s" đã được thêm vào "%2$s".</string>
     <string name="notification_create_failed">Không thể tạo thông báo: %1$s</string>
     <string name="recent_activities">Hoạt động gần đây</string>
     <string name="no_recent_activities">Không có hoạt động gần đây</string>

@@ -378,6 +378,7 @@
     <string name="no_enrolled_students_found">No enrolled students found</string>
     <string name="all_courses">All courses</string>
     <string name="untitled_course">Untitled course</string>
+    <string name="untitled_chapter">Untitled chapter</string>
     <string name="student_name_placeholder">Student Name</string>
     <string name="student_email_placeholder">email@example.com</string>
     <string name="course_title_placeholder">Course title</string>
@@ -420,6 +421,10 @@
     <string name="notification_course_rejected_body">Your course "%1$s" was rejected. Please review and update it before submitting again.</string>
     <string name="notification_course_purchased_title">New Course Purchase</string>
     <string name="notification_course_purchased_body">A student purchased "%1$s" for %2$s.</string>
+    <string name="notification_new_chapter_title">New Chapter Added</string>
+    <string name="notification_new_chapter_body">A new chapter "%1$s" was added to "%2$s".</string>
+    <string name="notification_new_lesson_title">New Lesson Added</string>
+    <string name="notification_new_lesson_body">A new lesson "%1$s" was added to "%2$s".</string>
     <string name="notification_create_failed">Could not create notification: %1$s</string>
     <string name="recent_activities">Recent Activities</string>
     <string name="no_recent_activities">No recent activities</string>
@@ -507,7 +512,7 @@
     <string name="sample_user_format">User %1$d</string>
     <string name="sample_document_format">Document_0%1$d.pdf</string>
     <string name="usd_price_format">$%1$.2f</string>
-    <string name="vnd_price_format">đ%1$,.0f</string>
+    <string name="vnd_price_format">%1$,.0f VND</string>
     <string name="price_zero_vnd">0 VND</string>
     <string name="lesson_count_with_duration_format">%1$d Lessons • %2$s</string>
 </resources>

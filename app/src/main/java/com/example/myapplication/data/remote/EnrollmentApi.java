@@ -17,6 +17,9 @@ public interface EnrollmentApi {
     @GET("enrollment_progress_view?select=*,courses(*)")
     Call<List<Enrollment>> getByUserId(@Query("user_id") String userIdFilter);
 
+    @GET("enrollments?select=id,user_id,course_id")
+    Call<List<Enrollment>> getByCourseId(@Query("course_id") String courseIdFilter);
+
     @GET("enrollment_progress_view?select=*")
     Call<List<Enrollment>> getById(@Query("id") String idFilter);
 

@@ -62,6 +62,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import java.util.ArrayList;
@@ -97,6 +98,7 @@ public class InstructorMainActivity extends AppCompatActivity
     private String pendingStudentCourseId;
     private String pendingRevenueCourseId;
     private String pendingReviewCourseId;
+    private boolean pendingShowReviewsTab = false;
     private String selectedReviewCourseId;
     private MaterialAutoCompleteTextView spReviewCourseFilter;
     private TextView tvReviewCourseName, tvAverageRating, tvReviewCount, tvEmptyReviews;
@@ -342,6 +344,13 @@ public class InstructorMainActivity extends AppCompatActivity
 
     private void showCourses() {
         View root = inflateContent(R.layout.activity_instructor_course_list);
+        TabLayout tabLayout = root.findViewById(R.id.tabLayout);
+        View courseListContainer = root.findViewById(R.id.courseListContainer);
+        View reviewsContainer = root.findViewById(R.id.reviewsContainer);
+
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.my_courses)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.course_reviews)));
+
         RecyclerView rvInstructorCourses = root.findViewById(R.id.rvInstructorCourses);
         ProgressBar progressBar = root.findViewById(R.id.progressBar);
         TextView tvEmpty = root.findViewById(R.id.tvEmpty);
@@ -368,7 +377,51 @@ public class InstructorMainActivity extends AppCompatActivity
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             }
         });
-        instructorViewModel.refreshCourses();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    courseListContainer.setVisibility(View.VISIBLE);
+                    reviewsContainer.setVisibility(View.GONE);
+                    instructorViewModel.refreshCourses();
+                } else {
+                    courseListContainer.setVisibility(View.GONE);
+                    reviewsContainer.setVisibility(View.VISIBLE);
+                    String initialCourseId = pendingReviewCourseId;
+                    pendingReviewCourseId = null;
+                    setupReviewsTabViews(root, initialCourseId);
+                }
+            }
+
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
+        if (pendingShowReviewsTab || pendingReviewCourseId != null) {
+            pendingShowReviewsTab = false;
+            TabLayout.Tab tab = tabLayout.getTabAt(1);
+            if (tab != null) {
+                tab.select();
+            }
+        } else {
+            instructorViewModel.refreshCourses();
+        }
+    }
+
+    private void setupReviewsTabViews(View root, String initialCourseId) {
+        spReviewCourseFilter = root.findViewById(R.id.spReviewCourseFilter);
+        tvReviewCourseName = root.findViewById(R.id.tvReviewCourseName);
+        tvAverageRating = root.findViewById(R.id.tvAverageRating);
+        tvReviewCount = root.findViewById(R.id.tvReviewCount);
+        tvEmptyReviews = root.findViewById(R.id.tvEmptyReviews);
+        rvReviews = root.findViewById(R.id.rvReviews);
+
+        reviewAdapter = new InstructorReviewAdapter();
+        rvReviews.setLayoutManager(new LinearLayoutManager(this));
+        rvReviews.setAdapter(reviewAdapter);
+
+        loadInstructorReviews(initialCourseId);
     }
 
     private void showStudents() {
@@ -383,7 +436,6 @@ public class InstructorMainActivity extends AppCompatActivity
         MaterialAutoCompleteTextView spCourseFilter = root.findViewById(R.id.spCourseFilter);
         TextView tvEmptyStudents = root.findViewById(R.id.tvEmptyStudents);
         TextView tvTotalEnrollments = root.findViewById(R.id.tvTotalEnrollments);
-        TextView tvUniqueStudents = root.findViewById(R.id.tvUniqueStudents);
         TextView tvAverageProgress = root.findViewById(R.id.tvAverageProgress);
         TextView tvCompletedEnrollments = root.findViewById(R.id.tvCompletedEnrollments);
         StudentAdapter adapter = new StudentAdapter();
@@ -402,7 +454,6 @@ public class InstructorMainActivity extends AppCompatActivity
         studentListViewModel.getCourses().observe(this, courses ->
                 setupStudentCourseFilter(spCourseFilter, courses, studentListViewModel.getSelectedCourseIdValue()));
         studentListViewModel.getTotalEnrollments().observe(this, tvTotalEnrollments::setText);
-        studentListViewModel.getUniqueStudents().observe(this, tvUniqueStudents::setText);
         studentListViewModel.getAverageProgress().observe(this, tvAverageProgress::setText);
         studentListViewModel.getCompletedEnrollments().observe(this, tvCompletedEnrollments::setText);
         studentListViewModel.getErrorMessage().observe(this, message -> {
@@ -478,24 +529,21 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void showReviews() {
-        View root = inflateContent(R.layout.activity_instructor_reviews);
-        String initialCourseId = pendingReviewCourseId;
-        pendingReviewCourseId = null;
-
-        View btnBack = root.findViewById(R.id.btnBack);
-        spReviewCourseFilter = root.findViewById(R.id.spReviewCourseFilter);
-        tvReviewCourseName = root.findViewById(R.id.tvReviewCourseName);
-        tvAverageRating = root.findViewById(R.id.tvAverageRating);
-        tvReviewCount = root.findViewById(R.id.tvReviewCount);
-        tvEmptyReviews = root.findViewById(R.id.tvEmptyReviews);
-        rvReviews = root.findViewById(R.id.rvReviews);
-
-        reviewAdapter = new InstructorReviewAdapter();
-        rvReviews.setLayoutManager(new LinearLayoutManager(this));
-        rvReviews.setAdapter(reviewAdapter);
-
-        btnBack.setOnClickListener(v -> bottomNav.setSelectedItemId(R.id.nav_instructor_courses));
-        loadInstructorReviews(initialCourseId);
+        pendingShowReviewsTab = true;
+        if (bottomNav.getSelectedItemId() == R.id.nav_instructor_courses) {
+            pendingShowReviewsTab = false;
+            TabLayout tabLayout = findViewById(R.id.tabLayout);
+            if (tabLayout != null) {
+                TabLayout.Tab tab = tabLayout.getTabAt(1);
+                if (tab != null) {
+                    tab.select();
+                }
+            } else {
+                showCourses();
+            }
+        } else {
+            bottomNav.setSelectedItemId(R.id.nav_instructor_courses);
+        }
     }
 
     private void loadInstructorReviews(String initialCourseId) {
@@ -827,17 +875,16 @@ public class InstructorMainActivity extends AppCompatActivity
         final int actionStudents = 1;
         final int actionRevenue = 2;
         final int actionReviews = 3;
-        final int actionStatus = 4;
-        final int actionEdit = 5;
-        final int actionDelete = 6;
+        final int actionEdit = 4;
+        final int actionDelete = 5;
 
         PopupMenu popupMenu = new PopupMenu(this, anchor);
         popupMenu.getMenu().add(0, actionStudents, 0, getString(R.string.manage_students));
         popupMenu.getMenu().add(0, actionRevenue, 1, getString(R.string.view_revenue));
         popupMenu.getMenu().add(0, actionReviews, 2, getString(R.string.view_reviews));
-        popupMenu.getMenu().add(0, actionStatus, 3, getString(R.string.edit_course_status));
-        popupMenu.getMenu().add(0, actionEdit, 4, getString(R.string.edit_course_action));
-        popupMenu.getMenu().add(0, actionDelete, 5, getString(R.string.delete_course));
+        popupMenu.getMenu().add(0, actionEdit, 3, getString(R.string.edit_course_action));
+        popupMenu.getMenu().add(0, actionDelete, 4, getString(R.string.delete_course));
+
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == actionStudents) {
@@ -846,8 +893,6 @@ public class InstructorMainActivity extends AppCompatActivity
                 openRevenueForCourse(course);
             } else if (itemId == actionReviews) {
                 openReviewsForCourse(course);
-            } else if (itemId == actionStatus) {
-                showEditStatusDialog(course);
             } else if (itemId == actionEdit) {
                 openEditCourse(course);
             } else if (itemId == actionDelete) {
@@ -1169,7 +1214,6 @@ public class InstructorMainActivity extends AppCompatActivity
         studentListViewModel.getStudents().removeObservers(this);
         studentListViewModel.getCourses().removeObservers(this);
         studentListViewModel.getTotalEnrollments().removeObservers(this);
-        studentListViewModel.getUniqueStudents().removeObservers(this);
         studentListViewModel.getAverageProgress().removeObservers(this);
         studentListViewModel.getCompletedEnrollments().removeObservers(this);
         studentListViewModel.getErrorMessage().removeObservers(this);

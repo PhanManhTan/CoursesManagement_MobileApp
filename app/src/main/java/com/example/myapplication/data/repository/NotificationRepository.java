@@ -32,6 +32,17 @@ public class NotificationRepository {
         });
     }
 
+    public void getByUserId(String userId, RepositoryCallback<List<Notification>> callback) {
+        notificationApi.getByUserId("eq." + userId).enqueue(new Callback<List<Notification>>() {
+            @Override
+            public void onResponse(Call<List<Notification>> call, Response<List<Notification>> response) {
+                if (response.isSuccessful()) callback.onSuccess(response.body());
+                else callback.onError("Error: " + response.code());
+            }
+            @Override public void onFailure(Call<List<Notification>> call, Throwable t) { callback.onError(t.getMessage()); }
+        });
+    }
+
     public void getById(String id, RepositoryCallback<Notification> callback) {
         notificationApi.getById(id).enqueue(new Callback<Notification>() {
             @Override
