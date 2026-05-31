@@ -30,6 +30,7 @@ public class BottomNavigationHelper {
                 intent = new Intent(activity, NotificationActivity.class);
             } else if (id == R.id.nav_account && !(activity instanceof AccountActivity)) {
                 intent = new Intent(activity, AccountActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             }
 
             if (intent != null) {

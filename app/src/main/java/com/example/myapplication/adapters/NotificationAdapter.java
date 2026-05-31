@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Notification;
+import com.example.myapplication.utils.NotificationLocalizer;
 import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
@@ -29,8 +30,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         Notification notification = notificationList.get(position);
 
-        holder.tvTitle.setText(notification.getTitle());
-        holder.tvMessage.setText(notification.getMessage());
+        NotificationLocalizer.localize(holder.itemView.getContext(), notification, holder.tvTitle, holder.tvMessage);
 
         if (!notification.isRead()) {
             holder.tvTitle.setAlpha(1.0f);

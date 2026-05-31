@@ -414,6 +414,15 @@
     <string name="notification_payment_success_body">Thanh toán cho \'Advanced Android\' đã thành công.</string>
     <string name="notification_new_course_title">Có khóa học mới</string>
     <string name="notification_new_course_body">Xem khóa UI/UX Design mới của Huy.</string>
+    <string name="notification_course_approved_title">Khóa học đã được duyệt</string>
+    <string name="notification_course_approved_body">Khóa "%1$s" của bạn đã được duyệt và hiển thị cho học viên.</string>
+    <string name="notification_course_rejected_title">Khóa học bị từ chối</string>
+    <string name="notification_course_rejected_body">Khóa "%1$s" của bạn đã bị từ chối. Vui lòng kiểm tra và cập nhật trước khi gửi lại.</string>
+    <string name="notification_course_purchased_title">Có học viên mua khóa học</string>
+    <string name="notification_course_purchased_body">Một học viên đã mua "%1$s" với giá %2$s.</string>
+    <string name="notification_create_failed">Không thể tạo thông báo: %1$s</string>
+    <string name="recent_activities">Hoạt động gần đây</string>
+    <string name="no_recent_activities">Không có hoạt động gần đây</string>
     <string name="fcm_channel_name">Kênh tác vụ quản trị</string>
     <string name="fcm_channel_description">Thông báo liên quan đến tác vụ quản trị và phê duyệt</string>
     <string name="fcm_fallback_title">Có tác vụ quản trị mới</string>
@@ -459,6 +468,7 @@
     <string name="sort_by">Sắp xếp:</string>
     <string name="newest">Mới nhất</string>
     <string name="price_usd">Giá ($)</string>
+    <string name="price_vnd">Giá (VND)</string>
     <string name="thumbnail_url">URL ảnh đại diện</string>
     <string name="save_changes">Lưu thay đổi</string>
     <string name="price_zero_hint">0.00</string>
@@ -497,6 +507,7 @@
     <string name="sample_user_format">Người dùng %1$d</string>
     <string name="sample_document_format">Document_0%1$d.pdf</string>
     <string name="usd_price_format">$%1$.2f</string>
-    <string name="vnd_price_format">đ%1$,.0f</string>
+    <string name="vnd_price_format">%1$,.0f VND</string>
+    <string name="price_zero_vnd">0 VND</string>
     <string name="lesson_count_with_duration_format">%1$d bài học • %2$s</string>
 </resources>

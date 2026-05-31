@@ -96,6 +96,7 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_account) {
                 Intent accountIntent = new Intent(this, AccountActivity.class);
                 accountIntent.putExtra("email", getIntent().getStringExtra("email"));
+                accountIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(accountIntent);
                 return true;
             }

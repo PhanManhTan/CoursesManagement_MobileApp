@@ -40,11 +40,20 @@ public interface AuthApi {
         private String role;
         @SerializedName("full_name")
         private String fullName;
+        @SerializedName("email")
+        private String email;
+        @SerializedName("bio")
+        private String bio;
+        @SerializedName("avatar_url")
+        private String avatarUrl;
         @SerializedName("status")
         private String status;
 
         public String getRole() { return role; }
         public String getFullName() { return fullName; }
+        public String getEmail() { return email; }
+        public String getBio() { return bio; }
+        public String getAvatarUrl() { return avatarUrl; }
         public String getStatus() { return status; }
     }
 

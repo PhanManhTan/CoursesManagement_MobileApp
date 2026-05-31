@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.activities.common.EditProfileActivity;
@@ -378,12 +380,17 @@ public class AdminMainActivity extends AppCompatActivity {
         TextView tvFullName = root.findViewById(R.id.tvFullName);
         TextView tvEmail = root.findViewById(R.id.tvEmail);
         TextView tvBio = root.findViewById(R.id.tvBio);
+        ImageView ivAvatar = root.findViewById(R.id.ivAvatar);
         View btnEditProfile = root.findViewById(R.id.btnEditProfile);
         View btnLogout = root.findViewById(R.id.btnLogout);
-        tvFullName.setText(R.string.loading);
-        tvEmail.setText("");
-        if (tvBio != null) {
-            tvBio.setText(R.string.loading);
+
+        boolean hasCachedProfile = bindCachedAccountProfile(tvFullName, tvEmail, tvBio, ivAvatar, R.string.admin_role);
+        if (!hasCachedProfile) {
+            tvFullName.setText(R.string.loading);
+            tvEmail.setText("");
+            if (tvBio != null) {
+                tvBio.setText(R.string.loading);
+            }
         }
 
         String userId = sessionManager.getUserId();
@@ -392,27 +399,34 @@ public class AdminMainActivity extends AppCompatActivity {
             return;
         }
 
-        userRepository.getById(userId, new UserRepository.RepositoryCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                runOnUiThread(() -> {
-                    if (user != null) {
-                        tvFullName.setText(user.getFullName() != null ? user.getFullName() : getString(R.string.admin_role));
-                        tvEmail.setText(user.getEmail() != null ? user.getEmail() : "");
-                        if (tvBio != null) {
-                            tvBio.setText(user.getBio() != null && !user.getBio().trim().isEmpty()
-                                    ? user.getBio()
-                                    : getString(R.string.no_bio_available));
+        if (!hasCachedProfile || !sessionManager.isProfileLoadedMemory()) {
+            userRepository.getById(userId, new UserRepository.RepositoryCallback<User>() {
+                @Override
+                public void onSuccess(User user) {
+                    runOnUiThread(() -> {
+                        if (user != null) {
+                            sessionManager.saveProfile(user.getFullName(), user.getEmail(), user.getBio(), user.getAvatarUrl());
+                            bindAccountProfile(
+                                    tvFullName,
+                                    tvEmail,
+                                    tvBio,
+                                    ivAvatar,
+                                    user.getFullName(),
+                                    user.getEmail(),
+                                    user.getBio(),
+                                    user.getAvatarUrl(),
+                                    R.string.admin_role
+                            );
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            @Override
-            public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(AdminMainActivity.this, R.string.admin_error_loading_account, Toast.LENGTH_SHORT).show());
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    runOnUiThread(() -> Toast.makeText(AdminMainActivity.this, R.string.admin_error_loading_account, Toast.LENGTH_SHORT).show());
+                }
+            });
+        }
 
         btnEditProfile.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
         btnLogout.setOnClickListener(v -> {
@@ -422,6 +436,58 @@ public class AdminMainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private boolean bindCachedAccountProfile(TextView tvFullName, TextView tvEmail, TextView tvBio,
+                                             ImageView ivAvatar, int fallbackNameRes) {
+        String cachedFullName = sessionManager.getFullName();
+        String cachedEmail = sessionManager.getEmail();
+        String cachedBio = sessionManager.getBio();
+        String cachedAvatarUrl = sessionManager.getAvatarUrl();
+        if (!hasValue(cachedFullName) && !hasValue(cachedEmail)
+                && !hasValue(cachedBio) && !hasValue(cachedAvatarUrl)) {
+            return false;
+        }
+
+        bindAccountProfile(
+                tvFullName,
+                tvEmail,
+                tvBio,
+                ivAvatar,
+                cachedFullName,
+                cachedEmail,
+                cachedBio,
+                cachedAvatarUrl,
+                fallbackNameRes
+        );
+        return true;
+    }
+
+    private void bindAccountProfile(TextView tvFullName, TextView tvEmail, TextView tvBio, ImageView ivAvatar,
+                                    String fullName, String email, String bio, String avatarUrl,
+                                    int fallbackNameRes) {
+        tvFullName.setText(hasValue(fullName) ? fullName : getString(fallbackNameRes));
+        tvEmail.setText(hasValue(email) ? email : "");
+        if (tvBio != null) {
+            tvBio.setText(hasValue(bio) ? bio : getString(R.string.no_bio_available));
+        }
+        if (ivAvatar == null) {
+            return;
+        }
+        if (hasValue(avatarUrl)) {
+            Glide.with(this)
+                    .load(avatarUrl)
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_camera_24)
+                    .error(R.drawable.ic_camera_24)
+                    .into(ivAvatar);
+        } else {
+            ivAvatar.setImageResource(R.drawable.ic_camera_24);
+        }
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private void redirectToLogin() {

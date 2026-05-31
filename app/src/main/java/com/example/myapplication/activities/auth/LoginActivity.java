@@ -129,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void fetchRealRoleAndRedirect(String userId, String email, String token) {
         // Gọi API lấy profile từ bảng users dựa trên ID, thêm status để check ban
-        authApi.getUserProfile("eq." + userId, "role,full_name,status").enqueue(new Callback<List<AuthApi.UserProfile>>() {
+        authApi.getUserProfile("eq." + userId, "role,full_name,email,bio,avatar_url,status").enqueue(new Callback<List<AuthApi.UserProfile>>() {
             @Override
             public void onResponse(Call<List<AuthApi.UserProfile>> call, Response<List<AuthApi.UserProfile>> response) {
                 btnLogin.setEnabled(true);
@@ -157,6 +157,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 // Safe session update
                 sessionManager.saveSession(token, userId, role);
+                if (profile != null) {
+                    String profileEmail = hasValue(profile.getEmail()) ? profile.getEmail() : email;
+                    sessionManager.saveProfile(profile.getFullName(), profileEmail, profile.getBio(), profile.getAvatarUrl());
+                }
 
                 Toast.makeText(LoginActivity.this, getString(R.string.login_as_role, getRoleLabel(role)), Toast.LENGTH_SHORT).show();
 
@@ -203,6 +207,10 @@ public class LoginActivity extends AppCompatActivity {
 
         String normalized = value.trim().toLowerCase();
         return normalized.isEmpty() ? fallback : normalized;
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private void handleSessionVerificationFailed(String message) {
