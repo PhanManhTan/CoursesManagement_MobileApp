@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
-            android:text="Reply"
+            android:text="@string/reply"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:textStyle="bold"

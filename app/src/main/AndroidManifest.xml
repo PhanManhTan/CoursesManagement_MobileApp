@@ -7,11 +7,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".CoursesApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/icon_app"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/icon_app_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
@@ -66,7 +68,7 @@
         <activity android:name=".activities.common.EditProfileActivity" android:exported="true" />
         <activity android:name=".activities.common.NotificationActivity" android:exported="true" />
         <activity android:name=".activities.common.PaymentResultActivity" android:exported="true" />
-        <activity android:name=".activities.common.VNPAYActivity" android:exported="true" />/>
+        <activity android:name=".activities.common.VNPAYActivity" android:exported="true" />
         <!-- Firebase Cloud Messaging Service -->
         <service
             android:name=".services.MyFirebaseMessagingService"

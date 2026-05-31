@@ -63,7 +63,7 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
 
         if (course != null) {
             holder.tvName.setText(course.getTitle());
-            holder.tvAuthor.setText("Loading...");
+            holder.tvAuthor.setText(R.string.loading);
 
             userRepository.getById(course.getInstructorId(), new UserRepository.RepositoryCallback<User>() {
                 @Override
@@ -75,7 +75,7 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
 
                 @Override
                 public void onError(String message) {
-                    holder.tvAuthor.setText("Unknown Instructor");
+                    holder.tvAuthor.setText(R.string.unknown_instructor);
                 }
             });
 
@@ -90,12 +90,12 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
 
             int completed = enrollment.getProgress();
             int total = enrollment.getTotalLessons();
-            holder.tvLessonCount.setText(completed + "/" + total + " lessons");
+            holder.tvLessonCount.setText(holder.itemView.getContext().getString(R.string.progress_lessons_format, completed, total));
 
             if (total > 0) {
                 int percent = (completed * 100) / total;
                 holder.pb.setProgress(percent);
-                holder.tvPercent.setText(percent + "% COMPLETE");
+                holder.tvPercent.setText(holder.itemView.getContext().getString(R.string.progress_complete_format, percent));
 
                 if (percent == 100) {
                     holder.btnReview.setVisibility(View.VISIBLE);
@@ -104,7 +104,7 @@ public class MyCourseAdapter extends RecyclerView.Adapter<MyCourseAdapter.ViewHo
                 }
             } else {
                 holder.pb.setProgress(0);
-                holder.tvPercent.setText("0% COMPLETE");
+                holder.tvPercent.setText(holder.itemView.getContext().getString(R.string.progress_complete_format, 0));
                 holder.btnReview.setVisibility(View.GONE);
             }
         }

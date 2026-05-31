@@ -17,7 +17,6 @@ import com.example.myapplication.models.Lesson;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class InstructorChapterAdapter extends RecyclerView.Adapter<InstructorChapterAdapter.ChapterViewHolder> {
     private final List<ChapterWithLessons> chapters = new ArrayList<>();
@@ -68,9 +67,9 @@ public class InstructorChapterAdapter extends RecyclerView.Adapter<InstructorCha
 
         String chapterTitle = chapter != null && hasValue(chapter.getTitle())
                 ? chapter.getTitle().trim()
-                : "Chapter " + (position + 1);
-        holder.tvChapterTitle.setText(String.format(Locale.US, "Chapter %d: %s", position + 1, chapterTitle));
-        holder.tvLessonCount.setText(String.format(Locale.US, "%d lessons", lessons.size()));
+                : holder.itemView.getContext().getString(R.string.default_chapter_title, position + 1);
+        holder.tvChapterTitle.setText(holder.itemView.getContext().getString(R.string.chapter_title_format, position + 1, chapterTitle));
+        holder.tvLessonCount.setText(holder.itemView.getContext().getString(R.string.lesson_count_format, lessons.size()));
         holder.tvEmptyLessons.setVisibility(lessons.isEmpty() ? View.VISIBLE : View.GONE);
 
         holder.btnEditChapter.setOnClickListener(v -> {
@@ -122,9 +121,9 @@ public class InstructorChapterAdapter extends RecyclerView.Adapter<InstructorCha
             TextView btnEditLesson = row.findViewById(R.id.btnEditLesson);
             TextView btnDeleteLesson = row.findViewById(R.id.btnDeleteLesson);
 
-            tvLessonIndex.setText(String.format(Locale.US, "Lesson %d", i + 1));
+            tvLessonIndex.setText(holder.itemView.getContext().getString(R.string.default_lesson_title, i + 1));
             String lessonTitle = hasValue(lesson.getTitle()) ? lesson.getTitle().trim() : "";
-            tvLessonTitle.setText(hasValue(lessonTitle) ? lessonTitle : "Untitled lesson");
+            tvLessonTitle.setText(hasValue(lessonTitle) ? lessonTitle : holder.itemView.getContext().getString(R.string.untitled_lesson));
 
             final int lessonPosition = i;
             btnEditLesson.setOnClickListener(v -> {

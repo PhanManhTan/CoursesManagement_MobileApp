@@ -16,6 +16,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.models.Enrollment;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.utils.VNPayUtils;
 
@@ -39,13 +40,14 @@ public class CheckoutActivity extends AppCompatActivity {
                     // VNPay trả về mã 00 - Thành công
                     processSuccessfulPayment();
                 } else {
-                    Toast.makeText(this, "Thanh toán thất bại hoặc đã bị hủy!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.payment_failed_or_cancelled, Toast.LENGTH_SHORT).show();
                 }
             }
     );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.checkout_activity);
 
@@ -84,11 +86,11 @@ public class CheckoutActivity extends AppCompatActivity {
 
         // Kiểm tra xem dữ liệu truyền sang có bị mất không
         if (userId == null || courseIds == null || cartIds == null) {
-            Toast.makeText(this, "Lỗi dữ liệu: Không tìm thấy khóa học để xử lý!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.payment_data_error, Toast.LENGTH_LONG).show();
             return;
         }
 
-        Toast.makeText(this, "Đang xử lý đơn hàng...", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.processing_order, Toast.LENGTH_LONG).show();
 
         // 1. Lặp để Add vào bảng Enrollments
         for (String courseId : courseIds) {
@@ -106,7 +108,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 public void onError(String message) {
                     // Hiển thị lỗi lên màn hình nếu Supabase từ chối
                     runOnUiThread(() -> {
-                        Toast.makeText(CheckoutActivity.this, "Lỗi thêm Enrollment: " + message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(CheckoutActivity.this, getString(R.string.enrollment_add_failed, message), Toast.LENGTH_LONG).show();
                         System.out.println("DEBUG_CHECKOUT: Lỗi Insert Enrollment: " + message);
                     });
                 }

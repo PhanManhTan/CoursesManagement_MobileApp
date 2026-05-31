@@ -69,7 +69,7 @@ public class LearningChapterAdapter extends RecyclerView.Adapter<LearningChapter
     @Override
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         LearningChapter chapterData = chapterList.get(position);
-        holder.tvChapterTitle.setText("Chapter " + (position + 1) + ": " + chapterData.getChapter().getTitle());
+        holder.tvChapterTitle.setText(context.getString(R.string.chapter_title_format, position + 1, chapterData.getChapter().getTitle()));
 
         holder.layoutLessonsContainer.setVisibility(chapterData.isExpanded() ? View.VISIBLE : View.GONE);
         holder.ivExpandArrow.setRotation(chapterData.isExpanded() ? 90 : -90);

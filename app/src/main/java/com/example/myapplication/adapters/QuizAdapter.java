@@ -58,7 +58,7 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     @Override
     public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
         Quiz quiz = quizList.get(position);
-        holder.tvQuestion.setText((position + 1) + ". " + quiz.getQuestion());
+        holder.tvQuestion.setText(context.getString(R.string.quiz_question_number_format, position + 1, quiz.getQuestion()));
 
         holder.rgOptions.removeAllViews();
         holder.rgOptions.setOnCheckedChangeListener(null);
@@ -112,13 +112,13 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
             holder.tvFeedback.setVisibility(View.VISIBLE);
             int selectedIndex = selectedAnswers.get(position, -1);
             if (selectedIndex == -1) {
-                holder.tvFeedback.setText("Not answered");
+                holder.tvFeedback.setText(R.string.not_answered);
                 holder.tvFeedback.setTextColor(Color.parseColor("#FF9800"));
             } else if (selectedIndex == correctIndex) {
-                holder.tvFeedback.setText("Correct!");
+                holder.tvFeedback.setText(R.string.correct);
                 holder.tvFeedback.setTextColor(Color.parseColor("#4CAF50"));
             } else {
-                holder.tvFeedback.setText("Incorrect");
+                holder.tvFeedback.setText(R.string.incorrect);
                 holder.tvFeedback.setTextColor(Color.parseColor("#F44336"));
             }
         } else {

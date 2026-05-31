@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Instructor Dashboard"
+            android:text="@string/instructor_dashboard"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -70,7 +70,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Total Students"
+                            android:text="@string/total_students"
                             android:textColor="@color/accent_light"
                             android:textSize="13sp" />
                         <TextView
@@ -100,7 +100,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Monthly Revenue"
+                            android:text="@string/monthly_revenue"
                             android:textColor="@color/accent_light"
                             android:textSize="13sp" />
                         <TextView
@@ -130,7 +130,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Avg. Rating"
+                            android:text="@string/avg_rating"
                             android:textColor="@color/accent_light"
                             android:textSize="13sp" />
                         <TextView
@@ -160,7 +160,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Live Courses"
+                            android:text="@string/live_courses"
                             android:textColor="@color/accent_light"
                             android:textSize="13sp" />
                         <TextView
@@ -182,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp"
-                android:text="Quick Actions"
+                android:text="@string/quick_actions"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -191,7 +191,7 @@
                 android:id="@+id/btnViewCourseList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Course List"
+                android:text="@string/view_course_list"
                 app:cornerRadius="8dp"
                 android:backgroundTint="@color/accent_muted"
                 android:padding="14dp" />
@@ -202,7 +202,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="View Revenue Details"
+                android:text="@string/view_revenue_details"
                 app:strokeColor="#5A4FCF"
                 android:textColor="@color/accent_muted"
                 android:padding="14dp" />
@@ -213,7 +213,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Manage Students"
+                android:text="@string/manage_students"
                 android:textColor="@color/accent_light" />
 
         </LinearLayout>

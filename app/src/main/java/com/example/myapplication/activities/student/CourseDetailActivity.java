@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.common.CartActivity;
 import com.example.myapplication.adapters.ChapterAdapter;
+import com.example.myapplication.adapters.ReviewAdapter;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.data.repository.CategoryRepository;
 import com.example.myapplication.data.repository.ChapterRepository;
@@ -31,6 +32,7 @@ import com.example.myapplication.models.Chapter;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Review;
 import com.example.myapplication.models.User;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -44,10 +46,8 @@ public class CourseDetailActivity extends AppCompatActivity {
     private TextView tvCartBadge;
     private View btnCartContainer;
     private ShapeableImageView avtTeacher;
-    private Button btnEnroll;
-    private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole, tvReviewsTitle;
     private Button btnEnroll, btnAddToCart;
-    private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole;
+    private TextView tvCourseTitle, tvDiscountPrice, tvOriginalPrice, tvPerDiscount, tvCourseDuration, tvRating, tvCategory, tvDesDetail, tvTeacherName, tvTeacherRole, tvReviewsTitle;
 
     private CourseRepository courseRepository;
     private ChapterRepository chapterRepository;
@@ -55,6 +55,7 @@ public class CourseDetailActivity extends AppCompatActivity {
     private CategoryRepository categoryRepository;
     private EnrollmentRepository enrollmentRepository;
     private CartRepository cartRepository;
+    private ReviewRepository reviewRepository;
     private SessionManager sessionManager;
 
     private ChapterAdapter chapterAdapter;
@@ -64,6 +65,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_detail);
 
@@ -72,7 +74,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         userId = sessionManager.getUserId();
 
         if (courseId == null) {
-            Toast.makeText(this, "Course not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.course_not_found, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -91,7 +93,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         btnAddToCart.setOnClickListener(v -> addToCart());
         
         btnEnroll.setOnClickListener(v -> {
-            Toast.makeText(this, "Buy feature coming soon", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.buy_feature_coming_soon, Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -125,6 +127,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         categoryRepository = new CategoryRepository(this);
         enrollmentRepository = new EnrollmentRepository(this);
         cartRepository = new CartRepository(this);
+        reviewRepository = new ReviewRepository(this);
     }
 
     @Override
@@ -186,14 +189,14 @@ public class CourseDetailActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, getString(R.string.error_with_message, message), Toast.LENGTH_SHORT).show());
             }
         });
     }
 
     private void displayCourseDetails(Course course) {
         tvCourseTitle.setText(course.getTitle());
-        tvDesDetail.setText(course.getDescription() != null ? course.getDescription() : "No description available.");
+        tvDesDetail.setText(course.getDescription() != null ? course.getDescription() : getString(R.string.no_description_available));
 
         tvDiscountPrice.setText(String.format("%,.0fđ", course.getDiscountPrice()));
 
@@ -202,14 +205,14 @@ public class CourseDetailActivity extends AppCompatActivity {
             tvOriginalPrice.setVisibility(View.VISIBLE);
 
             int discountPercent = (int) (((course.getPrice() - course.getDiscountPrice()) / course.getPrice()) * 100);
-            tvPerDiscount.setText(discountPercent + "% OFF");
+            tvPerDiscount.setText(getString(R.string.discount_off_format, discountPercent));
             tvPerDiscount.setVisibility(View.VISIBLE);
         } else {
             tvOriginalPrice.setVisibility(View.GONE);
             tvPerDiscount.setVisibility(View.GONE);
         }
 
-        tvCourseDuration.setText(course.getDuration() != null ? course.getDuration() : "N/A");
+        tvCourseDuration.setText(course.getDuration() != null ? course.getDuration() : getString(R.string.na_value));
         tvRating.setText(String.format("%.1f", course.getRating()));
 
         if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
@@ -224,9 +227,9 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     private void loadInstructorDetails(String instructorId) {
         if (instructorId == null || instructorId.isEmpty()) {
-            tvTeacherName.setText("Unknown Instructor");
+            tvTeacherName.setText(R.string.unknown_instructor);
             tvTeacherRole.setText("");
-            avtTeacher.setImageResource(R.drawable.noavatar);
+            avtTeacher.setImageResource(R.drawable.ic_user);
             return;
         }
 
@@ -235,13 +238,16 @@ public class CourseDetailActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 if (user != null) {
                     runOnUiThread(() -> {
-                        tvTeacherName.setText(user.getName() != null ? user.getName() : "Unknown Instructor");
-                        tvTeacherRole.setText(user.getRole() != null ? user.getRole() : "Instructor");
+                        tvTeacherName.setText(user.getName() != null ? user.getName() : getString(R.string.unknown_instructor));
+                        tvTeacherRole.setText(user.getRole() != null ? user.getRole() : getString(R.string.instructor_fallback));
 
                         if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
                             Glide.with(CourseDetailActivity.this)
                                     .load(user.getAvatarUrl())
+                                    .placeholder(R.drawable.ic_user)
                                     .into(avtTeacher);
+                        } else {
+                            avtTeacher.setImageResource(R.drawable.ic_user);
                         }
                     });
                 }
@@ -250,8 +256,9 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 runOnUiThread(() -> {
-                    tvTeacherName.setText("Unknown Instructor");
+                    tvTeacherName.setText(R.string.unknown_instructor);
                     tvTeacherRole.setText("");
+                    avtTeacher.setImageResource(R.drawable.ic_user);
                 });
             }
         });
@@ -259,7 +266,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     private void loadCategoryDetails(String categoryId) {
         if (categoryId == null || categoryId.isEmpty()) {
-            tvCategory.setText("Category: N/A");
+            tvCategory.setText(R.string.category_na);
             return;
         }
 
@@ -267,14 +274,14 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Category category) {
                 if (category != null) {
-                    runOnUiThread(() -> tvCategory.setText("Category: " + category.getName()));
+                    runOnUiThread(() -> tvCategory.setText(getString(R.string.category_format, category.getName())));
                 }
             }
 
             @Override
             public void onError(String message) {
                 // Thay thế bằng giá trị mặc định khi lỗi
-                runOnUiThread(() -> tvCategory.setText("Category: N/A"));
+                runOnUiThread(() -> tvCategory.setText(R.string.category_na));
             }
         });
     }
@@ -289,7 +296,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             public void onSuccess(Boolean isEnrolled) {
                 runOnUiThread(() -> {
                     if (isEnrolled) {
-                        btnEnroll.setText("Owned");
+                        btnEnroll.setText(R.string.owned);
                         btnEnroll.setEnabled(false);
                         btnEnroll.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
                         btnAddToCart.setVisibility(View.GONE);
@@ -305,7 +312,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     private void addToCart() {
         if (userId == null) {
-            Toast.makeText(this, "Please login to add to cart", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.login_to_add_cart, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -317,7 +324,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             public void onSuccess(Void data) {
                 runOnUiThread(() -> {
                     btnAddToCart.setEnabled(true);
-                    Toast.makeText(CourseDetailActivity.this, "Added to cart!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CourseDetailActivity.this, R.string.added_to_cart, Toast.LENGTH_SHORT).show();
                     updateCartBadge(); // Cập nhật lại số lượng ngay lập tức
                 });
             }
@@ -326,7 +333,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             public void onError(String message) {
                 runOnUiThread(() -> {
                     btnAddToCart.setEnabled(true);
-                    Toast.makeText(CourseDetailActivity.this, "Failed to add to cart: " + message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CourseDetailActivity.this, getString(R.string.failed_add_cart, message), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -337,7 +344,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<Chapter> chapters) {
                 if (chapters == null || chapters.isEmpty()) {
-                    runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, "This course has no chapters yet.", Toast.LENGTH_LONG).show());
+                    runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, R.string.no_chapters_yet, Toast.LENGTH_LONG).show());
                 } else {
                     runOnUiThread(() -> chapterAdapter.setChapterList(chapters));
                 }
@@ -345,7 +352,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, "Failed to load chapters: " + message, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(CourseDetailActivity.this, getString(R.string.failed_load_chapters, message), Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -355,10 +362,10 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<Review> reviews) {
                 if (reviews == null || reviews.isEmpty()) {
-                    tvReviewsTitle.setText("Student Reviews (0)");
+                    tvReviewsTitle.setText(getString(R.string.student_reviews_count, 0));
                     rvReviews.setVisibility(View.GONE);
                 } else {
-                    tvReviewsTitle.setText("Student Reviews (" + reviews.size() + ")");
+                    tvReviewsTitle.setText(getString(R.string.student_reviews_count, reviews.size()));
                     rvReviews.setVisibility(View.VISIBLE);
                     reviewAdapter.setReviewList(reviews);
                 }
@@ -366,7 +373,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                tvReviewsTitle.setText("Student Reviews");
+                tvReviewsTitle.setText(R.string.student_reviews);
             }
         });
     }

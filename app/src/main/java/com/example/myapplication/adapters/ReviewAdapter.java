@@ -52,24 +52,24 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             @Override
             public void onSuccess(User user) {
                 if (user != null) {
-                    holder.tvName.setText(user.getName() != null ? user.getName() : "Student");
+                    holder.tvName.setText(user.getName() != null ? user.getName() : holder.itemView.getContext().getString(R.string.student_fallback));
 
                     if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
                         Glide.with(holder.itemView.getContext())
                                 .load(user.getAvatarUrl())
-                                .placeholder(R.drawable.noavatar)
-                                .error(R.drawable.noavatar)
+                                .placeholder(R.drawable.ic_user)
+                                .error(R.drawable.ic_user)
                                 .into(holder.ivAvatar);
                     } else {
-                        holder.ivAvatar.setImageResource(R.drawable.noavatar);
+                        holder.ivAvatar.setImageResource(R.drawable.ic_user);
                     }
                 }
             }
 
             @Override
             public void onError(String message) {
-                holder.tvName.setText("Unknown Student");
-                holder.ivAvatar.setImageResource(R.drawable.noavatar);
+                holder.tvName.setText(R.string.unknown_student);
+                holder.ivAvatar.setImageResource(R.drawable.ic_user);
             }
         });
     }

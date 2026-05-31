@@ -27,6 +27,7 @@ import com.example.myapplication.models.Category;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utils.BottomNavigationHelper;
+import com.example.myapplication.utils.LanguageManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
@@ -55,6 +56,7 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
@@ -148,7 +150,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(SearchActivity.this, "Failed to load categories", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, R.string.failed_load_categories, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -194,7 +196,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String message) {
-                    Toast.makeText(SearchActivity.this, "Failed to load courses", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SearchActivity.this, R.string.failed_load_courses_plain, Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -206,7 +208,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String message) {
-                    Toast.makeText(SearchActivity.this, "Failed to search courses", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SearchActivity.this, R.string.failed_search_courses, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -217,7 +219,7 @@ public class SearchActivity extends AppCompatActivity {
 
         if (courses == null || courses.isEmpty()) {
             TextView tvEmpty = new TextView(SearchActivity.this);
-            tvEmpty.setText("No courses found.");
+            tvEmpty.setText(R.string.no_courses_found);
             tvEmpty.setPadding(32, 32, 32, 32);
             tvEmpty.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             tvEmpty.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
@@ -234,7 +236,7 @@ public class SearchActivity extends AppCompatActivity {
             ImageView thumb = itemView.findViewById(R.id.ivCourseThumb);
 
             title.setText(course.getTitle());
-            instructor.setText("Loading...");
+            instructor.setText(R.string.loading);
             price.setText(String.format("%,.0fđ", course.getDiscountPrice()));
 
             userRepository.getById(course.getInstructorId(), new UserRepository.RepositoryCallback<User>() {
@@ -247,7 +249,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String message) {
-                    instructor.setText("Unknown Instructor");
+                    instructor.setText(R.string.unknown_instructor);
                 }
             });
 

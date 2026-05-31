@@ -14,6 +14,7 @@ import com.example.myapplication.activities.admin.AdminMainActivity;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.activities.auth.OnboardingActivity;
 import com.example.myapplication.activities.instructor.InstructorMainActivity;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 public class SplashActivity extends AppCompatActivity {
@@ -25,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 

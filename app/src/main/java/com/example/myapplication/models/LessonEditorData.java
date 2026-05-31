@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class LessonEditorData implements Serializable {
     private String id;
+    private String courseId;
     private String chapterId;
     private String title;
     private String description;
@@ -367,6 +368,14 @@ public class LessonEditorData implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 
     public String getChapterId() {

@@ -35,6 +35,7 @@ import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.viewmodels.AdminViewModel;
 import com.example.myapplication.viewmodels.CourseApprovalViewModel;
@@ -63,13 +64,19 @@ public class AdminMainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
+
         setContentView(R.layout.activity_admin_main);
 
         contentContainer = findViewById(R.id.contentContainer);
         bottomNav = findViewById(R.id.bottomNav);
         userRepository = new UserRepository(this);
-        sessionManager = new SessionManager(this);
 
         setupBottomNav();
         handleIntent(getIntent());
@@ -80,6 +87,14 @@ public class AdminMainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sessionManager != null && !sessionManager.isLoggedIn()) {
+            redirectToLogin();
+        }
     }
 
     private void handleIntent(Intent intent) {
@@ -323,17 +338,17 @@ public class AdminMainActivity extends AppCompatActivity {
         TabLayout tabLayout = root.findViewById(R.id.tabLayout);
         if (tabLayout != null) {
             tabLayout.removeAllTabs();
-            tabLayout.addTab(tabLayout.newTab().setText("Violations"));
-            tabLayout.addTab(tabLayout.newTab().setText("Transactions"));
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.violations));
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.transactions));
 
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     if (tab.getPosition() == 0) {
-                        tvReportTitle.setText("User Reports & Flags");
+                        tvReportTitle.setText(R.string.user_reports_flags);
                         rvReports.setAdapter(reportAdapter);
                     } else {
-                        tvReportTitle.setText("System Transactions");
+                        tvReportTitle.setText(R.string.system_transactions);
                         rvReports.setAdapter(transactionAdapter);
                     }
                 }
@@ -362,13 +377,18 @@ public class AdminMainActivity extends AppCompatActivity {
 
         TextView tvFullName = root.findViewById(R.id.tvFullName);
         TextView tvEmail = root.findViewById(R.id.tvEmail);
+        TextView tvBio = root.findViewById(R.id.tvBio);
         View btnEditProfile = root.findViewById(R.id.btnEditProfile);
         View btnLogout = root.findViewById(R.id.btnLogout);
+        tvFullName.setText(R.string.loading);
+        tvEmail.setText("");
+        if (tvBio != null) {
+            tvBio.setText(R.string.loading);
+        }
 
         String userId = sessionManager.getUserId();
         if (userId == null) {
-            tvFullName.setText("Guest User");
-            tvEmail.setText("");
+            redirectToLogin();
             return;
         }
 
@@ -377,15 +397,20 @@ public class AdminMainActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 runOnUiThread(() -> {
                     if (user != null) {
-                        tvFullName.setText(user.getFullName() != null ? user.getFullName() : "Admin");
+                        tvFullName.setText(user.getFullName() != null ? user.getFullName() : getString(R.string.admin_role));
                         tvEmail.setText(user.getEmail() != null ? user.getEmail() : "");
+                        if (tvBio != null) {
+                            tvBio.setText(user.getBio() != null && !user.getBio().trim().isEmpty()
+                                    ? user.getBio()
+                                    : getString(R.string.no_bio_available));
+                        }
                     }
                 });
             }
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> Toast.makeText(AdminMainActivity.this, "Error loading account", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(AdminMainActivity.this, R.string.admin_error_loading_account, Toast.LENGTH_SHORT).show());
             }
         });
 
@@ -397,5 +422,13 @@ public class AdminMainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private void redirectToLogin() {
+        sessionManager.clear();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

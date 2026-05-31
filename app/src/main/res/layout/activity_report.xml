@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="System Reports"
+            android:text="@string/system_reports"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -52,7 +52,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Annual Total Revenue"
+                android:text="@string/annual_total_revenue"
                 android:textColor="@color/accent_light"
                 android:textSize="14sp" />
             <TextView
@@ -93,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="User Reports &amp; Flags"
+            android:text="@string/user_reports_flags"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
         android:textStyle="bold"

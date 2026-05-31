@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
+import com.example.myapplication.utils.LanguageManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,11 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private TextView tvLogin;
     private AuthApi authApi;
+    private String[] roleCodes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -47,9 +50,10 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         tvLogin = findViewById(R.id.tvLogin);
 
-        String[] roles = {"student", "instructor"};
+        roleCodes = new String[]{"student", "instructor"};
+        String[] roles = {getString(R.string.student_fallback), getString(R.string.instructor_fallback)};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, roles);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
         spRole.setAdapter(adapter);
 
         btnRegister.setOnClickListener(v -> attemptRegister());
@@ -62,47 +66,48 @@ public class RegisterActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
-        String role = spRole.getSelectedItem().toString();
+        int selectedRole = Math.max(0, spRole.getSelectedItemPosition());
+        String role = roleCodes[selectedRole];
 
         // ===== VALIDATE =====
         if (TextUtils.isEmpty(fullName)) {
-            etFullName.setError("Full name required");
+            etFullName.setError(getString(R.string.full_name_required));
             etFullName.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(email)) {
-            etEmail.setError("Email required");
+            etEmail.setError(getString(R.string.email_required));
             etEmail.requestFocus();
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Invalid email");
+            etEmail.setError(getString(R.string.invalid_email));
             etEmail.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            etPassword.setError("Password required");
+            etPassword.setError(getString(R.string.password_required));
             etPassword.requestFocus();
             return;
         }
 
         if (password.length() < 6) {
-            etPassword.setError("Min 6 characters");
+            etPassword.setError(getString(R.string.min_6_characters));
             etPassword.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(confirmPassword)) {
-            etConfirmPassword.setError("Confirm password required");
+            etConfirmPassword.setError(getString(R.string.confirm_password_required));
             etConfirmPassword.requestFocus();
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            etConfirmPassword.setError("Passwords do not match");
+            etConfirmPassword.setError(getString(R.string.passwords_do_not_match));
             etConfirmPassword.requestFocus();
             return;
         }
@@ -117,7 +122,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         // ===== UI LOADING =====
         btnRegister.setEnabled(false);
-        btnRegister.setText("Processing...");
+        btnRegister.setText(R.string.processing);
 
         // ===== CALL API =====
         authApi.signUp(request).enqueue(new Callback<AuthApi.AuthResponse>() {
@@ -125,11 +130,11 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call<AuthApi.AuthResponse> call, Response<AuthApi.AuthResponse> response) {
 
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Create Account");
+                btnRegister.setText(R.string.create_account);
 
                 if (response.isSuccessful()) {
                     Toast.makeText(RegisterActivity.this,
-                            "Registration successful! Please verify OTP in your email.",
+                            R.string.registration_success_verify_otp,
                             Toast.LENGTH_LONG).show();
 
                     Intent intent = new Intent(RegisterActivity.this, OtpVerifyActivity.class);
@@ -139,7 +144,7 @@ public class RegisterActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else {
                     Toast.makeText(RegisterActivity.this,
-                            "Register failed: " + response.code(),
+                            getString(R.string.register_failed_code, response.code()),
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -147,9 +152,9 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<AuthApi.AuthResponse> call, Throwable t) {
                 btnRegister.setEnabled(true);
-                btnRegister.setText("Create Account");
+                btnRegister.setText(R.string.create_account);
                 Toast.makeText(RegisterActivity.this,
-                        "Error: " + t.getMessage(),
+                        getString(R.string.error_with_message, t.getMessage()),
                         Toast.LENGTH_SHORT).show();
             }
         });

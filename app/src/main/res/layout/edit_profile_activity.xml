@@ -23,13 +23,13 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/outline_arrow_back_24"
             app:tint="@color/white"
-            android:contentDescription="Back" />
+            android:contentDescription="@string/back" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Edit Profile"
+            android:text="@string/edit_profile"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"/>
@@ -38,7 +38,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Update your details"
+        android:text="@string/update_your_details"
         android:textSize="14sp"
         android:textColor="@color/text_secondary"
         android:gravity="center"
@@ -48,7 +48,7 @@
         android:id="@+id/etFullName"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Full Name"
+        android:hint="@string/full_name_hint"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:inputType="textPersonName"
@@ -58,7 +58,7 @@
         android:id="@+id/etBio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Bio"
+        android:hint="@string/bio_hint"
         android:textColorHint="@color/text_hint"
         android:textColor="@color/text_primary"
         android:inputType="textMultiLine"
@@ -68,7 +68,7 @@
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="SAVE CHANGES"
+        android:text="@string/save_changes_upper"
         android:textColor="@color/text_primary"
         android:backgroundTint="@color/accent_pressed"
         android:textStyle="bold"/>

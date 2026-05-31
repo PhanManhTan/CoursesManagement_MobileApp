@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.CategoryAdapter;
 import com.example.myapplication.adapters.CourseAdapter;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.models.Cart;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.viewmodels.HomeViewModel;
 import com.example.myapplication.activities.student.MyCoursesActivity;
@@ -43,10 +45,16 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
         sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
+
         cartRepository = new CartRepository(this);
 
         tvWelcome = findViewById(R.id.tvWelcome);
@@ -65,7 +73,7 @@ public class HomeActivity extends AppCompatActivity {
         String email = getIntent().getStringExtra("email");
         if (email != null && !email.isEmpty()) {
             String name = email.split("@")[0];
-            tvWelcome.setText("Welcome, " + capitalize(name));
+            tvWelcome.setText(getString(R.string.welcome_user, capitalize(name)));
         }
 
         btnCartContainer.setOnClickListener(v -> {
@@ -98,7 +106,19 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
         updateCartBadge();
+    }
+
+    private void redirectToLogin() {
+        sessionManager.clear();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void updateCartBadge() {

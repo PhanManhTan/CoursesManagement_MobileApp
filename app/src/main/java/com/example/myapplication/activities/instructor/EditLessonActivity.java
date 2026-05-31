@@ -28,6 +28,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.LessonRepository;
 import com.example.myapplication.data.repository.QuizRepository;
 import com.example.myapplication.models.Lesson;
@@ -35,6 +36,8 @@ import com.example.myapplication.data.repository.SupabaseStorageRepository;
 import com.example.myapplication.models.LessonEditorData;
 import com.example.myapplication.models.Quiz;
 import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.utils.LanguageManager;
+import com.example.myapplication.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,10 +68,17 @@ public class EditLessonActivity extends AppCompatActivity {
     private boolean isBindingData;
     private boolean hasUnsavedChanges;
     private boolean isSaving;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
         registerFilePickers();
         setContentView(R.layout.activity_edit_lesson);
 
@@ -162,7 +172,7 @@ public class EditLessonActivity extends AppCompatActivity {
         try {
             pickVideoLauncher.launch("video/*");
         } catch (Exception e) {
-            Toast.makeText(this, "Cannot open video picker", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.cannot_open_video_picker, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -170,7 +180,7 @@ public class EditLessonActivity extends AppCompatActivity {
         try {
             pickAttachmentLauncher.launch(new String[]{"*/*"});
         } catch (Exception e) {
-            Toast.makeText(this, "Cannot open file picker", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.cannot_open_file_picker, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -184,7 +194,7 @@ public class EditLessonActivity extends AppCompatActivity {
         markDirty();
 
         beginUpload();
-        storageRepository.upload(uri, fileName, "courses/lessons/videos", new SupabaseStorageRepository.RepositoryCallback<String>() {
+        storageRepository.uploadToFolder(uri, fileName, buildLessonMediaFolder("videos"), new SupabaseStorageRepository.RepositoryCallback<String>() {
             @Override
             public void onSuccess(String url) {
                 runIfActive(() -> {
@@ -202,7 +212,7 @@ public class EditLessonActivity extends AppCompatActivity {
                     lessonData.setLocalVideoUri("");
                     lessonData.setVideoUrl("");
                     renderVideoName();
-                    Toast.makeText(EditLessonActivity.this, message, Toast.LENGTH_SHORT).show();
+                    showUploadError(message);
                     finishUpload();
                 });
             }
@@ -233,7 +243,7 @@ public class EditLessonActivity extends AppCompatActivity {
 
     private void uploadAttachment(int fileIndex, Uri uri, String fileName, String fileSize, String localUri) {
         beginUpload();
-        storageRepository.upload(uri, fileName, "courses/lessons/files", new SupabaseStorageRepository.RepositoryCallback<String>() {
+        storageRepository.uploadToFolder(uri, fileName, buildLessonMediaFolder("files"), new SupabaseStorageRepository.RepositoryCallback<String>() {
             @Override
             public void onSuccess(String url) {
                 runIfActive(() -> {
@@ -257,7 +267,7 @@ public class EditLessonActivity extends AppCompatActivity {
                     updateDocumentUrlFromFiles();
                     renderAttachments();
                     markDirty();
-                    Toast.makeText(EditLessonActivity.this, message, Toast.LENGTH_SHORT).show();
+                    showUploadError(message);
                     finishUpload();
                 });
             }
@@ -273,18 +283,18 @@ public class EditLessonActivity extends AppCompatActivity {
         String description = etLessonDescription.getText().toString().trim();
 
         if (TextUtils.isEmpty(title)) {
-            etLessonTitle.setError("Lesson title is required");
+            etLessonTitle.setError(getString(R.string.lesson_title_required));
             etLessonTitle.requestFocus();
             return;
         }
         if (pendingUploadCount > 0) {
-            Toast.makeText(this, "Please wait for uploads to finish", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.wait_uploads_finish, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!hasSelectedVideo()) {
             showSaveError(
-                    "Video required",
-                    "Add a video before saving this lesson. Attachments and quizzes are optional."
+                    getString(R.string.video_required),
+                    getString(R.string.video_required_message)
             );
             return;
         }
@@ -315,7 +325,7 @@ public class EditLessonActivity extends AppCompatActivity {
         updateDocumentUrlFromFiles();
 
         if (hasLocalMediaUrl(lessonData.getLocalVideoUri()) || hasLocalAttachment()) {
-            Toast.makeText(this, "Some media files are not uploaded yet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.media_not_uploaded, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -328,7 +338,7 @@ public class EditLessonActivity extends AppCompatActivity {
 
     private void saveLessonToRemoteOrReturn() {
         if (!hasValue(lessonData.getChapterId())) {
-            showLocalOnlyLessonMessage();
+            returnLessonResult(false);
             return;
         }
 
@@ -345,7 +355,7 @@ public class EditLessonActivity extends AppCompatActivity {
                 public void onError(String message) {
                     runIfActive(() -> {
                         setSavingState(false);
-                        showSaveError("Lesson save failed", message);
+                        showSaveError(getString(R.string.lesson_save_failed), message);
                     });
                 }
             });
@@ -358,7 +368,7 @@ public class EditLessonActivity extends AppCompatActivity {
                 if (savedLesson == null || !hasValue(savedLesson.getId())) {
                     runIfActive(() -> {
                         setSavingState(false);
-                        showSaveError("Lesson save failed", "Lesson was created but no lesson id was returned");
+                        showSaveError(getString(R.string.lesson_save_failed), getString(R.string.lesson_created_no_id));
                     });
                     return;
                 }
@@ -375,7 +385,7 @@ public class EditLessonActivity extends AppCompatActivity {
                     public void onError(String message) {
                         runIfActive(() -> {
                             setSavingState(false);
-                            showSaveError("Lesson save failed", message);
+                            showSaveError(getString(R.string.lesson_save_failed), message);
                         });
                     }
                 });
@@ -385,7 +395,7 @@ public class EditLessonActivity extends AppCompatActivity {
             public void onError(String message) {
                 runIfActive(() -> {
                     setSavingState(false);
-                    showSaveError("Lesson save failed", message);
+                    showSaveError(getString(R.string.lesson_save_failed), message);
                 });
             }
         });
@@ -411,7 +421,7 @@ public class EditLessonActivity extends AppCompatActivity {
             public void onSuccess(Void data) {
                 runIfActive(() -> {
                     setSavingState(false);
-                    Toast.makeText(EditLessonActivity.this, "Lesson saved successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditLessonActivity.this, R.string.lesson_saved_success, Toast.LENGTH_SHORT).show();
                     returnLessonResult(true);
                 });
             }
@@ -420,29 +430,14 @@ public class EditLessonActivity extends AppCompatActivity {
             public void onError(String message) {
                 runIfActive(() -> {
                     setSavingState(false);
-                    showSaveError("Quiz save failed", message);
+                    showSaveError(getString(R.string.quiz_save_failed), message);
                 });
             }
         });
     }
 
-    private void showLocalOnlyLessonMessage() {
-        String message = "This lesson was saved in the course draft only because the course or chapter has not been created on the server yet. Save the course first; after the chapter has a server ID, lesson changes will sync directly.";
-        Log.w(TAG, message);
-        if (isFinishing() || isDestroyed()) {
-            returnLessonResult(false);
-            return;
-        }
-
-        new AlertDialog.Builder(this)
-                .setTitle("Lesson saved in draft only")
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> returnLessonResult(false))
-                .show();
-    }
-
     private void showSaveError(String title, String message) {
-        String rawDetail = hasValue(message) ? message : "Unknown error";
+        String rawDetail = hasValue(message) ? message : getString(R.string.unknown_error);
         String detail = ApiErrorFormatter.fromMessage(rawDetail);
         Log.e(TAG, title + ": " + rawDetail);
         Toast.makeText(this, detail, Toast.LENGTH_LONG).show();
@@ -452,6 +447,22 @@ public class EditLessonActivity extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
                 .setTitle(title)
+                .setMessage(detail)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    private void showUploadError(String message) {
+        String rawDetail = hasValue(message) ? message : getString(R.string.unknown_error);
+        String detail = ApiErrorFormatter.fromMessage(rawDetail);
+        Log.e(TAG, "Upload failed: " + rawDetail);
+        Toast.makeText(this, detail, Toast.LENGTH_LONG).show();
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.upload_failed_title)
                 .setMessage(detail)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
@@ -549,7 +560,7 @@ public class EditLessonActivity extends AppCompatActivity {
             TextView btnDelete = new TextView(this);
             btnDelete.setLayoutParams(new LinearLayout.LayoutParams(dp(72), dp(36)));
             btnDelete.setGravity(Gravity.CENTER);
-            btnDelete.setText("DELETE");
+            btnDelete.setText(R.string.delete_upper);
             btnDelete.setTextColor(getColor(R.color.status_error));
             btnDelete.setTextSize(12);
             btnDelete.setTypeface(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD);
@@ -649,7 +660,7 @@ public class EditLessonActivity extends AppCompatActivity {
         for (int i = 0; i < llQuizContainer.getChildCount(); i++) {
             TextView tvQuizIndex = llQuizContainer.getChildAt(i).findViewById(R.id.tvQuizIndex);
             if (tvQuizIndex != null) {
-                tvQuizIndex.setText(String.format(Locale.US, "Question %d:", i + 1));
+                tvQuizIndex.setText(getString(R.string.question_count_format, i + 1));
             }
         }
     }
@@ -683,7 +694,7 @@ public class EditLessonActivity extends AppCompatActivity {
                 continue;
             }
             if (blankQuestion) {
-                etQuestion.setError("Question is required");
+                etQuestion.setError(getString(R.string.question_required));
                 etQuestion.requestFocus();
                 return null;
             }
@@ -693,7 +704,7 @@ public class EditLessonActivity extends AppCompatActivity {
                             : optionIndex == 1 ? etAnswerB
                             : optionIndex == 2 ? etAnswerC
                             : etAnswerD;
-                    target.setError("Answer is required");
+                    target.setError(getString(R.string.answer_required));
                     target.requestFocus();
                     return null;
                 }
@@ -701,7 +712,7 @@ public class EditLessonActivity extends AppCompatActivity {
 
             String correctAnswer = getSelectedAnswerKey(row);
             if (TextUtils.isEmpty(correctAnswer)) {
-                Toast.makeText(this, "Choose the correct answer for question " + (i + 1), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.choose_correct_answer_format, i + 1), Toast.LENGTH_SHORT).show();
                 return null;
             }
 
@@ -857,7 +868,7 @@ public class EditLessonActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(displayName)) {
             displayName = uri.getLastPathSegment();
         }
-        return TextUtils.isEmpty(displayName) ? "Selected file" : displayName;
+        return TextUtils.isEmpty(displayName) ? getString(R.string.selected_file) : displayName;
     }
 
     private String getDisplaySize(Uri uri) {
@@ -892,7 +903,7 @@ public class EditLessonActivity extends AppCompatActivity {
     }
 
     private String extractFileName(String value) {
-        if (!hasValue(value)) return "Selected file";
+        if (!hasValue(value)) return getString(R.string.selected_file);
 
         int slashIndex = Math.max(value.lastIndexOf('/'), value.lastIndexOf('\\'));
         if (slashIndex >= 0 && slashIndex < value.length() - 1) {
@@ -932,10 +943,10 @@ public class EditLessonActivity extends AppCompatActivity {
 
     private void confirmDeleteVideo() {
         new AlertDialog.Builder(this)
-                .setTitle("Delete video")
-                .setMessage("Remove this video from the lesson? Save the lesson after deleting to keep this change.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Delete", (dialog, which) -> clearVideoFile())
+                .setTitle(R.string.delete_video)
+                .setMessage(R.string.delete_video_confirm)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete, (dialog, which) -> clearVideoFile())
                 .show();
     }
 
@@ -945,10 +956,10 @@ public class EditLessonActivity extends AppCompatActivity {
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("Delete attachment")
-                .setMessage("Remove this file from the lesson? Save the lesson after deleting to keep this change.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_attachment)
+                .setMessage(R.string.delete_attachment_confirm)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     lessonData.removeFile(index);
                     updateDocumentUrlFromFiles();
                     renderAttachments();
@@ -959,10 +970,10 @@ public class EditLessonActivity extends AppCompatActivity {
 
     private void confirmDeleteQuiz(View row) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete quiz")
-                .setMessage("Remove this quiz question? Save the lesson after deleting to keep this change.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_quiz)
+                .setMessage(R.string.delete_quiz_confirm)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     llQuizContainer.removeView(row);
                     refreshQuizIndexes();
                     markDirty();
@@ -977,14 +988,14 @@ public class EditLessonActivity extends AppCompatActivity {
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("Unsaved changes")
-                .setMessage("Save your lesson before leaving?")
-                .setPositiveButton("Save", (dialog, which) -> saveLesson())
-                .setNegativeButton("Discard", (dialog, which) -> {
+                .setTitle(R.string.unsaved_changes)
+                .setMessage(R.string.save_lesson_before_leaving)
+                .setPositiveButton(R.string.save, (dialog, which) -> saveLesson())
+                .setNegativeButton(R.string.discard, (dialog, which) -> {
                     hasUnsavedChanges = false;
                     exitAction.run();
                 })
-                .setNeutralButton("Cancel", null)
+                .setNeutralButton(R.string.cancel, null)
                 .show();
     }
 
@@ -1005,11 +1016,27 @@ public class EditLessonActivity extends AppCompatActivity {
         return builder.toString();
     }
 
+    private String buildLessonMediaFolder(String mediaType) {
+        String courseId = hasValue(lessonData.getCourseId()) ? lessonData.getCourseId() : "draft";
+        String chapterId = hasValue(lessonData.getChapterId()) ? lessonData.getChapterId() : "draft-chapter";
+        String lessonId = hasValue(lessonData.getId()) ? lessonData.getId() : "draft-lesson";
+        return "courses/" + courseId + "/chapters/" + chapterId + "/lessons/" + lessonId + "/" + mediaType;
+    }
+
     private boolean hasValue(String value) {
         return value != null && !value.trim().isEmpty();
     }
 
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private void redirectToLogin() {
+        sessionManager.clear();
+        Toast.makeText(this, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

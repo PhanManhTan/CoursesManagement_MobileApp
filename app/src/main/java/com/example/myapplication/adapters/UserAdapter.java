@@ -47,15 +47,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         User user = users.get(position);
         holder.tvName.setText(user.getFullName());
         holder.tvEmail.setText(user.getEmail());
-        holder.tvRole.setText(user.getRole());
+        holder.tvRole.setText(formatRole(holder.itemView, user.getRole()));
 
         boolean isBanned = "banned".equalsIgnoreCase(user.getStatus());
         if (isBanned) {
-            holder.btnBan.setText("Unban");
+            holder.btnBan.setText(R.string.unban);
             holder.btnBan.setTextColor(Color.parseColor("#10B981")); // Emerald/Green
             holder.btnBan.setStrokeColorResource(android.R.color.transparent);
         } else {
-            holder.btnBan.setText("Ban");
+            holder.btnBan.setText(R.string.ban);
             holder.btnBan.setTextColor(Color.parseColor("#EF4444")); // Red
             holder.btnBan.setStrokeColorResource(android.R.color.transparent);
         }
@@ -68,6 +68,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    private String formatRole(View itemView, String role) {
+        if (role == null) return "";
+        if ("student".equalsIgnoreCase(role)) {
+            return itemView.getContext().getString(R.string.student);
+        }
+        if ("instructor".equalsIgnoreCase(role)) {
+            return itemView.getContext().getString(R.string.instructor_fallback);
+        }
+        if ("admin".equalsIgnoreCase(role)) {
+            return itemView.getContext().getString(R.string.admin_role);
+        }
+        return role;
     }
 
     static class UserViewHolder extends RecyclerView.ViewHolder {

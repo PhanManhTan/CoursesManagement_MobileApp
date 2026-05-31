@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Course Title"
+            android:text="@string/course_title_placeholder"
             android:textColor="@color/text_primary"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/accent"
-                android:text="List Lessons"
+                android:text="@string/list_lessons"
                 android:textAllCaps="false" />
 
             <Button
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/bg_secondary"
-                android:text="Discussions"
+                android:text="@string/discussions"
                 android:textAllCaps="false" />
 
             <Button
@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/bg_secondary"
-                android:text="Quiz"
+                android:text="@string/quiz"
                 android:textAllCaps="false" />
 
             <Button
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/bg_secondary"
-                android:text="Files"
+                android:text="@string/files"
                 android:textAllCaps="false" />
         </LinearLayout>
     </HorizontalScrollView>
@@ -100,7 +100,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/accent"
-        android:text="Add Discussion"
+        android:text="@string/add_discussion"
         android:textAllCaps="false"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
@@ -148,7 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Lesson Document"
+                    android:text="@string/lesson_document"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -164,7 +164,7 @@
                     android:paddingEnd="32dp"
                     android:backgroundTint="@color/accent"
                     android:textColor="@android:color/white"
-                    android:text="Download File"
+                    android:text="@string/download_file"
                     android:textAllCaps="false"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -194,7 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:hint="Add a discussion..."
+                android:hint="@string/add_discussion_hint"
                 android:textColorHint="@color/text_secondary"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
@@ -227,7 +227,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#9E9E9E"
-                android:text="Reset"
+                android:text="@string/reset"
                 android:textColor="@android:color/white"
                 android:textAllCaps="false" />
 
@@ -238,7 +238,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:backgroundTint="@color/accent"
-                android:text="Submit"
+                android:text="@string/submit"
                 android:textColor="@android:color/white"
                 android:textAllCaps="false" />
         </LinearLayout>

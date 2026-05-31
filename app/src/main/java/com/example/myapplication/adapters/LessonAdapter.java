@@ -39,18 +39,18 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
     @Override
     public void onBindViewHolder(@NonNull LessonViewHolder holder, int position) {
         Lesson lesson = lessonList.get(position);
-        holder.tvLessonNumber.setText(buildLessonTitle(lesson, position));
+        holder.tvLessonNumber.setText(buildLessonTitle(holder.itemView.getContext(), lesson, position));
         holder.itemView.setOnClickListener(null);
         holder.itemView.setClickable(false);
         holder.itemView.setFocusable(false);
 
-        renderSingleFile(holder.llVideoFiles, lesson.getLocalVideoName(), "No file selected", () -> {
+        renderSingleFile(holder.llVideoFiles, lesson.getLocalVideoName(), holder.itemView.getContext().getString(R.string.no_file_selected), () -> {
             int adapterPosition = resolveAdapterPosition(holder, position);
             if (listener != null && adapterPosition != RecyclerView.NO_POSITION) {
                 listener.onRemoveVideo(adapterPosition);
             }
         });
-        renderSingleFile(holder.llThumbnailFiles, lesson.getLocalThumbnailName(), "No file selected", () -> {
+        renderSingleFile(holder.llThumbnailFiles, lesson.getLocalThumbnailName(), holder.itemView.getContext().getString(R.string.no_file_selected), () -> {
             int adapterPosition = resolveAdapterPosition(holder, position);
             if (listener != null && adapterPosition != RecyclerView.NO_POSITION) {
                 listener.onRemoveThumbnail(adapterPosition);
@@ -58,8 +58,8 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         });
         renderFiles(holder.llFilesList, lesson.getLocalFileNames(), holder);
 
-        holder.btnUploadVideo.setText(lesson.getLocalVideoName() == null ? "Upload" : "Change");
-        holder.btnUploadThumbnail.setText(lesson.getLocalThumbnailName() == null ? "Upload" : "Change");
+        holder.btnUploadVideo.setText(lesson.getLocalVideoName() == null ? R.string.upload : R.string.change);
+        holder.btnUploadThumbnail.setText(lesson.getLocalThumbnailName() == null ? R.string.upload : R.string.change);
 
         holder.btnDelete.setOnClickListener(v -> {
             int adapterPosition = resolveAdapterPosition(holder, position);
@@ -116,7 +116,7 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         container.removeAllViews();
 
         if (fileNames == null || fileNames.isEmpty()) {
-            container.addView(createPlaceholder(container.getContext(), "No files"));
+            container.addView(createPlaceholder(container.getContext(), container.getContext().getString(R.string.no_files)));
             return;
         }
 
@@ -209,7 +209,7 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         for (int i = 0; i < container.getChildCount(); i++) {
             TextView tvQuizIndex = container.getChildAt(i).findViewById(R.id.tvQuizIndex);
             if (tvQuizIndex != null) {
-                tvQuizIndex.setText("Cau hoi " + (i + 1) + ":");
+                tvQuizIndex.setText(container.getContext().getString(R.string.question_count_format, i + 1));
             }
         }
     }
@@ -229,9 +229,10 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         return RecyclerView.NO_POSITION;
     }
 
-    private String buildLessonTitle(Lesson lesson, int position) {
+    private String buildLessonTitle(Context context, Lesson lesson, int position) {
         int lessonNumber = position + 1;
-        String baseTitle = "Lesson " + lessonNumber;
+        String baseTitle = context.getString(R.string.default_lesson_title, lessonNumber);
+        String englishBaseTitle = "Lesson " + lessonNumber;
         if (lesson == null || lesson.getTitle() == null) {
             return baseTitle;
         }
@@ -241,16 +242,20 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
             return baseTitle;
         }
 
-        String compactBaseTitle = ("Lesson" + lessonNumber).toLowerCase(Locale.US);
         String compactTitle = title.replaceAll("\\s+", "");
-        if (compactTitle.equalsIgnoreCase(compactBaseTitle)) {
+        if (compactTitle.equalsIgnoreCase(baseTitle.replaceAll("\\s+", ""))
+                || compactTitle.equalsIgnoreCase("Lesson" + lessonNumber)) {
             return baseTitle;
         }
 
-        String strippedTitle = stripGeneratedLessonPrefix(title, baseTitle, compactBaseTitle);
+        String strippedTitle = stripGeneratedLessonPrefix(title, baseTitle);
+        if (strippedTitle == null) {
+            strippedTitle = stripGeneratedLessonPrefix(title, englishBaseTitle);
+        }
         if (strippedTitle != null) {
             if (strippedTitle.isEmpty()
-                    || strippedTitle.replaceAll("\\s+", "").equalsIgnoreCase(compactBaseTitle)) {
+                    || strippedTitle.replaceAll("\\s+", "").equalsIgnoreCase(baseTitle.replaceAll("\\s+", ""))
+                    || strippedTitle.replaceAll("\\s+", "").equalsIgnoreCase("Lesson" + lessonNumber)) {
                 return baseTitle;
             }
             return baseTitle + " - " + strippedTitle;
@@ -259,18 +264,11 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         return baseTitle + " - " + title;
     }
 
-    private String stripGeneratedLessonPrefix(String title, String baseTitle, String compactBaseTitle) {
+    private String stripGeneratedLessonPrefix(String title, String baseTitle) {
         String lowerTitle = title.toLowerCase(Locale.US);
         String lowerBaseTitle = baseTitle.toLowerCase(Locale.US);
         if (lowerTitle.startsWith(lowerBaseTitle) && hasLessonPrefixBoundary(title, baseTitle.length())) {
             return title.substring(baseTitle.length()).replaceFirst("^[\\s:.-]+", "").trim();
-        }
-
-        String compactTitle = title.replaceAll("\\s+", "").toLowerCase(Locale.US);
-        if (compactTitle.startsWith(compactBaseTitle)
-                && hasLessonPrefixBoundary(compactTitle, compactBaseTitle.length())) {
-            String compactPrefix = "Lesson" + baseTitle.substring("Lesson ".length());
-            return title.substring(compactPrefix.length()).replaceFirst("^[\\s:.-]+", "").trim();
         }
 
         return null;
