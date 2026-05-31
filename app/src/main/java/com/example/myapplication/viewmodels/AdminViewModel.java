@@ -40,7 +40,7 @@ public class AdminViewModel extends AndroidViewModel {
                 if (data != null) totalUsers.setValue(String.valueOf(data.size()));
                 else totalUsers.setValue("0");
             }
-            @Override public void onError(String message) { totalUsers.setValue("0"); }
+            @Override public void onError(String message) { totalUsers.setValue("Error"); }
         });
 
         // Fetch Active Courses
@@ -50,7 +50,7 @@ public class AdminViewModel extends AndroidViewModel {
                 if (data != null) activeCourses.setValue(String.valueOf(data.size()));
                 else activeCourses.setValue("0");
             }
-            @Override public void onError(String message) { activeCourses.setValue("0"); }
+            @Override public void onError(String message) { activeCourses.setValue("Error"); }
         });
 
         // Fetch Pending Courses
@@ -60,7 +60,7 @@ public class AdminViewModel extends AndroidViewModel {
                 if (data != null) pendingCourses.setValue(String.valueOf(data.size()));
                 else pendingCourses.setValue("0");
             }
-            @Override public void onError(String message) { pendingCourses.setValue("0"); }
+            @Override public void onError(String message) { pendingCourses.setValue("Error"); }
         });
 
         // Fetch Total Revenue
@@ -75,7 +75,7 @@ public class AdminViewModel extends AndroidViewModel {
                 }
                 totalRevenue.setValue(String.format(Locale.US, "$%.1fk", total / 1000.0));
             }
-            @Override public void onError(String message) { totalRevenue.setValue("$0k"); }
+            @Override public void onError(String message) { totalRevenue.setValue("Error"); }
         });
     }
 

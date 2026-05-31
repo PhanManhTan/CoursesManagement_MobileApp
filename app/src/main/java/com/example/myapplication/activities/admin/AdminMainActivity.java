@@ -72,6 +72,13 @@ public class AdminMainActivity extends AppCompatActivity {
             return;
         }
 
+        String role = sessionManager.getRole();
+        if (role == null || !"admin".equalsIgnoreCase(role)) {
+            Toast.makeText(this, "Access denied: Admins only", Toast.LENGTH_LONG).show();
+            redirectToLogin();
+            return;
+        }
+
         setContentView(R.layout.activity_admin_main);
 
         contentContainer = findViewById(R.id.contentContainer);
@@ -92,10 +99,13 @@ public class AdminMainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (sessionManager != null && !sessionManager.isLoggedIn()) {
-            redirectToLogin();
+        if (sessionManager != null) {
+            if (!sessionManager.isLoggedIn() || !"admin".equalsIgnoreCase(sessionManager.getRole())) {
+                redirectToLogin();
+            }
         }
     }
+
 
     private void handleIntent(Intent intent) {
         if (intent != null && intent.hasExtra("TARGET_TAB")) {

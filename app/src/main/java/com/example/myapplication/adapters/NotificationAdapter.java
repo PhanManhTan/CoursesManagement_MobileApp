@@ -18,6 +18,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         this.notificationList = notificationList;
     }
 
+    public void setNotifications(List<Notification> notificationList) {
+        this.notificationList = notificationList;
+        notifyDataSetChanged();
+    }
+
+
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

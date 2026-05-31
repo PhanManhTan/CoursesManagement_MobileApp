@@ -768,7 +768,7 @@ public class InstructorMainActivity extends AppCompatActivity
     private int findStatusSelection(String status) {
         if (!hasValue(status)) return -1;
         String normalized = status.trim().toLowerCase(Locale.US).replace("-", "_").replace(" ", "_");
-        if (normalized.contains("pending") || normalized.contains("review") || normalized.contains("submitted") || normalized.contains("waiting")) {
+        if (normalized.contains("pending") || normalized.contains("review") || normalized.contains("submitted") || normalized.contains("waiting") || normalized.contains("reject")) {
             return 1;
         }
         if (normalized.contains("publish") || normalized.equals("approved") || normalized.equals("active") || normalized.equals("public")) {

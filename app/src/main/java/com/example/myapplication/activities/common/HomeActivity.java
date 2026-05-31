@@ -37,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvWelcome, tvCartBadge;
     private View btnCartContainer;
     private RecyclerView rvCategories, rvFeaturedCourses;
+    private TextView tvEmptyCategories, tvEmptyFeaturedCourses;
     private CategoryAdapter categoryAdapter;
     private CourseAdapter courseAdapter;
     private HomeViewModel homeViewModel;
@@ -63,12 +64,33 @@ public class HomeActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
         rvCategories = findViewById(R.id.rvCategories);
         rvFeaturedCourses = findViewById(R.id.rvFeaturedCourses);
+        tvEmptyCategories = findViewById(R.id.tvEmptyCategories);
+        tvEmptyFeaturedCourses = findViewById(R.id.tvEmptyFeaturedCourses);
 
         setupRecyclerViews();
         
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        homeViewModel.getCategories().observe(this, categories -> categoryAdapter.setCategories(categories));
-        homeViewModel.getFeaturedCourses().observe(this, courses -> courseAdapter.setCourses(courses));
+        homeViewModel.getCategories().observe(this, categories -> {
+            categoryAdapter.setCategories(categories);
+            if (categories == null || categories.isEmpty()) {
+                tvEmptyCategories.setVisibility(View.VISIBLE);
+                rvCategories.setVisibility(View.GONE);
+            } else {
+                tvEmptyCategories.setVisibility(View.GONE);
+                rvCategories.setVisibility(View.VISIBLE);
+            }
+        });
+        homeViewModel.getFeaturedCourses().observe(this, courses -> {
+            courseAdapter.setCourses(courses);
+            if (courses == null || courses.isEmpty()) {
+                tvEmptyFeaturedCourses.setVisibility(View.VISIBLE);
+                rvFeaturedCourses.setVisibility(View.GONE);
+            } else {
+                tvEmptyFeaturedCourses.setVisibility(View.GONE);
+                rvFeaturedCourses.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         String email = getIntent().getStringExtra("email");
         if (email != null && !email.isEmpty()) {
