@@ -1,6 +1,5 @@
 package com.example.myapplication.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +12,18 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
     private List<Notification> notificationList;
+    private OnNotificationClickListener listener;
+
+    public interface OnNotificationClickListener {
+        void onNotificationClick(Notification notification);
+    }
 
     public NotificationAdapter(List<Notification> notificationList) {
         this.notificationList = notificationList;
+    }
+
+    public void setOnNotificationClickListener(OnNotificationClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -32,11 +40,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvTitle.setText(notification.getTitle());
         holder.tvMessage.setText(notification.getMessage());
 
+        // Luôn giữ background resource để có khung (rounded corners và stroke)
+        holder.itemView.setBackgroundResource(R.drawable.bg_rounded_dark);
+
         if (!notification.isRead()) {
+            // Thông báo chưa đọc: Hiện rõ, có thể đổi màu nền hoặc stroke để nhấn mạnh
             holder.tvTitle.setAlpha(1.0f);
+            holder.tvMessage.setAlpha(1.0f);
+            holder.itemView.setBackgroundTintList(null); // Trở về mặc định của drawable
         } else {
-            holder.tvTitle.setAlpha(0.6f);
+            // Thông báo đã đọc: Làm mờ đi
+            holder.tvTitle.setAlpha(0.5f);
+            holder.tvMessage.setAlpha(0.5f);
+            // Làm mờ cả khung nếu muốn
+            holder.itemView.setAlpha(0.8f);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onNotificationClick(notification);
+            }
+        });
     }
 
     @Override
