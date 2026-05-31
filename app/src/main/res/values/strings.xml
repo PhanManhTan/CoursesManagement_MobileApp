@@ -370,7 +370,9 @@
     <string name="my_students">My Students</string>
     <string name="search_students_hint">Search students...</string>
     <string name="enrollments">Enrollments</string>
+    <string name="course_enrollments">Course Enrollments</string>
     <string name="students">Students</string>
+    <string name="unique_students">Unique Students</string>
     <string name="avg_progress">Avg Progress</string>
     <string name="completed">Completed</string>
     <string name="no_enrolled_students_found">No enrolled students found</string>

@@ -370,7 +370,9 @@
     <string name="my_students">Học viên của tôi</string>
     <string name="search_students_hint">Tìm học viên...</string>
     <string name="enrollments">Lượt ghi danh</string>
+    <string name="course_enrollments">Lượt ghi danh khóa học</string>
     <string name="students">Học viên</string>
+    <string name="unique_students">Học viên duy nhất</string>
     <string name="avg_progress">Tiến độ TB</string>
     <string name="completed">Hoàn thành</string>
     <string name="no_enrolled_students_found">Không tìm thấy học viên đã ghi danh</string>

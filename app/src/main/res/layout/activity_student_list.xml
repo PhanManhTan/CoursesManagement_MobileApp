@@ -95,7 +95,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/enrollments"
+                    android:text="@string/course_enrollments"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
 
@@ -128,7 +128,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/students"
+                    android:text="@string/unique_students"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
 
