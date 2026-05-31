@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +18,7 @@ import com.example.myapplication.models.Course;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCourseAdapter.CourseViewHolder> {
 
@@ -51,20 +53,10 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         Course course = courseList.get(position);
         holder.tvCourseName.setText(course.getTitle());
-        String duration = course.getDuration() != null ? course.getDuration() : "N/A";
-        holder.tvLessonCount.setText(course.getLessonCount() + " Lessons • " + duration);
-        holder.tvPrice.setText("$" + String.format("%.2f", course.getPrice()));
-        holder.tvStatus.setText(course.getStatus());
-
-        // Update status background/color based on status
-        if ("PUBLISHED".equalsIgnoreCase(course.getStatus()) || "APPROVED".equalsIgnoreCase(course.getStatus())) {
-            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_published);
-            holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
-        } else {
-            // Default or DRAFT
-            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_published); // Should have a draft bg ideally
-            holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
-        }
+        String duration = course.getDuration() != null ? course.getDuration() : context.getString(R.string.na_value);
+        holder.tvLessonCount.setText(context.getString(R.string.lesson_count_with_duration_format, course.getLessonCount(), duration));
+        holder.tvPrice.setText(context.getString(R.string.usd_price_format, course.getPrice()));
+        bindStatus(context, holder.tvStatus, course.getStatus());
 
         if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
@@ -89,6 +81,75 @@ public class InstructorCourseAdapter extends RecyclerView.Adapter<InstructorCour
     @Override
     public int getItemCount() {
         return courseList.size();
+    }
+
+    public static void bindStatus(Context context, TextView statusView, String status) {
+        StatusUi statusUi = resolveStatusUi(context, status);
+        statusView.setText(statusUi.label);
+        statusView.setBackgroundResource(statusUi.backgroundRes);
+        statusView.setTextColor(ContextCompat.getColor(context, statusUi.textColorRes));
+    }
+
+    private static StatusUi resolveStatusUi(Context context, String status) {
+        String normalized = status == null
+                ? ""
+                : status.trim().toLowerCase(Locale.US).replace("-", "_").replace(" ", "_");
+
+        if (normalized.contains("reject") || normalized.contains("decline") || normalized.contains("denied")) {
+            return new StatusUi(
+                    context.getString(R.string.course_status_rejected),
+                    R.drawable.bg_course_status_rejected,
+                    R.color.status_error
+            );
+        }
+        if (normalized.contains("pending")
+                || normalized.contains("review")
+                || normalized.contains("submitted")
+                || normalized.contains("waiting")) {
+            return new StatusUi(
+                    context.getString(R.string.course_status_pending),
+                    R.drawable.bg_course_status_pending,
+                    R.color.status_warning
+            );
+        }
+        if (normalized.contains("draft")
+                || normalized.contains("private")
+                || normalized.contains("hidden")
+                || normalized.contains("inactive")
+                || normalized.contains("unpublish")) {
+            return new StatusUi(
+                    context.getString(R.string.course_status_pending),
+                    R.drawable.bg_course_status_pending,
+                    R.color.status_warning
+            );
+        }
+        if (normalized.contains("publish")
+                || normalized.equals("approved")
+                || normalized.equals("active")
+                || normalized.equals("public")) {
+            return new StatusUi(
+                    context.getString(R.string.course_status_published),
+                    R.drawable.bg_course_status_published,
+                    R.color.status_success
+            );
+        }
+        return new StatusUi(
+                context.getString(R.string.course_status_pending),
+                R.drawable.bg_course_status_pending,
+                R.color.status_warning
+        );
+    }
+
+    private static class StatusUi {
+        final String label;
+        final int backgroundRes;
+        final int textColorRes;
+
+        StatusUi(String label, int backgroundRes, int textColorRes) {
+            this.label = label;
+            this.backgroundRes = backgroundRes;
+            this.textColorRes = textColorRes;
+        }
     }
 
     public static class CourseViewHolder extends RecyclerView.ViewHolder {

@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="My Courses"
+            android:text="@string/my_courses"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -53,7 +53,7 @@
         android:id="@+id/tvEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No courses yet"
+        android:text="@string/no_courses_yet"
         android:textColor="@color/text_secondary"
         android:textSize="15sp"
         android:visibility="gone"

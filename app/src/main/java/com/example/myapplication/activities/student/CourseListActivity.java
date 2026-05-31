@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.User;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.MockData;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class CourseListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_list);
 
@@ -48,12 +50,12 @@ public class CourseListActivity extends AppCompatActivity {
 
                 if (title != null) title.setText(course.getTitle());
                 
-                String instructorName = "Instructor";
+                String instructorName = getString(R.string.instructor_fallback);
                 User inst = MockData.getUserById(course.getInstructorId());
                 if (inst != null) instructorName = inst.getFullName();
                 
                 if (instructor != null) instructor.setText(instructorName);
-                if (price != null) price.setText("đ" + String.format("%,.0f", course.getPrice() * 1000));
+                if (price != null) price.setText(getString(R.string.vnd_price_format, course.getPrice() * 1000));
                 if (thumb != null) thumb.setImageResource(R.drawable.image_courses);
 
                 itemView.setOnClickListener(new View.OnClickListener() {

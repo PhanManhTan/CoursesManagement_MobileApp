@@ -33,7 +33,7 @@
                 android:id="@+id/tvLessonTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Introduction to Obsidian"
+                android:text="@string/lesson_sample_title"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -42,7 +42,7 @@
                 android:id="@+id/tvLessonDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="12:45 mins"
+                android:text="@string/lesson_duration_placeholder"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
         </LinearLayout>

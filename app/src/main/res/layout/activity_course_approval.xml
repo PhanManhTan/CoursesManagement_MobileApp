@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Course Approvals"
+            android:text="@string/course_approvals"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />

@@ -79,7 +79,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         }
 
         // 1. Fetch Instructor Name
-        holder.tvInstructor.setText("Loading...");
+        holder.tvInstructor.setText(R.string.loading);
         if (course.getInstructorId() != null) {
             userRepository.getById(course.getInstructorId(), new UserRepository.RepositoryCallback<User>() {
                 @Override
@@ -87,28 +87,28 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
                     if (user != null && user.getName() != null) {
                         holder.tvInstructor.setText(user.getName());
                     } else {
-                        holder.tvInstructor.setText("Unknown Instructor");
+                        holder.tvInstructor.setText(R.string.unknown_instructor);
                     }
                 }
 
                 @Override
                 public void onError(String message) {
-                    holder.tvInstructor.setText("Unknown Instructor");
+                    holder.tvInstructor.setText(R.string.unknown_instructor);
                 }
             });
         } else {
-            holder.tvInstructor.setText("Unknown Instructor");
+            holder.tvInstructor.setText(R.string.unknown_instructor);
         }
 
         // Format Price
         // Assuming your backend stores price in whole VND (e.g., 349000).
         // If it stores it in thousands (e.g., 349), keep the * 1000 multiplier you had.
         // For standard implementation, I will assume it stores full value. Adjust if needed.
-        holder.tvPrice.setText("đ" + String.format("%,.0f", course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice()));
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice()));
 
         if (course.getDiscountPrice() > 0 && course.getPrice() > course.getDiscountPrice()) {
             holder.tvOriginalPrice.setVisibility(View.VISIBLE);
-            holder.tvOriginalPrice.setText("đ" + String.format("%,.0f", course.getPrice()));
+            holder.tvOriginalPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, course.getPrice()));
         } else {
             holder.tvOriginalPrice.setVisibility(View.GONE);
         }

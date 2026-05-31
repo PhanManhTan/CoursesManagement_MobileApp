@@ -40,6 +40,7 @@ import com.example.myapplication.models.LearningDataWrapper.LearningLesson;
 import com.example.myapplication.models.Lesson;
 import com.example.myapplication.models.LessonProgress;
 import com.example.myapplication.models.Quiz;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +87,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learning);
 
@@ -123,7 +125,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         vvCourse.setMediaController(mediaController);
 
         vvCourse.setOnErrorListener((mp, what, extra) -> {
-            Toast.makeText(LearningActivity.this, "Video not found or network error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LearningActivity.this, R.string.video_not_found_network, Toast.LENGTH_SHORT).show();
             return true;
         });
 
@@ -147,7 +149,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
         btnDiscuss.setOnClickListener(v -> {
             if (currentPlayingLesson == null) {
-                Toast.makeText(this, "Please select a lesson first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_lesson_first, Toast.LENGTH_SHORT).show();
                 return;
             }
             updateTabUI(TabState.DISCUSSIONS);
@@ -156,7 +158,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
         btnQuizz.setOnClickListener(v -> {
             if (currentPlayingLesson == null) {
-                Toast.makeText(this, "Please select a lesson first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_lesson_first, Toast.LENGTH_SHORT).show();
                 return;
             }
             updateTabUI(TabState.QUIZZES);
@@ -165,7 +167,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
         btnFiles.setOnClickListener(v -> {
             if (currentPlayingLesson == null) {
-                Toast.makeText(this, "Please select a lesson first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_lesson_first, Toast.LENGTH_SHORT).show();
                 return;
             }
             updateTabUI(TabState.FILES);
@@ -175,7 +177,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         btnAddDiscussion.setOnClickListener(v -> {
             layoutCommentInput.setVisibility(View.VISIBLE);
             replyingParentId = null;
-            etCommentInput.setHint("Add a discussion...");
+            etCommentInput.setHint(R.string.add_discussion_hint);
             etCommentInput.requestFocus();
             showKeyboard(etCommentInput);
         });
@@ -198,7 +200,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         }
 
         if (courseId == null || userId == null) {
-            Toast.makeText(this, "Missing required information", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.missing_required_information, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -218,11 +220,11 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         String docUrl = currentPlayingLesson.getLesson().getDocumentUrl();
 
         if (docUrl != null && !docUrl.trim().isEmpty() && !docUrl.trim().equalsIgnoreCase("null")) {
-            tvFileName.setText("Document attached to this lesson");
+            tvFileName.setText(R.string.document_attached_lesson);
             btnDownloadFile.setVisibility(View.VISIBLE);
             btnDownloadFile.setOnClickListener(v -> downloadFile(docUrl));
         } else {
-            tvFileName.setText("No files available for this lesson");
+            tvFileName.setText(R.string.no_files_for_lesson);
             btnDownloadFile.setVisibility(View.GONE);
         }
     }
@@ -234,7 +236,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             if (fileName.isEmpty() || !fileName.contains(".")) {
                 fileName = "lesson_document.pdf";
             }
-            request.setTitle("Downloading Course File");
+            request.setTitle(getString(R.string.download_course_file));
             request.setDescription(fileName);
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
@@ -242,10 +244,10 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
             if (manager != null) {
                 manager.enqueue(request);
-                Toast.makeText(this, "Downloading started. Check notifications.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.download_started, Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Download failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.download_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -261,13 +263,13 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
                 } else {
                     quizAdapter.submitList(new ArrayList<>());
                     layoutQuizControls.setVisibility(View.GONE);
-                    Toast.makeText(LearningActivity.this, "No quizzes for this lesson.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LearningActivity.this, R.string.no_quizzes_for_lesson, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Failed to load quizzes: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, getString(R.string.failed_load_quizzes, message), Toast.LENGTH_SHORT).show();
                 layoutQuizControls.setVisibility(View.GONE);
             }
         });
@@ -286,7 +288,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Failed to load comments", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, R.string.failed_load_comments, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -313,7 +315,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Failed to post comment", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, R.string.failed_post_comment, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -356,7 +358,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     public void onReplyClick(Comment parentComment) {
         layoutCommentInput.setVisibility(View.VISIBLE);
         replyingParentId = parentComment.getId();
-        etCommentInput.setHint("Reply to " + parentComment.getUsers().getFullName() + "...");
+        etCommentInput.setHint(getString(R.string.reply_to_format, parentComment.getUsers().getFullName()));
         etCommentInput.requestFocus();
         showKeyboard(etCommentInput);
     }
@@ -413,7 +415,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             @Override
             public void onSuccess(List<Chapter> chapters) {
                 if (chapters == null || chapters.isEmpty()) {
-                    Toast.makeText(LearningActivity.this, "Course has no content", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LearningActivity.this, R.string.course_has_no_content, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Collections.sort(chapters, (c1, c2) -> Integer.compare(c1.getOrderIndex(), c2.getOrderIndex()));
@@ -424,7 +426,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
             }
             @Override
             public void onError(String message) {
-                Toast.makeText(LearningActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LearningActivity.this, getString(R.string.error_with_message, message), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -498,13 +500,13 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         lastSavedSeconds = currentPlayingLesson.getProgress() != null ? currentPlayingLesson.getProgress().getWatchTimeSeconds() : 0;
 
         replyingParentId = null;
-        etCommentInput.setHint("Add a comment...");
+        etCommentInput.setHint(R.string.add_comment_hint);
 
         String videoUrl = learningLesson.getLesson().getVideoUrl();
 
         if (videoUrl == null || videoUrl.trim().isEmpty()) {
             vvCourse.stopPlayback();
-            Toast.makeText(this, "No video available for this lesson", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_video_for_lesson, Toast.LENGTH_SHORT).show();
         } else {
             vvCourse.setVideoURI(Uri.parse(videoUrl));
             vvCourse.setOnPreparedListener(mp -> {

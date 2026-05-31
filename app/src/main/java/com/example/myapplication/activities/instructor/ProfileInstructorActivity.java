@@ -1,5 +1,6 @@
 package com.example.myapplication.activities.instructor;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -10,12 +11,17 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
+import com.example.myapplication.adapters.InstructorCourseAdapter;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.CourseRepository;
 import com.example.myapplication.data.repository.EnrollmentRepository;
+import com.example.myapplication.data.repository.ReviewRepository;
 import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.Course;
 import com.example.myapplication.models.Enrollment;
+import com.example.myapplication.models.Review;
 import com.example.myapplication.models.User;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import java.util.List;
 import java.util.Locale;
@@ -24,14 +30,16 @@ public class ProfileInstructorActivity extends AppCompatActivity {
 
     private LinearLayout lnInstructorCourses;
     private ImageView btnBack;
-    private TextView tvName, tvBio, tvExpertise, tvStudentsCount;
+    private TextView tvName, tvBio, tvExpertise, tvStudentsCount, tvRatingValue;
     private UserRepository userRepository;
     private CourseRepository courseRepository;
     private EnrollmentRepository enrollmentRepository;
+    private ReviewRepository reviewRepository;
     private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_instructor);
 
@@ -39,13 +47,20 @@ public class ProfileInstructorActivity extends AppCompatActivity {
         tvBio = findViewById(R.id.tvBio);
         tvExpertise = findViewById(R.id.tvExpertise);
         tvStudentsCount = findViewById(R.id.tvStudentsCount);
+        tvRatingValue = findViewById(R.id.tvRatingValue);
         lnInstructorCourses = findViewById(R.id.lnInstructorCourses);
         btnBack = findViewById(R.id.btnBack);
+
+        sessionManager = new SessionManager(this);
+        if (!sessionManager.isLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
 
         userRepository = new UserRepository(this);
         courseRepository = new CourseRepository(this);
         enrollmentRepository = new EnrollmentRepository(this);
-        sessionManager = new SessionManager(this);
+        reviewRepository = new ReviewRepository(this);
 
         btnBack.setOnClickListener(v -> finish());
 
@@ -54,7 +69,10 @@ public class ProfileInstructorActivity extends AppCompatActivity {
 
     private void loadInstructorProfile() {
         String instructorId = sessionManager.getUserId();
-        if (instructorId == null) return;
+        if (instructorId == null) {
+            redirectToLogin();
+            return;
+        }
 
         // Fetch User Info
         userRepository.getById(instructorId, new UserRepository.RepositoryCallback<User>() {
@@ -62,7 +80,7 @@ public class ProfileInstructorActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 if (user != null) {
                     tvName.setText(user.getFullName());
-                    tvBio.setText(user.getBio() != null ? user.getBio() : "No bio available.");
+                    tvBio.setText(user.getBio() != null ? user.getBio() : getString(R.string.no_bio_available));
                     tvExpertise.setText(user.getRole());
                 }
             }
@@ -76,10 +94,38 @@ public class ProfileInstructorActivity extends AppCompatActivity {
                 if (courses != null) {
                     displayCourses(courses);
                     calculateTotalStudents(courses);
+                    calculateAverageRating(courses);
                 }
             }
             @Override public void onError(String message) {
-                Toast.makeText(ProfileInstructorActivity.this, "Error loading courses", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileInstructorActivity.this, R.string.failed_load_courses_plain, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void calculateAverageRating(List<Course> courses) {
+        reviewRepository.getAll(new ReviewRepository.RepositoryCallback<List<Review>>() {
+            @Override
+            public void onSuccess(List<Review> allReviews) {
+                double totalRating = 0;
+                int ratingCount = 0;
+                if (courses != null && allReviews != null) {
+                    for (Course course : courses) {
+                        for (Review review : allReviews) {
+                            if (review.getCourseId() != null && review.getCourseId().equals(course.getId())) {
+                                totalRating += review.getRating();
+                                ratingCount++;
+                            }
+                        }
+                    }
+                }
+                double average = ratingCount > 0 ? totalRating / ratingCount : 0;
+                tvRatingValue.setText(String.format(Locale.US, "%.1f ★", average));
+            }
+
+            @Override
+            public void onError(String message) {
+                tvRatingValue.setText("0.0 ★");
             }
         });
     }
@@ -119,9 +165,9 @@ public class ProfileInstructorActivity extends AppCompatActivity {
             ImageButton btnMore = itemView.findViewById(R.id.btnMore);
 
             title.setText(course.getTitle());
-            lessons.setText(course.getLessonCount() + " Lessons");
+            lessons.setText(getString(R.string.lesson_count_format, course.getLessonCount()));
             price.setText(String.format(Locale.US, "$%.2f", course.getPrice()));
-            status.setText(course.getStatus());
+            InstructorCourseAdapter.bindStatus(this, status, course.getStatus());
             btnMore.setVisibility(View.GONE);
 
             if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
@@ -136,5 +182,14 @@ public class ProfileInstructorActivity extends AppCompatActivity {
 
             lnInstructorCourses.addView(itemView);
         }
+    }
+
+    private void redirectToLogin() {
+        sessionManager.clear();
+        Toast.makeText(this, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Instructor Profile"
+            android:text="@string/instructor_profile"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Loading..."
+                android:text="@string/loading"
                 android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -69,7 +69,7 @@
                 android:id="@+id/tvExpertise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Instructor"
+                android:text="@string/loading"
                 android:textColor="@color/accent_light"
                 android:textSize="14sp" />
 
@@ -88,14 +88,14 @@
                         android:id="@+id/tvStudentsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="15,420"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Students"
+                    android:text="@string/students"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -109,14 +109,14 @@
                         android:id="@+id/tvRatingValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4.9 ★"
+                        android:text="0.0 ★"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rating"
+                    android:text="@string/rating"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -126,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="About Me"
+            android:text="@string/about_me"
                 android:textColor="@color/accent_light"
                 android:textStyle="bold" />
 
@@ -135,7 +135,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="..."
+                android:text="@string/loading"
                 android:textColor="@color/text_primary"
                 android:lineSpacingExtra="4dp" />
 
@@ -143,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="My Courses"
+            android:text="@string/my_courses"
                 android:textColor="@color/accent_light"
                 android:textStyle="bold" />
 

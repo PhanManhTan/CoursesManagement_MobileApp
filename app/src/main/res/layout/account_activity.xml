@@ -33,13 +33,14 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     app:srcCompat="@drawable/outline_arrow_back_24"
                     app:tint="#FFFFFF"
-                    android:contentDescription="Back" />
+                    android:contentDescription="@string/back" />
 
                 <TextView
+                    android:id="@+id/tvAccountTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="My Account"
+                    android:text="@string/my_account"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"/>
@@ -71,14 +72,14 @@
                     android:padding="6dp"
                     android:elevation="4dp"
                     android:backgroundTint="@color/accent_pressed"
-                    android:contentDescription="Update Avatar" />
+                    android:contentDescription="@string/update_avatar" />
             </FrameLayout>
 
             <TextView
                 android:id="@+id/tvFullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="HuynhHuy"
+                android:text="@string/loading"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"/>
@@ -87,7 +88,7 @@
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="student@example.com"
+                android:text=""
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="24dp"
@@ -103,9 +104,10 @@
                 android:layout_marginBottom="32dp">
 
                 <TextView
+                    android:id="@+id/tvBioLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BIO"
+                    android:text="@string/bio_label"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_secondary"
@@ -115,17 +117,54 @@
                     android:id="@+id/tvBio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No bio available"
+                    android:text="@string/loading"
                     android:textSize="16sp"
                     android:textColor="@color/text_primary"
                     android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/languageContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_rounded_dark"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tvLanguageLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_language"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvLanguageHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/choose_display_language"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+
+                <Spinner
+                    android:id="@+id/spLanguage"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/bg_tertiary"
+                    android:paddingHorizontal="8dp"
+                    android:popupBackground="@color/bg_tertiary" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnEditProfile"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="EDIT PROFILE"
+                android:text="@string/edit_profile_upper"
                 android:textColor="@color/text_primary"
                 android:backgroundTint="@color/accent_pressed"
                 android:layout_marginBottom="16dp"/>
@@ -134,7 +173,7 @@
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="LOGOUT"
+                android:text="@string/logout_upper"
                 android:textColor="@color/accent_light"
                 android:backgroundTint="@color/bg_secondary"
                 android:textStyle="bold"/>

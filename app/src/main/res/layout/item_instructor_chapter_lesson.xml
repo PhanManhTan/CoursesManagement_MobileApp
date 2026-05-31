@@ -14,7 +14,7 @@
         android:id="@+id/tvLessonIndex"
         android:layout_width="76dp"
         android:layout_height="wrap_content"
-        android:text="Lesson 1"
+        android:text="@string/default_lesson_title_placeholder"
         android:textAppearance="@style/TextAppearance.App.Caption" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="2"
-        android:text="Lesson title"
+        android:text="@string/lesson_title_placeholder"
         android:textAppearance="@style/TextAppearance.App.Body" />
 
     <TextView

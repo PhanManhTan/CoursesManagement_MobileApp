@@ -2,12 +2,19 @@ package com.example.myapplication.data.repository;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.myapplication.R;
+import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.utils.Constants;
 import com.example.myapplication.utils.SessionManager;
 
@@ -16,7 +23,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,37 +52,61 @@ public class SupabaseStorageRepository {
 
     public SupabaseStorageRepository(Context context) {
         this.context = context.getApplicationContext();
-        this.client = new OkHttpClient();
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.MINUTES)
+                .readTimeout(5, TimeUnit.MINUTES)
+                .callTimeout(10, TimeUnit.MINUTES)
+                .build();
         this.sessionManager = new SessionManager(this.context);
     }
 
-    /**
-     * @param bucketName Tên bucket trên Supabase (ví dụ: "avatars")
-     */
     public void upload(Uri fileUri, String displayName, String bucketName, RepositoryCallback<String> callback) {
+        if (hasValue(bucketName) && (bucketName.contains("/") || bucketName.contains("\\"))) {
+            uploadInternal(fileUri, displayName, getBucketName(), bucketName, callback);
+            return;
+        }
+        uploadInternal(fileUri, displayName, bucketName, "", callback);
+    }
+
+    public void uploadToFolder(Uri fileUri, String displayName, String folderPath, RepositoryCallback<String> callback) {
+        uploadInternal(fileUri, displayName, getBucketName(), folderPath, callback);
+    }
+
+    /**
+     * @param bucketName Tên bucket trên Supabase (ví dụ: "avatars" hoặc bucket mặc định "course-media")
+     * @param folderPath Thư mục bên trong bucket, ví dụ "courses/{courseId}/lessons/videos"
+     */
+    private void uploadInternal(Uri fileUri, String displayName, String bucketName, String folderPath, RepositoryCallback<String> callback) {
         if (fileUri == null) {
-            callback.onError("No file selected");
+            callback.onError(context.getString(R.string.no_file_selected));
             return;
         }
 
         String projectBaseUrl = getProjectBaseUrl();
         if (!hasValue(projectBaseUrl) || !hasValue(Constants.SUPABASE_API_KEY)) {
-            callback.onError("Supabase is not configured");
+            callback.onError(context.getString(R.string.supabase_not_configured));
             return;
         }
 
         String token = sessionManager.getToken();
         if (!hasValue(token)) {
-            callback.onError("Missing Supabase session");
+            redirectToLogin();
+            callback.onError(context.getString(R.string.session_expired_login_again));
             return;
         }
 
         String bucket = hasValue(bucketName) ? bucketName : getBucketName();
 
-        String objectPath = buildObjectPath("", displayName, fileUri);
+        String objectPath = buildObjectPath(folderPath, displayName, fileUri);
 
         String mimeType = context.getContentResolver().getType(fileUri);
         if (!hasValue(mimeType)) {
+            mimeType = "application/octet-stream";
+        }
+        MediaType mediaType = MediaType.parse(mimeType);
+        if (mediaType == null) {
+            mediaType = MediaType.parse("application/octet-stream");
             mimeType = "application/octet-stream";
         }
 
@@ -87,7 +121,7 @@ public class SupabaseStorageRepository {
         RequestBody fileBody = new UriRequestBody(
                 context.getContentResolver(),
                 fileUri,
-                MediaType.parse(mimeType)
+                mediaType
         );
 
         Request request = new Request.Builder()
@@ -96,12 +130,13 @@ public class SupabaseStorageRepository {
                 .header("apikey", Constants.SUPABASE_API_KEY)
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", mimeType)
+                .header("x-upsert", "true")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError(e.getMessage());
+                callback.onError(formatNetworkUploadError(e));
             }
 
             @Override
@@ -113,7 +148,12 @@ public class SupabaseStorageRepository {
 
                 if (!successful) {
                     Log.e(TAG, "Upload failed (" + statusCode + "): " + responseBody);
-                    callback.onError(parseUploadError(responseBody, statusCode));
+                    if (statusCode == 401) {
+                        redirectToLogin();
+                        callback.onError(context.getString(R.string.session_expired_login_again));
+                        return;
+                    }
+                    callback.onError(parseUploadError(responseBody, statusCode, bucket));
                     return;
                 }
 
@@ -138,10 +178,13 @@ public class SupabaseStorageRepository {
         if (!hasValue(userFolder)) userFolder = "anonymous";
 
         String safeFileName = sanitizeFileName(hasValue(displayName) ? displayName : getDisplayName(fileUri));
-        String uniqueName = System.currentTimeMillis() + "_" + safeFileName;
+        String uniqueName = System.currentTimeMillis() + "_" + UUID.randomUUID() + "_" + safeFileName;
 
         if (hasValue(folder)) {
-            return sanitizePathPart(folder) + "/" + userFolder + "/" + uniqueName;
+            String safeFolder = sanitizeFolderPath(folder);
+            if (hasValue(safeFolder)) {
+                return userFolder + "/" + safeFolder + "/" + uniqueName;
+            }
         }
         return userFolder + "/" + uniqueName;
     }
@@ -153,6 +196,19 @@ public class SupabaseStorageRepository {
     private String sanitizePathPart(String value) {
         if (!hasValue(value)) return "";
         return value.trim().replaceAll("[\\\\/]+", "-").replaceAll("[^A-Za-z0-9._-]", "-");
+    }
+
+    private String sanitizeFolderPath(String value) {
+        if (!hasValue(value)) return "";
+        String[] parts = value.trim().split("[\\\\/]+");
+        StringBuilder builder = new StringBuilder();
+        for (String part : parts) {
+            String safePart = sanitizePathPart(part);
+            if (!hasValue(safePart)) continue;
+            if (builder.length() > 0) builder.append('/');
+            builder.append(safePart);
+        }
+        return builder.toString();
     }
 
     private String encodePath(String path) {
@@ -170,13 +226,65 @@ public class SupabaseStorageRepository {
         return projectBaseUrl + "/storage/v1/object/public/" + encodePath(bucket) + "/" + encodePath(objectPath);
     }
 
-    private String parseUploadError(String responseBody, int statusCode) {
+    private String parseUploadError(String responseBody, int statusCode, String bucket) {
         try {
             JSONObject json = new JSONObject(responseBody);
-            return json.optString("message", json.optString("error", "Error " + statusCode));
+            String code = json.optString("statusCode", json.optString("code", ""));
+            String error = json.optString("error", "");
+            String message = json.optString("message", "");
+            String combined = (code + " " + error + " " + message).toLowerCase(Locale.US);
+            if (isBucketNotFound(statusCode, combined)) {
+                return context.getString(R.string.storage_bucket_not_found_format, bucket);
+            }
+            if (combined.contains("row-level security")) {
+                return context.getString(R.string.storage_permission_denied);
+            }
+            if (hasValue(message)) {
+                return message;
+            }
+            if (hasValue(error)) {
+                return error;
+            }
         } catch (JSONException e) {
-            return "Error " + statusCode;
+            String lowerBody = responseBody != null ? responseBody.toLowerCase(Locale.US) : "";
+            if (isBucketNotFound(statusCode, lowerBody)) {
+                return context.getString(R.string.storage_bucket_not_found_format, bucket);
+            }
         }
+        if (statusCode == 401 || statusCode == 403) {
+            return context.getString(R.string.storage_permission_denied);
+        }
+        if (statusCode == 400 && lower(responseBody).contains("row-level security")) {
+            return context.getString(R.string.storage_permission_denied);
+        }
+        if (statusCode == 413) {
+            return context.getString(R.string.upload_file_too_large);
+        }
+        return "Error " + statusCode;
+    }
+
+    private String formatNetworkUploadError(IOException error) {
+        if (error instanceof SocketTimeoutException) {
+            return context.getString(R.string.upload_timeout);
+        }
+        String message = error.getMessage();
+        return context.getString(
+                R.string.upload_network_error_format,
+                hasValue(message) ? message : context.getString(R.string.unknown_error)
+        );
+    }
+
+    private String lower(String value) {
+        return value != null ? value.toLowerCase(Locale.US) : "";
+    }
+
+    private boolean isBucketNotFound(int statusCode, String lowerMessage) {
+        if (lowerMessage == null) {
+            lowerMessage = "";
+        }
+        return lowerMessage.contains("bucket not found")
+                || lowerMessage.contains("bucket_not_found")
+                || (statusCode == 404 && lowerMessage.contains("bucket"));
     }
 
     private String getDisplayName(Uri uri) {
@@ -194,6 +302,16 @@ public class SupabaseStorageRepository {
         return value != null && !value.trim().isEmpty();
     }
 
+    private void redirectToLogin() {
+        sessionManager.clear();
+        new Handler(Looper.getMainLooper()).post(() -> {
+            Toast.makeText(context, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(context, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            context.startActivity(intent);
+        });
+    }
+
     private static class UriRequestBody extends RequestBody {
         private final ContentResolver contentResolver;
         private final Uri uri;
@@ -207,6 +325,30 @@ public class SupabaseStorageRepository {
 
         @Override
         public MediaType contentType() { return mediaType; }
+
+        @Override
+        public long contentLength() throws IOException {
+            try (AssetFileDescriptor descriptor = contentResolver.openAssetFileDescriptor(uri, "r")) {
+                if (descriptor != null && descriptor.getLength() >= 0) {
+                    return descriptor.getLength();
+                }
+            } catch (Exception ignored) {
+            }
+
+            try (Cursor cursor = contentResolver.query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    if (sizeIndex >= 0) {
+                        long size = cursor.getLong(sizeIndex);
+                        if (size >= 0) {
+                            return size;
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            return -1;
+        }
 
         @Override
         public void writeTo(BufferedSink sink) throws IOException {

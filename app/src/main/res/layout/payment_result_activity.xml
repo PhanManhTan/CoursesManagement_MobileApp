@@ -38,7 +38,7 @@
             android:id="@+id/tvStatusTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Payment Successful!"
+            android:text="@string/payment_success_title"
             android:textColor="@color/text_primary"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -50,7 +50,7 @@
             android:layout_marginTop="12dp"
             android:gravity="center"
             android:lineSpacingExtra="4dp"
-            android:text="Your transaction was completed successfully.\nYou can now start learning your new courses."
+            android:text="@string/payment_success_message"
             android:textColor="@color/text_secondary"
             android:textSize="16sp" />
 
@@ -64,7 +64,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TRANSACTION ID"
+            android:text="@string/transaction_id_upper"
             android:textColor="@color/text_hint"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -85,7 +85,7 @@
         android:id="@+id/btnBackToHome"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="BACK TO HOME"
+        android:text="@string/back_to_home_upper"
         android:textColor="@color/text_primary"
         android:backgroundTint="@color/accent_pressed"
         android:textStyle="bold"

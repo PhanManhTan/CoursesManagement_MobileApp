@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.VNPayUtils;
 
 public class VNPAYActivity extends AppCompatActivity {
@@ -20,6 +21,7 @@ public class VNPAYActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vnpay);
 
@@ -57,7 +59,7 @@ public class VNPAYActivity extends AppCompatActivity {
         if (paymentUrl != null && !paymentUrl.isEmpty()) {
             webView.loadUrl(paymentUrl);
         } else {
-            Toast.makeText(this, "Lỗi tạo URL thanh toán", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.vnpay_url_error, Toast.LENGTH_SHORT).show();
             finish();
         }
     }

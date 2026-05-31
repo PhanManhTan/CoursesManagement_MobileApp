@@ -15,6 +15,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.User;
 import com.example.myapplication.utils.ApiErrorFormatter;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 public class EditProfileActivity extends AppCompatActivity {
@@ -30,6 +31,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile_activity);
 
@@ -57,7 +59,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void loadCurrentUser() {
         if (!hasValue(currentUserId)) {
-            showProfileError("Profile unavailable", "Missing user session. Please sign in again.");
+            showProfileError(getString(R.string.profile_unavailable), getString(R.string.missing_user_session_sign_in));
             setFormEnabled(false);
             return;
         }
@@ -76,7 +78,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onError(String message) {
                 runOnUiThread(() -> {
                     setFormEnabled(true);
-                    showProfileError("Profile load failed", message);
+                    showProfileError(getString(R.string.profile_load_failed), message);
                 });
             }
         });
@@ -84,7 +86,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void bindUser(User user) {
         if (user == null) {
-            showProfileError("Profile load failed", "User not found");
+            showProfileError(getString(R.string.profile_load_failed), getString(R.string.user_not_found));
             return;
         }
 
@@ -97,7 +99,7 @@ public class EditProfileActivity extends AppCompatActivity {
             return;
         }
         if (!hasValue(currentUserId)) {
-            showProfileError("Profile save failed", "Missing user session. Please sign in again.");
+            showProfileError(getString(R.string.profile_save_failed), getString(R.string.missing_user_session_sign_in));
             return;
         }
 
@@ -105,7 +107,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String bio = etBio.getText().toString().trim();
 
         if (TextUtils.isEmpty(fullName)) {
-            etFullName.setError("Full name is required");
+            etFullName.setError(getString(R.string.full_name_required));
             etFullName.requestFocus();
             return;
         }
@@ -116,7 +118,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onSuccess(Void data) {
                 runOnUiThread(() -> {
                     setSaving(false);
-                    Toast.makeText(EditProfileActivity.this, "Profile updated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditProfileActivity.this, R.string.profile_updated, Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 });
@@ -126,7 +128,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onError(String message) {
                 runOnUiThread(() -> {
                     setSaving(false);
-                    showProfileError("Profile save failed", message);
+                    showProfileError(getString(R.string.profile_save_failed), message);
                 });
             }
         });
@@ -136,7 +138,7 @@ public class EditProfileActivity extends AppCompatActivity {
         isSaving = saving;
         btnSave.setEnabled(!saving);
         btnSave.setAlpha(saving ? 0.5f : 1.0f);
-        btnSave.setText(saving ? "SAVING..." : "SAVE CHANGES");
+        btnSave.setText(saving ? R.string.saving_upper : R.string.save_changes_upper);
     }
 
     private void setFormEnabled(boolean enabled) {
@@ -147,7 +149,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void showProfileError(String title, String message) {
-        String rawDetail = hasValue(message) ? message : "Unknown error";
+        String rawDetail = hasValue(message) ? message : getString(R.string.unknown_error);
         String detail = ApiErrorFormatter.fromMessage(rawDetail);
         Log.e(TAG, title + ": " + rawDetail);
         Toast.makeText(this, detail, Toast.LENGTH_LONG).show();

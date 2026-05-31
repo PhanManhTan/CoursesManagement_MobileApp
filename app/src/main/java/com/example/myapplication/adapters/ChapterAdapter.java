@@ -48,7 +48,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     @Override
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         Chapter chapter = chapterList.get(position);
-        holder.tvChapterTitle.setText("Chapter " + (position + 1) + ": " + chapter.getTitle());
+        holder.tvChapterTitle.setText(context.getString(R.string.chapter_title_format, position + 1, chapter.getTitle()));
 
         boolean isExpanded = expandedPositions.contains(position);
         holder.layoutLessonsContainer.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -83,7 +83,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                 container.removeAllViews();
                 if (lessons == null || lessons.isEmpty()) {
                     TextView tvNoLesson = new TextView(context);
-                    tvNoLesson.setText("No lessons available in this chapter.");
+                    tvNoLesson.setText(R.string.no_lessons_available_chapter);
                     tvNoLesson.setPadding(50, 20, 20, 20);
                     tvNoLesson.setTextColor(context.getResources().getColor(R.color.text_secondary));
                     container.addView(tvNoLesson);

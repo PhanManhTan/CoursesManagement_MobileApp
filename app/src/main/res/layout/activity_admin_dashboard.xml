@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Admin Dashboard"
+            android:text="@string/admin_dashboard"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -59,7 +59,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="System Statistics"
+                        android:text="@string/system_statistics"
                         android:textColor="@color/accent_light"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -85,7 +85,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Users"
+                                android:text="@string/users"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -105,7 +105,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Courses"
+                                android:text="@string/courses"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -125,7 +125,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Revenue"
+                                android:text="@string/revenue"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -145,7 +145,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Pending"
+                                android:text="@string/pending"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -159,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="12dp"
-                android:text="System Management"
+                android:text="@string/system_management"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -168,7 +168,7 @@
                 android:id="@+id/btnCourseApproval"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pending Course Approvals"
+                android:text="@string/pending_course_approvals"
                 app:cornerRadius="8dp"
                 android:backgroundTint="@color/status_error"
                 android:padding="14dp" />
@@ -179,7 +179,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="User &amp; Role Management"
+                android:text="@string/user_role_management"
                 app:strokeColor="#5A4FCF"
                 android:textColor="@color/accent_muted"
                 android:padding="14dp" />
@@ -190,7 +190,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Content Reports &amp; Flags"
+                android:text="@string/content_reports_flags"
                 android:textColor="@color/accent_light" />
 
         </LinearLayout>

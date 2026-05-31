@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.data.repository.ReviewRepository;
 import com.example.myapplication.models.Review;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 public class ReviewActivity extends AppCompatActivity {
@@ -30,6 +31,7 @@ public class ReviewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
 
@@ -61,7 +63,7 @@ public class ReviewActivity extends AppCompatActivity {
 
         // Disable submit button while fetching to prevent duplicate submissions
         btnSubmit.setEnabled(false);
-        btnSubmit.setText("Loading...");
+        btnSubmit.setText(R.string.loading);
 
         reviewRepository.getReviewByUserAndCourse(userId, courseId, new ReviewRepository.RepositoryCallback<Review>() {
             @Override
@@ -73,7 +75,7 @@ public class ReviewActivity extends AppCompatActivity {
             public void onError(String message) {
                 // Review not found, allow user to submit
                 btnSubmit.setEnabled(true);
-                btnSubmit.setText("SUBMIT REVIEW");
+                btnSubmit.setText(R.string.submit_review_upper);
             }
         });
     }
@@ -86,7 +88,7 @@ public class ReviewActivity extends AppCompatActivity {
         etReview.setEnabled(false);
         etReview.setFocusable(false);
 
-        btnSubmit.setText("ALREADY REVIEWED");
+        btnSubmit.setText(R.string.already_reviewed_upper);
         btnSubmit.setEnabled(false);
     }
 
@@ -95,12 +97,12 @@ public class ReviewActivity extends AppCompatActivity {
         String comment = etReview.getText().toString().trim();
 
         if (rating == 0) {
-            Toast.makeText(this, "Please provide a rating", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.provide_rating, Toast.LENGTH_SHORT).show();
             return;
         }
 
         btnSubmit.setEnabled(false);
-        btnSubmit.setText("Submitting...");
+        btnSubmit.setText(R.string.submitting);
 
         Review newReview = new Review();
         newReview.setUserId(userId);
@@ -111,15 +113,15 @@ public class ReviewActivity extends AppCompatActivity {
         reviewRepository.insert(newReview, new ReviewRepository.RepositoryCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
-                Toast.makeText(ReviewActivity.this, "Review submitted successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ReviewActivity.this, R.string.review_submitted, Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ReviewActivity.this, "Failed to submit review: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ReviewActivity.this, getString(R.string.failed_submit_review, message), Toast.LENGTH_SHORT).show();
                 btnSubmit.setEnabled(true);
-                btnSubmit.setText("SUBMIT REVIEW");
+                btnSubmit.setText(R.string.submit_review_upper);
             }
         });
     }

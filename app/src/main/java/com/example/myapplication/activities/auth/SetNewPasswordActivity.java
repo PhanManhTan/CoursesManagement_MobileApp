@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.data.remote.AuthApi;
 import com.example.myapplication.data.remote.RetrofitClient;
+import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 
 import retrofit2.Call;
@@ -31,6 +32,7 @@ public class SetNewPasswordActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_new_password);
 
@@ -56,28 +58,28 @@ public class SetNewPasswordActivity extends AppCompatActivity {
         String confirm  = etConfirmPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(password)) {
-            etNewPassword.setError("Password is required");
+            etNewPassword.setError(getString(R.string.password_required));
             etNewPassword.requestFocus();
             return;
         }
         if (password.length() < 6) {
-            etNewPassword.setError("Password must be at least 6 characters");
+            etNewPassword.setError(getString(R.string.password_min_6));
             etNewPassword.requestFocus();
             return;
         }
         if (TextUtils.isEmpty(confirm)) {
-            etConfirmPassword.setError("Please confirm your password");
+            etConfirmPassword.setError(getString(R.string.confirm_your_password));
             etConfirmPassword.requestFocus();
             return;
         }
         if (!password.equals(confirm)) {
-            etConfirmPassword.setError("Passwords do not match");
+            etConfirmPassword.setError(getString(R.string.passwords_do_not_match));
             etConfirmPassword.requestFocus();
             return;
         }
 
         btnResetPassword.setEnabled(false);
-        btnResetPassword.setText("Updating...");
+        btnResetPassword.setText(R.string.updating);
 
         AuthApi authApi = RetrofitClient.getClient(this).create(AuthApi.class);
         AuthApi.UpdatePasswordRequest request = new AuthApi.UpdatePasswordRequest(password);
@@ -89,11 +91,11 @@ public class SetNewPasswordActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<AuthApi.AuthResponse> call, Response<AuthApi.AuthResponse> response) {
                 btnResetPassword.setEnabled(true);
-                btnResetPassword.setText("Reset Password");
+                btnResetPassword.setText(R.string.reset_password);
 
                 if (response.isSuccessful()) {
                     Toast.makeText(SetNewPasswordActivity.this,
-                            "Password updated! Please login with your new password.",
+                            R.string.password_updated_login,
                             Toast.LENGTH_LONG).show();
 
                     // Xóa token cũ để bắt buộc đăng nhập lại
@@ -106,7 +108,7 @@ public class SetNewPasswordActivity extends AppCompatActivity {
                     finish();
                 } else {
                     Toast.makeText(SetNewPasswordActivity.this,
-                            "Failed to update password. Session may have expired.",
+                            R.string.password_update_failed_expired,
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -114,9 +116,9 @@ public class SetNewPasswordActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<AuthApi.AuthResponse> call, Throwable t) {
                 btnResetPassword.setEnabled(true);
-                btnResetPassword.setText("Reset Password");
+                btnResetPassword.setText(R.string.reset_password);
                 Toast.makeText(SetNewPasswordActivity.this,
-                        "Error: " + t.getMessage(),
+                        getString(R.string.error_with_message, t.getMessage()),
                         Toast.LENGTH_SHORT).show();
             }
         });

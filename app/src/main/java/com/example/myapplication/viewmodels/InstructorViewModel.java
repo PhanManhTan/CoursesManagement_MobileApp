@@ -129,6 +129,39 @@ public class InstructorViewModel extends AndroidViewModel {
         });
     }
 
+    public void updateCourseStatus(Course course, String status) {
+        if (course == null || course.getId() == null || course.getId().isEmpty()) {
+            errorMessage.setValue("Invalid course id");
+            return;
+        }
+        if (status == null || status.trim().isEmpty()) {
+            errorMessage.setValue("Invalid course status");
+            return;
+        }
+        if (instructorId == null || instructorId.trim().isEmpty()) {
+            errorMessage.setValue("Missing instructor session");
+            return;
+        }
+
+        String previousStatus = course.getStatus();
+        course.setStatus(status);
+        loading.setValue(true);
+        courseRepository.updateForInstructor(course.getId(), instructorId, course, new CourseRepository.RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                loading.setValue(false);
+                refreshCourses();
+            }
+
+            @Override
+            public void onError(String message) {
+                course.setStatus(previousStatus);
+                loading.setValue(false);
+                errorMessage.setValue(message);
+            }
+        });
+    }
+
     private int countLiveCourses(List<Course> courses) {
         int liveCount = 0;
         if (courses != null) {

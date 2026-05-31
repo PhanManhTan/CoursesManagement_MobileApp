@@ -67,7 +67,7 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Di
                     .placeholder(android.R.drawable.ic_menu_report_image)
                     .into(holder.ivUserAvatar);
         } else {
-            holder.tvUserName.setText("Unknown User");
+            holder.tvUserName.setText(R.string.unknown_user);
         }
 
         holder.tvCommentContent.setText(comment.getContent());

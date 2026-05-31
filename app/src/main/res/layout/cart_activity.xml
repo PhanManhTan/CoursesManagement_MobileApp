@@ -22,13 +22,13 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/outline_arrow_back_24"
             app:tint="@color/white"
-            android:contentDescription="Back" />
+            android:contentDescription="@string/back" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="My Cart"
+            android:text="@string/my_cart"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"/>
@@ -50,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Total:"
+            android:text="@string/total_label"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"/>
@@ -68,7 +68,7 @@
         android:id="@+id/btnCheckout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="CHECKOUT"
+        android:text="@string/checkout_upper"
         android:textColor="@color/text_primary"
         android:backgroundTint="@color/accent_pressed"
         android:textStyle="bold"/>

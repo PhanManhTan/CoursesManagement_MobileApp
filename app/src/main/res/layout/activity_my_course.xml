@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="My Courses"
+            android:text="@string/my_courses"
             android:textColor="#FFFFFF"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -46,9 +46,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All" android:textAllCaps="false" android:backgroundTint="#5E5CE6" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ongoing" android:textAllCaps="false" android:backgroundTint="#2C2C2E" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Completed" android:textAllCaps="false" android:backgroundTint="#2C2C2E"/>
+            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/all" android:textAllCaps="false" android:backgroundTint="#5E5CE6" android:layout_marginEnd="10dp"/>
+            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ongoing" android:textAllCaps="false" android:backgroundTint="#2C2C2E" android:layout_marginEnd="10dp"/>
+            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/completed" android:textAllCaps="false" android:backgroundTint="#2C2C2E"/>
         </LinearLayout>
     </HorizontalScrollView>
 
