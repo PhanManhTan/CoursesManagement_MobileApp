@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationActivity extends AppCompatActivity {
-    private NotificationRepository repository;
-    private SessionManager sessionManager;
+
     private NotificationAdapter adapter;
-    private List<Notification> notificationsList = new ArrayList<>();
+    private List<Notification> notificationList = new ArrayList<>();
+    private NotificationRepository notificationRepository;
+    private SessionManager sessionManager;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,24 +34,46 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_activity);
 
+        sessionManager = new SessionManager(this);
+        notificationRepository = new NotificationRepository(this);
+
         RecyclerView rvNotifications = findViewById(R.id.rvNotifications);
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new NotificationAdapter(notificationsList);
+        adapter = new NotificationAdapter(notificationList);
+        adapter.setOnNotificationClickListener(notification -> {
+            if (!notification.isRead()) {
+                markAsRead(notification);
+            }
+        });
         rvNotifications.setAdapter(adapter);
 
-        sessionManager = new SessionManager(this);
-        repository = new NotificationRepository(this);
-
-        loadNotifications();
-
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_notification);
         BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
-            public void handleOnBackPressed() {
+            public void handleOnBackPressed() { }
+        });
+
+        loadNotifications();
+    }
+
+    private void markAsRead(Notification notification) {
+        notificationRepository.markAsRead(notification.getId(), new NotificationRepository.RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                runOnUiThread(() -> {
+                    notification.setRead(true);
+                    adapter.notifyDataSetChanged();
+                    BottomNavigationHelper.updateNotificationBadge(NotificationActivity.this, bottomNav);
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                // Keep it silent or show toast
             }
         });
     }
@@ -61,24 +85,25 @@ public class NotificationActivity extends AppCompatActivity {
             return;
         }
 
-        repository.getByUserId(userId, new NotificationRepository.RepositoryCallback<List<Notification>>() {
+        notificationRepository.getByUserId(userId, new NotificationRepository.RepositoryCallback<List<Notification>>() {
             @Override
             public void onSuccess(List<Notification> data) {
                 runOnUiThread(() -> {
+                    notificationList.clear();
                     if (data != null) {
-                        notificationsList = data;
-                        adapter.setNotifications(notificationsList);
+                        notificationList.addAll(data);
                     }
+                    adapter.setNotifications(notificationList);
+                    BottomNavigationHelper.updateNotificationBadge(NotificationActivity.this, bottomNav);
                 });
             }
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> {
-                    Toast.makeText(NotificationActivity.this, "Failed to load notifications: " + message, Toast.LENGTH_SHORT).show();
-                });
+                runOnUiThread(() ->
+                        Toast.makeText(NotificationActivity.this, "Failed to load notifications: " + message, Toast.LENGTH_SHORT).show()
+                );
             }
         });
     }
 }
-

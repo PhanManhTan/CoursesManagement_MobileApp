@@ -3,11 +3,9 @@ package com.example.myapplication.activities.common;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,15 +16,10 @@ import com.example.myapplication.adapters.CourseAdapter;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.models.Cart;
+import com.example.myapplication.utils.BottomNavigationHelper;
 import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.viewmodels.HomeViewModel;
-import com.example.myapplication.activities.student.MyCoursesActivity;
-import com.example.myapplication.activities.student.SearchActivity;
-import com.example.myapplication.activities.common.AccountActivity;
-import com.example.myapplication.activities.common.NotificationActivity;
-import com.example.myapplication.activities.common.CartActivity;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
@@ -68,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
         tvEmptyFeaturedCourses = findViewById(R.id.tvEmptyFeaturedCourses);
 
         setupRecyclerViews();
-        
+
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getCategories().observe(this, categories -> {
             categoryAdapter.setCategories(categories);
@@ -91,7 +84,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
         String email = getIntent().getStringExtra("email");
         if (email != null && !email.isEmpty()) {
             String name = email.split("@")[0];
@@ -102,27 +94,8 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(new Intent(this, CartActivity.class));
         });
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                return true;
-            } else if (id == R.id.nav_search) {
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            } else if (id == R.id.nav_courses) {
-                startActivity(new Intent(this, MyCoursesActivity.class));
-                return true;
-            } else if (id == R.id.nav_notification) {
-                startActivity(new Intent(this, NotificationActivity.class));
-                return true;
-            } else if (id == R.id.nav_account) {
-                Intent accountIntent = new Intent(this, AccountActivity.class);
-                accountIntent.putExtra("email", getIntent().getStringExtra("email"));
-                startActivity(accountIntent);
-                return true;
-            }
-            return false;
-        });
+        bottomNav.setSelectedItemId(R.id.nav_home);
+        BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
     }
 
     @Override
@@ -133,6 +106,7 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
         updateCartBadge();
+        BottomNavigationHelper.updateNotificationBadge(this, bottomNav);
     }
 
     private void redirectToLogin() {
@@ -173,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupRecyclerViews() {
         categoryAdapter = new CategoryAdapter();
         categoryAdapter.setOnItemClickListener(category -> {
-            Intent intent = new Intent(this, SearchActivity.class);
+            Intent intent = new Intent(this, com.example.myapplication.activities.student.SearchActivity.class);
             intent.putExtra("category_name", category.getName());
             startActivity(intent);
         });

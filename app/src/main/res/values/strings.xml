@@ -501,5 +501,11 @@
     <string name="empty_featured_courses">No featured courses available</string>
     <string name="tab_pending_approvals">Pending</string>
     <string name="tab_active_courses">Active</string>
-</resources>
 
+    <string name="enroll_for_free">Enroll for Free</string>
+    <string name="processing_enrollment">Processing enrollment...</string>
+    <string name="enrollment_successful_notif">Enrollment Successful 🎉</string>
+    <string name="payment_successful_notif">Payment Successful 🎉</string>
+    <string name="enrollment_success_db_message">You have successfully enrolled in the course! Happy learning.</string>
+    <string name="open_app_to_learn">Open the app to start learning now!</string>
+</resources>
