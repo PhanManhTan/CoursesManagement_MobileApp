@@ -261,11 +261,7 @@ public class InstructorViewModel extends AndroidViewModel {
                                 // Fallback: If enrollment has no price, use course discount or original price
                                 double amount = enrollment.getPaidAmount();
                                 if (amount <= 0) {
-                                    if (course.getDiscountPrice() > 0) {
-                                        amount = course.getDiscountPrice();
-                                    } else {
-                                        amount = course.getPrice();
-                                    }
+                                    amount = course.getDiscountPrice();
                                 }
                                 if (isCurrentMonthEnrollment(enrollment)) {
                                     monthlyTotal += amount;

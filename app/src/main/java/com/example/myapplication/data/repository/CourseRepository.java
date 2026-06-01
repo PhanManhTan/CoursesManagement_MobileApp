@@ -332,9 +332,7 @@ public class CourseRepository {
         putIfNotEmpty(payload, "description", course.getDescription());
         putIfNotEmpty(payload, "thumbnail_url", course.getThumbnailUrl());
         payload.put("price", course.getPrice());
-        if (course.getDiscountPrice() > 0) {
-            payload.put("discount_price", course.getDiscountPrice());
-        }
+        payload.put("discount_price", course.getDiscountPrice());
         putIfNotEmpty(payload, "status", course.getStatus());
         putIfNotEmpty(payload, "category_id", course.getCategoryId());
         putIfNotEmpty(payload, "created_at", course.getCreatedAt());

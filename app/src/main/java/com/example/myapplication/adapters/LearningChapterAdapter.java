@@ -27,6 +27,7 @@ public class LearningChapterAdapter extends RecyclerView.Adapter<LearningChapter
     private final Context context;
     private List<LearningChapter> chapterList = new ArrayList<>();
     private final OnLessonClickListener listener;
+    private boolean showCompletionStatus = true;
 
     public LearningChapterAdapter(Context context, OnLessonClickListener listener) {
         this.context = context;
@@ -39,6 +40,11 @@ public class LearningChapterAdapter extends RecyclerView.Adapter<LearningChapter
         notifyDataSetChanged();
     }
 
+    public void setShowCompletionStatus(boolean showCompletionStatus) {
+        this.showCompletionStatus = showCompletionStatus;
+        notifyDataSetChanged();
+    }
+
     private void processLockStatus() {
         boolean isNextUnlocked = true;
         for (LearningChapter chapter : chapterList) {
@@ -47,9 +53,12 @@ public class LearningChapterAdapter extends RecyclerView.Adapter<LearningChapter
 
                 if (!learningLesson.isLocked()) {
                     int duration = learningLesson.getLesson().getDurationSeconds();
+                    boolean isCompleted = learningLesson.getProgress() != null && learningLesson.getProgress().isCompleted();
                     int watchTime = learningLesson.getProgress() != null ? learningLesson.getProgress().getWatchTimeSeconds() : 0;
 
-                    if (duration > 0) {
+                    if (isCompleted) {
+                        isNextUnlocked = true;
+                    } else if (duration > 0) {
                         isNextUnlocked = ((double) watchTime / duration) >= 0.8;
                     } else {
                         isNextUnlocked = true;
@@ -101,7 +110,12 @@ public class LearningChapterAdapter extends RecyclerView.Adapter<LearningChapter
             View cvLessonContainer = lessonView.findViewById(R.id.cvLessonContainer);
 
             tvTitle.setText(learningLesson.getLesson().getTitle());
-            tvInfo.setText(formatDuration(learningLesson.getLesson().getDurationSeconds()));
+            boolean isCompleted = learningLesson.getProgress() != null && learningLesson.getProgress().isCompleted();
+            String durationText = formatDuration(learningLesson.getLesson().getDurationSeconds());
+            boolean displayCompleted = showCompletionStatus && isCompleted;
+            tvInfo.setText(displayCompleted
+                    ? durationText + " • " + context.getString(R.string.completed)
+                    : durationText);
 
             if (learningLesson.isLocked()) {
                 ivPlayIcon.setVisibility(View.GONE);

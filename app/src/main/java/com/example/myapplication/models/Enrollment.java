@@ -50,7 +50,7 @@ public class Enrollment {
 
     public double getPaidAmount() { 
         if (paidAmount <= 0.0 && course != null) {
-            return course.getDiscountPrice() > 0.0 ? course.getDiscountPrice() : course.getPrice();
+            return course.getDiscountPrice();
         }
         return paidAmount; 
     }

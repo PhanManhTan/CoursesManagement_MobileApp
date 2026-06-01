@@ -112,6 +112,8 @@
     <string name="course_not_found">Course not found</string>
     <string name="buy_feature_coming_soon">Buy feature coming soon</string>
     <string name="no_description_available">No description available.</string>
+    <string name="discount_percent">Discount Percent (%)</string>
+    <string name="discount_percent_hint">Enter discount percent</string>
     <string name="discount_off_format">%1$d%% OFF</string>
     <string name="discount_off_placeholder">0%% OFF</string>
     <string name="unknown_instructor">Unknown Instructor</string>
@@ -155,6 +157,7 @@
     <string name="reply_to_format">Reply to %1$s...</string>
     <string name="course_has_no_content">Course has no content</string>
     <string name="no_video_for_lesson">No video available for this lesson</string>
+    <string name="current_lesson_format">%1$s • %2$s</string>
     <string name="write_review">Write a Review</string>
     <string name="review_experience_question">How was your experience?</string>
     <string name="tap_rate_satisfaction">Tap to rate your satisfaction</string>
@@ -355,6 +358,7 @@
     <string name="course_title_required">Enter a course title before saving.</string>
     <string name="description_required">Enter a course description before saving.</string>
     <string name="invalid_price">Enter a valid price using numbers only.</string>
+    <string name="invalid_discount_percent">Enter a valid discount percentage (0-100).</string>
     <string name="select_category">Select category</string>
     <string name="course_category_required">Select a category before saving.</string>
     <string name="error_loading_categories">Cannot load categories: %1$s</string>
@@ -448,8 +452,8 @@
 
     <string name="admin_dashboard">Admin Dashboard</string>
     <string name="system_statistics">System Statistics</string>
-    <string name="users">Total Users</string>
-    <string name="courses">Active Courses</string>
+    <string name="users">User</string>
+    <string name="courses">Courses</string>
     <string name="revenue">Total Revenue</string>
     <string name="pending">Pending Approvals</string>
     <string name="system_management">System Management</string>

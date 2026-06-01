@@ -61,6 +61,7 @@ public class EditCourseActivity extends AppCompatActivity {
     private EditText etTitle;
     private EditText etDescription;
     private EditText etPrice;
+    private EditText etDiscountPercent;
     private Spinner spCategory;
     private ImageView ivThumbnailPreview;
     private TextView tvEditorTitle;
@@ -117,6 +118,7 @@ public class EditCourseActivity extends AppCompatActivity {
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         etPrice = findViewById(R.id.etPrice);
+        etDiscountPercent = findViewById(R.id.etDiscountPercent);
         spCategory = findViewById(R.id.spCategory);
         ivThumbnailPreview = findViewById(R.id.ivThumbnailPreview);
         tvEditorTitle = findViewById(R.id.tvEditorTitle);
@@ -306,6 +308,7 @@ public class EditCourseActivity extends AppCompatActivity {
         etTitle.setText(valueOrEmpty(course.getTitle()));
         etDescription.setText(valueOrEmpty(course.getDescription()));
         etPrice.setText(course.getPrice() > 0 ? String.format(Locale.US, "%.0f", course.getPrice()) : "");
+        etDiscountPercent.setText(formatNumber(resolveDiscountPercent(course)));
         selectedCategoryId = course.getCategoryId();
         syncCategorySelection();
 
@@ -592,6 +595,7 @@ public class EditCourseActivity extends AppCompatActivity {
         String title = etTitle.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
         String priceText = etPrice.getText().toString().trim();
+        String discountPercentText = etDiscountPercent.getText().toString().trim();
 
         if (TextUtils.isEmpty(title)) {
             etTitle.setError(getString(R.string.course_title_required));
@@ -620,6 +624,22 @@ public class EditCourseActivity extends AppCompatActivity {
             return;
         }
 
+        double discountPercent;
+        try {
+            discountPercent = TextUtils.isEmpty(discountPercentText) ? 0 : Double.parseDouble(discountPercentText);
+        } catch (NumberFormatException e) {
+            etDiscountPercent.setError(getString(R.string.invalid_discount_percent));
+            etDiscountPercent.requestFocus();
+            return;
+        }
+        if (Double.isNaN(discountPercent) || Double.isInfinite(discountPercent)
+                || discountPercent < 0 || discountPercent > 100) {
+            etDiscountPercent.setError(getString(R.string.invalid_discount_percent));
+            etDiscountPercent.requestFocus();
+            return;
+        }
+        double discountPrice = calculateDiscountPrice(price, discountPercent);
+
         if (pendingUploadCount > 0) {
             Toast.makeText(this, R.string.wait_uploads_finish, Toast.LENGTH_SHORT).show();
             return;
@@ -635,7 +655,7 @@ public class EditCourseActivity extends AppCompatActivity {
         normalizeOrderIndexes();
         isSaving = true;
         updateEditorLockState();
-        viewModel.saveCourseStructure(title, description, price, currentThumbnailUrl, selectedCategoryId, createChapterSnapshot());
+        viewModel.saveCourseStructure(title, description, price, discountPrice, currentThumbnailUrl, selectedCategoryId, createChapterSnapshot());
     }
 
     private void registerLaunchers() {
@@ -887,6 +907,7 @@ public class EditCourseActivity extends AppCompatActivity {
         etTitle.addTextChangedListener(watcher);
         etDescription.addTextChangedListener(watcher);
         etPrice.addTextChangedListener(watcher);
+        etDiscountPercent.addTextChangedListener(watcher);
     }
 
     private void markDirty() {
@@ -970,6 +991,32 @@ public class EditCourseActivity extends AppCompatActivity {
                 .setMessage(detail)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
+    }
+
+    private double resolveDiscountPercent(Course course) {
+        if (course == null || course.getPrice() <= 0) {
+            return 0;
+        }
+
+        double price = course.getPrice();
+        double discountPrice = Math.max(0, Math.min(price, course.getDiscountPrice()));
+        return ((price - discountPrice) / price) * 100;
+    }
+
+    private double calculateDiscountPrice(double price, double discountPercent) {
+        if (price <= 0) {
+            return 0;
+        }
+        return Math.max(0, price * (100 - discountPercent) / 100);
+    }
+
+    private String formatNumber(double value) {
+        if (Math.abs(value - Math.rint(value)) < 0.0001) {
+            return String.format(Locale.US, "%.0f", value);
+        }
+        return String.format(Locale.US, "%.2f", value)
+                .replaceAll("0+$", "")
+                .replaceAll("\\.$", "");
     }
 
     private String valueOrEmpty(String value) {

@@ -68,11 +68,24 @@ public class CheckoutActivity extends AppCompatActivity {
 
     // Sửa trong CheckoutActivity.java (Khu vực hàm verifyAndEnroll)
 
+    private String getEdgeFunctionUrl(String path) {
+        String baseUrl = com.example.myapplication.utils.Constants.SUPABASE_URL;
+        if (baseUrl.endsWith("/rest/v1/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 8);
+        } else if (baseUrl.endsWith("/rest/v1")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 7);
+        }
+        if (!baseUrl.endsWith("/")) {
+            baseUrl += "/";
+        }
+        return baseUrl + "functions/v1/" + path;
+    }
+
     private void verifyAndEnroll(String fullUrl, String txnNo) {
         if (fullUrl == null || !fullUrl.contains("?")) return;
 
         String queryParams = fullUrl.substring(fullUrl.indexOf("?"));
-        String ipnUrl = com.example.myapplication.utils.Constants.SUPABASE_URL + "/functions/v1/vnpay/ipn" + queryParams;
+        String ipnUrl = getEdgeFunctionUrl("vnpay/ipn") + queryParams;
 
         com.example.myapplication.data.remote.EdgeFunctionApi edgeApi =
                 com.example.myapplication.data.remote.RetrofitClient.getClient(this).create(com.example.myapplication.data.remote.EdgeFunctionApi.class);
@@ -239,7 +252,7 @@ public class CheckoutActivity extends AppCompatActivity {
         com.example.myapplication.data.remote.EdgeFunctionApi edgeApi =
                 com.example.myapplication.data.remote.RetrofitClient.getClient(this).create(com.example.myapplication.data.remote.EdgeFunctionApi.class);
 
-        String edgeUrl = com.example.myapplication.utils.Constants.SUPABASE_URL + "/functions/v1/vnpay/create-url";
+        String edgeUrl = getEdgeFunctionUrl("vnpay/create-url");
 
         // THÊM DÒNG NÀY: Tạo header xác thực dạng "Bearer [API_KEY]"
         String authHeader = "Bearer " + com.example.myapplication.utils.Constants.SUPABASE_API_KEY;

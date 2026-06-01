@@ -149,6 +149,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:text="@string/discount_percent"
+                android:textAppearance="@style/TextAppearance.App.Label.Accent" />
+
+            <EditText
+                android:id="@+id/etDiscountPercent"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_square"
+                android:hint="@string/discount_percent_hint"
+                android:inputType="numberDecimal"
+                android:paddingHorizontal="12dp"
+                android:text="@string/discount_percent_hint"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:text="@string/category"
                 android:textAppearance="@style/TextAppearance.App.Label.Accent" />
 

@@ -42,9 +42,13 @@ import com.example.myapplication.models.LessonProgress;
 import com.example.myapplication.models.Quiz;
 import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LearningActivity extends AppCompatActivity implements LearningChapterAdapter.OnLessonClickListener, DiscussionAdapter.OnReplyClickListener {
@@ -54,7 +58,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     private VideoView vvCourse;
     private RecyclerView rvContent;
     private ImageView btnBack;
-    private TextView tvCourseTitle;
+    private TextView tvCourseTitle, tvCurrentLessonTitle;
     private Button btnListLess, btnDiscuss, btnQuizz, btnFiles, btnAddDiscussion, btnDownloadFile;
 
     private LinearLayout layoutCommentInput, layoutQuizControls, layoutFiles;
@@ -77,6 +81,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     private int lastSavedSeconds = 0;
     private boolean hasPendingSave = false;
     private String replyingParentId = null;
+    private TabState currentTabState = TabState.LESSONS;
 
     private ChapterRepository chapterRepository;
     private LessonRepository lessonRepository;
@@ -100,6 +105,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         btnQuizz = findViewById(R.id.btnQuizz);
         btnFiles = findViewById(R.id.btnFiles);
         btnAddDiscussion = findViewById(R.id.btnAddDiscussion);
+        tvCurrentLessonTitle = findViewById(R.id.tvCurrentLessonTitle);
 
         layoutCommentInput = findViewById(R.id.layoutCommentInput);
         layoutQuizControls = findViewById(R.id.layoutQuizControls);
@@ -386,10 +392,11 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
                 if (duration > 0 && ((double) currentPositionSeconds / duration) >= 0.8) {
                     if (!progress.isCompleted()) {
-                        progress.setCompleted(true);
+                        completeProgress(progress, currentPlayingLesson.getLesson());
                         saveProgressToDatabase(progress);
                         hasPendingSave = false;
                         chapterAdapter.setData(chapterList);
+                        refreshLessonActionButtons();
                     }
                 }
             }
@@ -397,6 +404,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     }
 
     private void saveProgressToDatabase(LessonProgress progress) {
+        if (progress == null) return;
         if (progress.getId() == null) {
             progressRepository.insertAndReturn(progress, new LessonProgressRepository.RepositoryCallback<LessonProgress>() {
                 @Override
@@ -416,6 +424,24 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
                 public void onError(String message) {}
             });
         }
+    }
+
+    private void completeProgress(LessonProgress progress, Lesson lesson) {
+        if (progress == null || lesson == null) return;
+
+        progress.setCompleted(true);
+        if (progress.getCompletedAt() == null || progress.getCompletedAt().trim().isEmpty()) {
+            progress.setCompletedAt(getCurrentUtcTimestamp());
+        }
+
+        int currentVideoSeconds = vvCourse != null ? Math.max(vvCourse.getCurrentPosition() / 1000, 0) : 0;
+        progress.setWatchTimeSeconds(Math.max(progress.getWatchTimeSeconds(), currentVideoSeconds));
+    }
+
+    private String getCurrentUtcTimestamp() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formatter.format(new Date());
     }
 
     private void loadLearningData() {
@@ -508,6 +534,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
         currentPlayingLesson = learningLesson;
         lastSavedSeconds = currentPlayingLesson.getProgress() != null ? currentPlayingLesson.getProgress().getWatchTimeSeconds() : 0;
+        updateCurrentLessonTitle(learningLesson);
 
         replyingParentId = null;
         etCommentInput.setHint(R.string.add_comment_hint);
@@ -534,9 +561,54 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
         } else if (layoutFiles.getVisibility() == View.VISIBLE) {
             loadFileUi();
         }
+        refreshLessonActionButtons();
+    }
+
+    private void updateCurrentLessonTitle(LearningLesson learningLesson) {
+        if (learningLesson == null || learningLesson.getLesson() == null) {
+            tvCurrentLessonTitle.setVisibility(View.GONE);
+            return;
+        }
+
+        String chapterTitle = findChapterTitle(learningLesson);
+        String lessonTitle = learningLesson.getLesson().getTitle();
+        tvCurrentLessonTitle.setText(getString(R.string.current_lesson_format, chapterTitle, lessonTitle));
+        tvCurrentLessonTitle.setVisibility(View.VISIBLE);
+    }
+
+    private String findChapterTitle(LearningLesson targetLesson) {
+        if (chapterList == null || targetLesson == null || targetLesson.getLesson() == null) {
+            return getString(R.string.untitled_chapter);
+        }
+
+        String targetLessonId = targetLesson.getLesson().getId();
+        for (int chapterIndex = 0; chapterIndex < chapterList.size(); chapterIndex++) {
+            LearningChapter chapter = chapterList.get(chapterIndex);
+            if (chapter == null || chapter.getLessons() == null) continue;
+
+            for (LearningLesson learningLesson : chapter.getLessons()) {
+                if (learningLesson == targetLesson || isSameLesson(targetLessonId, learningLesson)) {
+                    String title = chapter.getChapter() != null ? chapter.getChapter().getTitle() : "";
+                    if (title == null || title.trim().isEmpty()) {
+                        title = getString(R.string.untitled_chapter);
+                    }
+                    return getString(R.string.chapter_title_format, chapterIndex + 1, title);
+                }
+            }
+        }
+        return getString(R.string.untitled_chapter);
+    }
+
+    private boolean isSameLesson(String targetLessonId, LearningLesson learningLesson) {
+        return targetLessonId != null
+                && learningLesson != null
+                && learningLesson.getLesson() != null
+                && targetLessonId.equals(learningLesson.getLesson().getId());
     }
 
     private void updateTabUI(TabState state) {
+        currentTabState = state;
+
         btnListLess.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
         btnDiscuss.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
         btnQuizz.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.bg_secondary));
@@ -544,7 +616,6 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
         layoutCommentInput.setVisibility(View.GONE);
         layoutQuizControls.setVisibility(View.GONE);
-        btnAddDiscussion.setVisibility(View.GONE);
         rvContent.setVisibility(View.GONE);
         layoutFiles.setVisibility(View.GONE);
 
@@ -558,7 +629,6 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
                 btnDiscuss.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
                 rvContent.setVisibility(View.VISIBLE);
                 rvContent.setAdapter(discussionAdapter);
-                btnAddDiscussion.setVisibility(View.VISIBLE);
                 break;
             case QUIZZES:
                 btnQuizz.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.accent));
@@ -570,6 +640,14 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
                 layoutFiles.setVisibility(View.VISIBLE);
                 break;
         }
+        refreshLessonActionButtons();
+    }
+
+    private void refreshLessonActionButtons() {
+        boolean hasLesson = currentPlayingLesson != null;
+        boolean showAddDiscussion = hasLesson && currentTabState == TabState.DISCUSSIONS;
+
+        btnAddDiscussion.setVisibility(showAddDiscussion ? View.VISIBLE : View.GONE);
     }
 
     @Override

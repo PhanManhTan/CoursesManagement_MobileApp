@@ -1,0 +1,60 @@
+-- =========================================================================
+-- CLOUD-NATIVE APPROACH: TRIGGERS TRIGGERED DIRECTLY BY TABLE WEBHOOKS
+-- =========================================================================
+-- We have implemented all logic inside the "send-fcm" Edge Function.
+--
+-- Whenever:
+--   - An enrollment is inserted,
+--   - A course is updated (status changes to approved/rejected),
+--   - Or a new lesson is inserted into a course,
+--
+-- Supabase webhooks will trigger the Edge Function, which automatically:
+--   1. Gathers all recipient user and course details.
+--   2. Inserts database notifications for the targets.
+--   3. Sends Firebase Cloud Messaging (FCM) Push notifications to all active tokens.
+--
+-- This is completely cloud-based, server-side, and extremely reliable!
+--
+-- =========================================================================
+-- INSTRUCTIONS FOR SETTING UP DATABASE WEBHOOKS ON YOUR SUPABASE DASHBOARD
+-- =========================================================================
+--
+-- 1. Webhook for Courses Update (Course Approval / Rejection):
+--    - Name: send_course_approval_noti (or reuse existing)
+--    - Table: courses
+--    - Events: Check "Insert" and "Update"
+--    - Type: HTTP Post
+--    - URL: https://<your-supabase-project-id>.supabase.co/functions/v1/send-fcm
+--    - Headers:
+--        * Authorization: Bearer <your-supabase-service-role-key>
+--        * Content-Type: application/json
+--
+-- 2. Webhook for Student Enrollments (Notify Instructor):
+--    - Name: send_enrollment_noti
+--    - Table: enrollments
+--    - Events: Check "Insert" only
+--    - Type: HTTP Post
+--    - URL: https://<your-supabase-project-id>.supabase.co/functions/v1/send-fcm
+--    - Headers:
+--        * Authorization: Bearer <your-supabase-service-role-key>
+--        * Content-Type: application/json
+--
+-- 3. Webhook for General Notifications:
+--    - Name: send_fcm_on_notification
+--    - Table: notifications
+--    - Events: Check "Insert" only
+--    - Type: HTTP Post
+--    - URL: https://<your-supabase-project-id>.supabase.co/functions/v1/send-fcm
+--    - Headers:
+--        * Authorization: Bearer <your-supabase-service-role-key>
+--        * Content-Type: application/json
+--
+-- 4. Webhook for New Lessons (Notify Enrolled Students):
+--    - Name: send_new_lesson_noti
+--    - Table: lessons
+--    - Events: Check "Insert" only
+--    - Type: HTTP Post
+--    - URL: https://<your-supabase-project-id>.supabase.co/functions/v1/send-fcm
+--    - Headers:
+--        * Authorization: Bearer <your-supabase-service-role-key>
+--        * Content-Type: application/json

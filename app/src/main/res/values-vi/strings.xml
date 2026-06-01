@@ -155,6 +155,7 @@
     <string name="reply_to_format">Trả lời %1$s...</string>
     <string name="course_has_no_content">Khóa học chưa có nội dung</string>
     <string name="no_video_for_lesson">Bài học này chưa có video</string>
+    <string name="current_lesson_format">%1$s • %2$s</string>
     <string name="write_review">Viết đánh giá</string>
     <string name="review_experience_question">Trải nghiệm của bạn thế nào?</string>
     <string name="tap_rate_satisfaction">Chạm để đánh giá mức hài lòng</string>
@@ -227,6 +228,8 @@
     <string name="description">Mô tả</string>
     <string name="course_description_hint">Nhập mô tả khóa học</string>
     <string name="price">Giá</string>
+    <string name="discount_percent">Phần trăm giảm giá (%)</string>
+    <string name="discount_percent_hint">Nhập phần trăm giảm giá</string>
     <string name="chapters">Chương</string>
     <string name="chapter_count_empty">0 chương</string>
     <string name="add_chapter">Thêm chương</string>
@@ -448,8 +451,8 @@
 
     <string name="admin_dashboard">Bảng điều khiển quản trị</string>
     <string name="system_statistics">Thống kê hệ thống</string>
-    <string name="users">Tổng người dùng</string>
-    <string name="courses">Khóa học hoạt động</string>
+    <string name="users">Người dùng</string>
+    <string name="courses">Khóa học</string>
     <string name="revenue">Tổng doanh thu</string>
     <string name="pending">Khóa học chờ duyệt</string>
     <string name="system_management">Quản lý hệ thống</string>

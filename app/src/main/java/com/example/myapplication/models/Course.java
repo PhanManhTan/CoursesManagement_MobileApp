@@ -23,7 +23,7 @@ public class Course implements Serializable {
     private double price;
 
     @SerializedName("discount_price")
-    private double discountPrice;
+    private Double discountPrice;
 
     @SerializedName("status")
     private String status;
@@ -123,7 +123,7 @@ public class Course implements Serializable {
     }
 
     public double getDiscountPrice() {
-        return discountPrice;
+        return discountPrice != null ? discountPrice : price;
     }
 
     public void setDiscountPrice(double discountPrice) {

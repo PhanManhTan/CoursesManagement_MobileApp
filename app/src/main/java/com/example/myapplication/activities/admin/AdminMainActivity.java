@@ -341,9 +341,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
             @Override
             public void onCourseClick(Course course) {
-                Intent intent = new Intent(AdminMainActivity.this, com.example.myapplication.activities.student.CourseDetailActivity.class);
-                intent.putExtra("COURSE_ID", course.getId());
-                startActivity(intent);
+                openAdminCourseDetailPreview(course);
             }
         });
 
@@ -378,6 +376,18 @@ public class AdminMainActivity extends AppCompatActivity {
         }
 
         courseApprovalViewModel.fetchPendingCourses();
+    }
+
+    private void openAdminCourseDetailPreview(Course course) {
+        if (course == null || course.getId() == null) {
+            Toast.makeText(this, R.string.course_not_found, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(AdminMainActivity.this, AdminLearningPreviewActivity.class);
+        intent.putExtra(AdminLearningPreviewActivity.EXTRA_COURSE_ID, course.getId());
+        intent.putExtra(AdminLearningPreviewActivity.EXTRA_COURSE_TITLE, course.getTitle());
+        startActivity(intent);
     }
 
     // ─── [4] Tab: Reports ───

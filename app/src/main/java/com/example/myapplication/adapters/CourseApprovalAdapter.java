@@ -9,10 +9,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
+import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.Course;
+import com.example.myapplication.models.User;
 import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAdapter.CourseViewHolder> {
     public interface OnApprovalListener {
@@ -23,6 +27,8 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
 
     private List<Course> courses = new ArrayList<>();
     private OnApprovalListener listener;
+    private UserRepository userRepository;
+    private final Map<String, String> instructorNameCache = new HashMap<>();
 
     public void setListener(OnApprovalListener listener) {
         this.listener = listener;
@@ -41,6 +47,9 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
     @Override
     public CourseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_approval, parent, false);
+        if (userRepository == null) {
+            userRepository = new UserRepository(parent.getContext());
+        }
         return new CourseViewHolder(view);
     }
 
@@ -48,13 +57,7 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         Course course = courses.get(position);
         holder.tvTitle.setText(course.getTitle());
-        
-        // Handling long UUIDs gracefully
-        String instructorDisplay = course.getInstructorId();
-        if (instructorDisplay != null && instructorDisplay.length() > 8) {
-            instructorDisplay = "ID: " + instructorDisplay.substring(0, 8) + "...";
-        }
-        holder.tvInstructor.setText(instructorDisplay);
+        bindInstructorName(holder, course.getInstructorId());
         holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, course.getPrice()));
 
         // Using Glide for thumbnail loading
@@ -94,6 +97,47 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onCourseClick(course);
         });
+    }
+
+    private void bindInstructorName(@NonNull CourseViewHolder holder, String instructorId) {
+        holder.tvInstructor.setTag(instructorId);
+        if (instructorId == null || instructorId.trim().isEmpty()) {
+            holder.tvInstructor.setText(R.string.unknown_instructor);
+            return;
+        }
+
+        String cachedName = instructorNameCache.get(instructorId);
+        if (cachedName != null) {
+            holder.tvInstructor.setText(cachedName);
+            return;
+        }
+
+        holder.tvInstructor.setText(R.string.loading);
+        userRepository.getById(instructorId, new UserRepository.RepositoryCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                String name = user != null && hasValue(user.getName())
+                        ? user.getName()
+                        : holder.itemView.getContext().getString(R.string.unknown_instructor);
+                instructorNameCache.put(instructorId, name);
+                if (instructorId.equals(holder.tvInstructor.getTag())) {
+                    holder.tvInstructor.setText(name);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                String fallback = holder.itemView.getContext().getString(R.string.unknown_instructor);
+                instructorNameCache.put(instructorId, fallback);
+                if (instructorId.equals(holder.tvInstructor.getTag())) {
+                    holder.tvInstructor.setText(fallback);
+                }
+            }
+        });
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Override

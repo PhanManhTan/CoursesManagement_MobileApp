@@ -105,6 +105,38 @@ public class HomeActivity extends AppCompatActivity {
 
         bottomNav.setSelectedItemId(R.id.nav_home);
         BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
+        checkNotificationPermissionAndFetchFCMToken();
+    }
+
+    private void checkNotificationPermissionAndFetchFCMToken() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                        101
+                );
+            }
+        }
+
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    android.util.Log.w("HomeActivity", "Fetching FCM registration token failed", task.getException());
+                    return;
+                }
+                String token = task.getResult();
+                android.util.Log.d("HomeActivity", "FCM Registration Token: " + token);
+
+                String userId = sessionManager.getUserId();
+                if (userId != null) {
+                    new com.example.myapplication.data.repository.FcmRepository(this).uploadToken(userId, token);
+                }
+            });
+        } catch (Exception e) {
+            android.util.Log.e("HomeActivity", "Error initializing Firebase Messaging: " + e.getMessage());
+        }
     }
 
     @Override

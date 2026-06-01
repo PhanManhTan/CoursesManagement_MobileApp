@@ -261,7 +261,16 @@ public class SearchActivity extends AppCompatActivity {
     private void displayCourses(List<Course> courses) {
         searchResultsContainer.removeAllViews();
 
-        if (courses == null || courses.isEmpty()) {
+        List<Course> visibleCourses = new java.util.ArrayList<>();
+        if (courses != null) {
+            for (Course course : courses) {
+                if (isVisibleToStudent(course)) {
+                    visibleCourses.add(course);
+                }
+            }
+        }
+
+        if (visibleCourses.isEmpty()) {
             android.util.Log.d("SearchActivity", "No courses found for the given search criteria.");
             TextView tvEmpty = new TextView(SearchActivity.this);
             tvEmpty.setText(R.string.no_courses_found);
@@ -272,9 +281,9 @@ public class SearchActivity extends AppCompatActivity {
             return;
         }
 
-        android.util.Log.d("SearchActivity", "Displaying " + courses.size() + " courses.");
+        android.util.Log.d("SearchActivity", "Displaying " + visibleCourses.size() + " courses.");
 
-        for (Course course : courses) {
+        for (Course course : visibleCourses) {
             View itemView = getLayoutInflater().inflate(R.layout.item_course_search, searchResultsContainer, false);
 
             TextView title = itemView.findViewById(R.id.tvCourseTitle);
@@ -305,6 +314,7 @@ public class SearchActivity extends AppCompatActivity {
                 Glide.with(SearchActivity.this)
                         .load(course.getThumbnailUrl())
                         .placeholder(R.drawable.image_courses)
+                        .error(R.drawable.image_courses)
                         .into(thumb);
             } else {
                 thumb.setImageResource(R.drawable.image_courses);
@@ -318,6 +328,20 @@ public class SearchActivity extends AppCompatActivity {
 
             searchResultsContainer.addView(itemView);
         }
+    }
+
+    private boolean isVisibleToStudent(Course course) {
+        if (course.getStatus() == null || course.getStatus().isEmpty()) {
+            return true; // default to true if status is not set
+        }
+        String status = course.getStatus().trim().toLowerCase(java.util.Locale.US);
+        // Do not show pending, review, rejected, draft or private/hidden courses
+        if (status.contains("pending") || status.contains("review") || status.contains("reject")
+                || status.contains("draft") || status.contains("private") || status.contains("hidden")
+                || status.contains("inactive")) {
+            return false;
+        }
+        return true;
     }
 
     @Override

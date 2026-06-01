@@ -203,10 +203,7 @@ public class RevenueViewModel extends AndroidViewModel {
         if (enrollment.getPaidAmount() > 0) {
             return enrollment.getPaidAmount();
         }
-        if (course.getDiscountPrice() > 0) {
-            return course.getDiscountPrice();
-        }
-        return course.getPrice();
+        return course.getDiscountPrice();
     }
 
     private String resolveSelectedCourseName() {

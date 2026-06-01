@@ -197,10 +197,14 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public void saveCourse(String title, String description, double price, String thumbnailUrl) {
-        saveCourse(title, description, price, thumbnailUrl, new ArrayList<>());
+        saveCourse(title, description, price, price, thumbnailUrl, new ArrayList<>());
     }
 
     public void saveCourse(String title, String description, double price, String thumbnailUrl, List<Lesson> lessonList) {
+        saveCourse(title, description, price, price, thumbnailUrl, lessonList);
+    }
+
+    public void saveCourse(String title, String description, double price, double discountPrice, String thumbnailUrl, List<Lesson> lessonList) {
         Course current = course.getValue();
         if (current == null) {
             current = new Course();
@@ -209,6 +213,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         current.setTitle(title);
         current.setDescription(description);
         current.setPrice(price);
+        current.setDiscountPrice(discountPrice);
         current.setThumbnailUrl(thumbnailUrl);
         saveSuccess.setValue(false);
 
@@ -254,7 +259,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         }
     }
 
-    public void saveCourseStructure(String title, String description, double price, String thumbnailUrl,
+    public void saveCourseStructure(String title, String description, double price, double discountPrice, String thumbnailUrl,
                                     String categoryId, List<ChapterWithLessons> chapterList) {
         if (Boolean.TRUE.equals(isSaving.getValue())) {
             return;
@@ -278,6 +283,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         current.setTitle(title);
         current.setDescription(description);
         current.setPrice(price);
+        current.setDiscountPrice(discountPrice);
         current.setThumbnailUrl(thumbnailUrl);
         current.setCategoryId(categoryId);
         saveSuccess.setValue(false);
