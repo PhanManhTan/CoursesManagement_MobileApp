@@ -28,8 +28,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
 
     private OnItemClickListener listener;
     private List<Course> courses = new ArrayList<>();
-
-    // Repositories for fetching extra data
     private ReviewRepository reviewRepository;
     private UserRepository userRepository;
 
@@ -47,7 +45,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_home, parent, false);
 
-        // Initialize repositories if they are null
         if (reviewRepository == null) {
             reviewRepository = new ReviewRepository(parent.getContext());
         }
@@ -63,22 +60,19 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         Course course = courses.get(position);
         holder.tvTitle.setText(course.getTitle());
 
-        // Setup click listener
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(course);
         });
 
-        // Load Thumbnail using Glide
         if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(course.getThumbnailUrl())
-                    .placeholder(R.drawable.image_courses) // Make sure you have this placeholder
+                    .placeholder(R.drawable.image_courses)
                     .into(holder.ivThumb);
         } else {
             holder.ivThumb.setImageResource(R.drawable.image_courses);
         }
 
-        // 1. Fetch Instructor Name
         holder.tvInstructor.setText(R.string.loading);
         if (course.getInstructorId() != null) {
             userRepository.getById(course.getInstructorId(), new UserRepository.RepositoryCallback<User>() {
@@ -100,20 +94,23 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
             holder.tvInstructor.setText(R.string.unknown_instructor);
         }
 
-        // Format Price
-        // Assuming your backend stores price in whole VND (e.g., 349000).
-        // If it stores it in thousands (e.g., 349), keep the * 1000 multiplier you had.
-        // For standard implementation, I will assume it stores full value. Adjust if needed.
-        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice()));
+        double originalPrice = course.getPrice();
+        double discountPrice = course.getDiscountPrice();
 
-        if (course.getDiscountPrice() > 0 && course.getPrice() > course.getDiscountPrice()) {
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, discountPrice));
+
+        if (originalPrice > discountPrice) {
             holder.tvOriginalPrice.setVisibility(View.VISIBLE);
-            holder.tvOriginalPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, course.getPrice()));
+            holder.tvOriginalPrice.setText(holder.itemView.getContext().getString(R.string.vnd_price_format, originalPrice));
+
+            int discountPercent = (int) Math.round(((originalPrice - discountPrice) / originalPrice) * 100);
+            holder.tvDiscountPercent.setVisibility(View.VISIBLE);
+            holder.tvDiscountPercent.setText("-" + discountPercent + "%");
         } else {
             holder.tvOriginalPrice.setVisibility(View.GONE);
+            holder.tvDiscountPercent.setVisibility(View.GONE);
         }
 
-        // 2. Fetch Reviews dynamically to calculate rating and review count
         holder.tvRatingValue.setText("0.0");
         holder.tvReviewCount.setText("(0)");
 
@@ -130,7 +127,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
 
                     float averageRating = sumRating / totalReviews;
 
-                    // Display calculated rating and count
                     holder.tvRatingValue.setText(String.format("%.1f", averageRating));
                     holder.tvReviewCount.setText("(" + totalReviews + ")");
                 }
@@ -138,7 +134,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
 
             @Override
             public void onError(String message) {
-                // Keep default 0.0 and (0) on error
             }
         });
     }
@@ -149,7 +144,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvInstructor, tvPrice, tvOriginalPrice, tvRatingValue, tvReviewCount;
+        TextView tvTitle, tvInstructor, tvPrice, tvOriginalPrice, tvDiscountPercent, tvRatingValue, tvReviewCount;
         ImageView ivThumb;
         public ViewHolder(View v) {
             super(v);
@@ -157,6 +152,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
             tvInstructor = v.findViewById(R.id.tvInstructor);
             tvPrice = v.findViewById(R.id.tvPrice);
             tvOriginalPrice = v.findViewById(R.id.tvOriginalPrice);
+            tvDiscountPercent = v.findViewById(R.id.tvDiscountPercent);
             tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             tvRatingValue = v.findViewById(R.id.tvRatingValue);
             tvReviewCount = v.findViewById(R.id.tvReviewCount);
