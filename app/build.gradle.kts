@@ -81,6 +81,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
-    // Firebase Cloud Messaging (FCM)
+    // Firebase Cloud Messaging (FCM) - Note: This will require google-services.json to work at runtime
     implementation("com.google.firebase:firebase-messaging:23.4.0")
 }

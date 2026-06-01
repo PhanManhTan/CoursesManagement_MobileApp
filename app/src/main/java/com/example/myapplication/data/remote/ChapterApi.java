@@ -36,6 +36,13 @@ public interface ChapterApi {
     @PATCH("chapters")
     Call<Void> update(@Query("id") String idFilter, @Body Map<String, Object> chapter);
 
+    @PATCH("chapters?select=*")
+    Call<List<Chapter>> updateAndReturn(
+            @Header("Prefer") String prefer,
+            @Query("id") String idFilter,
+            @Body Map<String, Object> chapter
+    );
+
     // Delete Chapter by ID
     @DELETE("chapters")
     Call<Void> delete(@Query("id") String idFilter);

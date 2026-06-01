@@ -355,6 +355,9 @@
     <string name="course_title_required">Nhập tên khóa học trước khi lưu.</string>
     <string name="description_required">Nhập mô tả khóa học trước khi lưu.</string>
     <string name="invalid_price">Nhập giá hợp lệ, chỉ dùng chữ số.</string>
+    <string name="select_category">Chọn danh mục</string>
+    <string name="course_category_required">Chọn danh mục trước khi lưu.</string>
+    <string name="error_loading_categories">Không thể tải danh mục: %1$s</string>
     <string name="wait_uploads_finish">Tệp vẫn đang tải lên. Hãy chờ tải xong rồi lưu.</string>
     <string name="media_not_uploaded">Một số tệp media đã chọn chưa tải lên thành công. Hãy chọn lại tệp hoặc chờ tải xong trước khi lưu.</string>
     <string name="cannot_open_image_picker">Không thể mở trình chọn ảnh</string>
@@ -524,4 +527,6 @@
     <string name="payment_successful_notif">Thanh toán thành công 🎉</string>
     <string name="enrollment_success_db_message">Bạn đã đăng ký thành công khóa học! Chúc bạn học tập tốt.</string>
     <string name="open_app_to_learn">Mở ứng dụng để bắt đầu học ngay!</string>
+    <string name="empty_categories">Chưa có danh mục</string>
+    <string name="empty_featured_courses">Chưa có khóa học nổi bật</string>
 </resources>
