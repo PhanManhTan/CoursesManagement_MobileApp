@@ -95,9 +95,11 @@ public interface AuthApi {
 
     class LoginResponse {
         @SerializedName("access_token") private String accessToken;
+        @SerializedName("refresh_token") private String refreshToken;
         @SerializedName("user") private AuthResponse user;
         public AuthResponse getUser() { return user; }
         public String getAccessToken() { return accessToken; }
+        public String getRefreshToken() { return refreshToken; }
     }
 
     class AuthResponse {

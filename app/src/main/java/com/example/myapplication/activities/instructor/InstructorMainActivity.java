@@ -214,7 +214,6 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void redirectToLogin(String message) {
-        sessionManager.clear();
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -104,13 +104,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<AuthApi.LoginResponse> call, Response<AuthApi.LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getUser() != null) {
                     String accessToken = response.body().getAccessToken();
+                    String refreshToken = response.body().getRefreshToken();
                     String userId = response.body().getUser().getId();
                     
                     // 1. Lưu token ban đầu
-                    sessionManager.saveSession(accessToken, userId, "student");
+                    sessionManager.saveSession(accessToken, refreshToken, userId, "student");
                     
                     // 2. Truy vấn thông tin thực tế
-                    fetchRealRoleAndRedirect(userId, email, accessToken);
+                    fetchRealRoleAndRedirect(userId, email, accessToken, refreshToken);
                 } else {
                     btnLogin.setEnabled(true);
                     btnLogin.setText(R.string.login);
@@ -127,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchRealRoleAndRedirect(String userId, String email, String token) {
+    private void fetchRealRoleAndRedirect(String userId, String email, String token, String refreshToken) {
         // Gọi API lấy profile từ bảng users dựa trên ID, thêm status để check ban
         authApi.getUserProfile("eq." + userId, "role,full_name,email,bio,avatar_url,status").enqueue(new Callback<List<AuthApi.UserProfile>>() {
             @Override
@@ -156,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 // Safe session update
-                sessionManager.saveSession(token, userId, role);
+                sessionManager.saveSession(token, refreshToken, userId, role);
                 if (profile != null) {
                     String profileEmail = hasValue(profile.getEmail()) ? profile.getEmail() : email;
                     sessionManager.saveProfile(profile.getFullName(), profileEmail, profile.getBio(), profile.getAvatarUrl());
