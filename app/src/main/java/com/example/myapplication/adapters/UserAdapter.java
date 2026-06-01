@@ -4,12 +4,12 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.models.User;
-import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,12 +52,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         boolean isBanned = "banned".equalsIgnoreCase(user.getStatus());
         if (isBanned) {
             holder.btnBan.setText(R.string.unban);
-            holder.btnBan.setTextColor(Color.parseColor("#10B981")); // Emerald/Green
-            holder.btnBan.setStrokeColorResource(android.R.color.transparent);
+            holder.btnBan.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#10B981"))); // Emerald/Green Background
+            holder.btnBan.setTextColor(Color.WHITE);
         } else {
             holder.btnBan.setText(R.string.ban);
-            holder.btnBan.setTextColor(Color.parseColor("#EF4444")); // Red
-            holder.btnBan.setStrokeColorResource(android.R.color.transparent);
+            holder.btnBan.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#EF4444"))); // Red Background
+            holder.btnBan.setTextColor(Color.WHITE);
         }
 
         holder.btnBan.setOnClickListener(v -> {
@@ -86,7 +86,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvEmail, tvRole;
-        MaterialButton btnBan;
+        Button btnBan;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);

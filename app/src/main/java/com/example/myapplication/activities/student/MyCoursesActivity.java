@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -33,6 +34,7 @@ public class MyCoursesActivity extends AppCompatActivity {
     private EnrollmentRepository enrollmentRepository;
     private SessionManager sessionManager;
     private List<Enrollment> allEnrollments = new ArrayList<>();
+    private TextView tvEmptyMyCourses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class MyCoursesActivity extends AppCompatActivity {
         btnFilterOnGoing = findViewById(R.id.btnFilterOnGoing);
         btnFilterCompleted = findViewById(R.id.btnFilterCompleted);
         bottomNav = findViewById(R.id.bottomNav);
+        tvEmptyMyCourses = findViewById(R.id.tvEmptyMyCourses);
     }
 
     private void setupRecyclerView() {
@@ -93,6 +96,7 @@ public class MyCoursesActivity extends AppCompatActivity {
         btnFilterAll.setOnClickListener(v -> {
             updateFilterButtons(btnFilterAll);
             myCourseAdapter.setEnrollmentList(allEnrollments);
+            updateEmptyState(allEnrollments);
         });
 
         btnFilterOnGoing.setOnClickListener(v -> {
@@ -126,6 +130,7 @@ public class MyCoursesActivity extends AppCompatActivity {
             public void onSuccess(List<Enrollment> enrollments) {
                 allEnrollments = enrollments != null ? enrollments : new ArrayList<>();
                 myCourseAdapter.setEnrollmentList(allEnrollments);
+                updateEmptyState(allEnrollments);
             }
 
             @Override
@@ -146,11 +151,29 @@ public class MyCoursesActivity extends AppCompatActivity {
             }
         }
         myCourseAdapter.setEnrollmentList(filteredList);
+        updateEmptyState(filteredList);
+    }
+
+    private void updateEmptyState(List<Enrollment> list) {
+        if (list == null || list.isEmpty()) {
+            tvEmptyMyCourses.setVisibility(View.VISIBLE);
+            rvMyCourses.setVisibility(View.GONE);
+        } else {
+            tvEmptyMyCourses.setVisibility(View.GONE);
+            rvMyCourses.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        overridePendingTransition(0, 0);
         loadMyCourses();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        overridePendingTransition(0, 0);
     }
 }

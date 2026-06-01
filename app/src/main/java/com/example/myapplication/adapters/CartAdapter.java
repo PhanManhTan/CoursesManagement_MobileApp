@@ -55,7 +55,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             // Hiển thị trạng thái đang tải tên giảng viên
             holder.tvInstructor.setText(R.string.loading);
             String instructorId = course.getInstructorId();
-            holder.tvInstructor.setTag(instructorId); 
+            holder.tvInstructor.setTag(instructorId);
 
             userRepository.getById(instructorId, new UserRepository.RepositoryCallback<User>() {
                 @Override

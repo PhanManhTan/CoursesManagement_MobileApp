@@ -25,6 +25,10 @@ public class HomeViewModel extends AndroidViewModel {
         loadData();
     }
 
+    public void refreshData() {
+        loadData();
+    }
+
     private void loadData() {
         categoryRepository.getAll(new CategoryRepository.RepositoryCallback<List<Category>>() {
             @Override
@@ -49,6 +53,34 @@ public class HomeViewModel extends AndroidViewModel {
                 Log.e("HomeViewModel", message);
             }
         });
+    }
+
+    public void fetchFeaturedCoursesByCategory(String categoryId) {
+        if (categoryId == null || categoryId.isEmpty()) {
+            courseRepository.getAll(new CourseRepository.RepositoryCallback<List<Course>>() {
+                @Override
+                public void onSuccess(List<Course> data) {
+                    featuredCourses.postValue(data);
+                }
+
+                @Override
+                public void onError(String message) {
+                    Log.e("HomeViewModel", "Failed to fetch all courses: " + message);
+                }
+            });
+        } else {
+            courseRepository.getByCategoryId(categoryId, new CourseRepository.RepositoryCallback<List<Course>>() {
+                @Override
+                public void onSuccess(List<Course> data) {
+                    featuredCourses.postValue(data);
+                }
+
+                @Override
+                public void onError(String message) {
+                    Log.e("HomeViewModel", "Failed to fetch category courses: " + message);
+                }
+            });
+        }
     }
 
     public LiveData<List<Category>> getCategories() { return categories; }

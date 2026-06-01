@@ -10,9 +10,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -116,6 +119,8 @@ public class AdminMainActivity extends AppCompatActivity {
                 bottomNav.setSelectedItemId(R.id.nav_admin_approval);
             } else if ("course_violation_report".equalsIgnoreCase(target)) {
                 bottomNav.setSelectedItemId(R.id.nav_admin_reports);
+            } else if ("account".equalsIgnoreCase(target) || "admin_account".equalsIgnoreCase(target)) {
+                bottomNav.setSelectedItemId(R.id.nav_admin_account);
             } else {
                 bottomNav.setSelectedItemId(R.id.nav_admin_home);
             }
@@ -262,7 +267,18 @@ public class AdminMainActivity extends AppCompatActivity {
         rvUsers.setAdapter(adapter);
 
         userManageViewModel = new ViewModelProvider(this).get(UserManageViewModel.class);
-        adapter.setListener(user -> userManageViewModel.toggleBanUser(user));
+        adapter.setListener(user -> {
+            String currentUserId = sessionManager.getUserId();
+            if (user.getId() != null && user.getId().equals(currentUserId)) {
+                Toast.makeText(this, "Bạn không thể tự khóa tài khoản của chính mình!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if ("admin".equalsIgnoreCase(user.getRole())) {
+                Toast.makeText(this, "Không thể khóa tài khoản Admin!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            userManageViewModel.toggleBanUser(user);
+        });
         userManageViewModel.getUsers().observe(this, adapter::setUsers);
 
         EditText etSearchUser = root.findViewById(R.id.etSearchUser);
@@ -274,9 +290,21 @@ public class AdminMainActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        root.findViewById(R.id.tvFilterAll).setOnClickListener(v -> userManageViewModel.filterUsers("All"));
-        root.findViewById(R.id.tvFilterStudent).setOnClickListener(v -> userManageViewModel.filterUsers("Student"));
-        root.findViewById(R.id.tvFilterInstructor).setOnClickListener(v -> userManageViewModel.filterUsers("Instructor"));
+        Spinner spFilterRole = root.findViewById(R.id.spFilterRole);
+        if (spFilterRole != null) {
+            String[] roles = {getString(R.string.all), getString(R.string.student), getString(R.string.instructor_fallback)};
+            String[] roleValues = {"All", "Student", "Instructor"};
+            ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, roles);
+            roleAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
+            spFilterRole.setAdapter(roleAdapter);
+            spFilterRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    userManageViewModel.filterUsers(roleValues[position]);
+                }
+                @Override public void onNothingSelected(AdapterView<?> parent) {}
+            });
+        }
 
         userManageViewModel.fetchUsers();
     }
@@ -365,16 +393,14 @@ public class AdminMainActivity extends AppCompatActivity {
         RecyclerView rvReports = root.findViewById(R.id.rvReports);
         rvReports.setLayoutManager(new LinearLayoutManager(this));
 
-        ReportAdapter reportAdapter = new ReportAdapter();
         EnrollmentTransactionAdapter transactionAdapter = new EnrollmentTransactionAdapter();
-        rvReports.setAdapter(reportAdapter); // Default to reports/violations
+        rvReports.setAdapter(transactionAdapter); // Only show transactions, remove violations
 
         TextView tvTotalAnnualRevenue = root.findViewById(R.id.tvTotalAnnualRevenue);
         TextView tvRevenueTrend = root.findViewById(R.id.tvRevenueTrend);
         TextView tvReportTitle = root.findViewById(R.id.tvReportTitle);
 
         reportViewModel = new ViewModelProvider(this).get(ReportViewModel.class);
-        reportViewModel.getReports().observe(this, reportAdapter::setReports);
         reportViewModel.getEnrollments().observe(this, transactionAdapter::setTransactions);
 
         reportViewModel.getTotalAnnualRevenue().observe(this, revenue -> {
@@ -386,31 +412,10 @@ public class AdminMainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = root.findViewById(R.id.tabLayout);
         if (tabLayout != null) {
-            tabLayout.removeAllTabs();
-            tabLayout.addTab(tabLayout.newTab().setText(R.string.violations));
-            tabLayout.addTab(tabLayout.newTab().setText(R.string.transactions));
-
-            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                @Override
-                public void onTabSelected(TabLayout.Tab tab) {
-                    if (tab.getPosition() == 0) {
-                        tvReportTitle.setText(R.string.user_reports_flags);
-                        rvReports.setAdapter(reportAdapter);
-                    } else {
-                        tvReportTitle.setText(R.string.system_transactions);
-                        rvReports.setAdapter(transactionAdapter);
-                    }
-                }
-
-                @Override
-                public void onTabUnselected(TabLayout.Tab tab) {}
-
-                @Override
-                public void onTabReselected(TabLayout.Tab tab) {}
-            });
+            tabLayout.setVisibility(View.GONE); // No longer needed as we removed Violations
         }
+        tvReportTitle.setText(R.string.system_transactions);
 
-        reportViewModel.fetchReports();
         reportViewModel.fetchRevenueStats();
     }
 
@@ -430,6 +435,8 @@ public class AdminMainActivity extends AppCompatActivity {
         ImageView ivAvatar = root.findViewById(R.id.ivAvatar);
         View btnEditProfile = root.findViewById(R.id.btnEditProfile);
         View btnLogout = root.findViewById(R.id.btnLogout);
+        setupAccountLanguage(root);
+        applyAccountLanguageText(root);
 
         boolean hasCachedProfile = bindCachedAccountProfile(tvFullName, tvEmail, tvBio, ivAvatar, R.string.admin_role);
         if (!hasCachedProfile) {
@@ -483,6 +490,56 @@ public class AdminMainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private void setupAccountLanguage(View root) {
+        Spinner spLanguage = root.findViewById(R.id.spLanguage);
+        if (spLanguage == null) return;
+
+        String[] labels = {getString(R.string.language_english), getString(R.string.language_vietnamese)};
+        String[] codes = {LanguageManager.LANGUAGE_ENGLISH, LanguageManager.LANGUAGE_VIETNAMESE};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, labels);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
+        spLanguage.setAdapter(adapter);
+        spLanguage.setSelection(findLanguageIndex(codes, LanguageManager.getSavedLanguage(this)), false);
+        spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position < 0 || position >= codes.length) return;
+                String selectedCode = codes[position];
+                if (!selectedCode.equals(LanguageManager.getSavedLanguage(AdminMainActivity.this))) {
+                    getIntent().putExtra("TARGET_TAB", "account");
+                    LanguageManager.saveLanguage(AdminMainActivity.this, selectedCode);
+                }
+            }
+
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private int findLanguageIndex(String[] codes, String selectedCode) {
+        for (int i = 0; i < codes.length; i++) {
+            if (codes[i].equals(selectedCode)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private void applyAccountLanguageText(View root) {
+        setText(root, R.id.tvAccountTitle, getString(R.string.my_account));
+        setText(root, R.id.tvBioLabel, getString(R.string.bio_label));
+        setText(root, R.id.tvLanguageLabel, getString(R.string.app_language));
+        setText(root, R.id.tvLanguageHint, getString(R.string.choose_display_language));
+        setText(root, R.id.btnEditProfile, getString(R.string.edit_profile_upper));
+        setText(root, R.id.btnLogout, getString(R.string.logout_upper));
+    }
+
+    private void setText(View root, int viewId, String text) {
+        TextView textView = root.findViewById(viewId);
+        if (textView != null) {
+            textView.setText(text);
+        }
     }
 
     private boolean bindCachedAccountProfile(TextView tvFullName, TextView tvEmail, TextView tvBio,

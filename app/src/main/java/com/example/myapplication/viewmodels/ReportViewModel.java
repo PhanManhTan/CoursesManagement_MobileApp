@@ -62,13 +62,13 @@ public class ReportViewModel extends AndroidViewModel {
                 } else {
                     enrollments.setValue(new ArrayList<>());
                 }
-                totalAnnualRevenue.setValue(String.format(Locale.US, "$%,.2f", total));
+                totalAnnualRevenue.setValue(String.format(Locale.US, "%,.0f VND", total));
                 revenueTrend.setValue("Total Lifetime Revenue");
             }
 
             @Override
             public void onError(String message) {
-                totalAnnualRevenue.setValue("$0.00");
+                totalAnnualRevenue.setValue("0 VND");
                 revenueTrend.setValue("Error loading revenue");
                 enrollments.setValue(new ArrayList<>());
             }

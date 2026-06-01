@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 import com.example.myapplication.models.Notification;
@@ -45,12 +46,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         NotificationLocalizer.localize(holder.itemView.getContext(), notification, holder.tvTitle, holder.tvMessage);
 
-        holder.itemView.setBackgroundResource(R.drawable.bg_rounded_dark);
-
         if (!notification.isRead()) {
             holder.tvTitle.setAlpha(1.0f);
             holder.tvMessage.setAlpha(1.0f);
-            holder.itemView.setBackgroundTintList(null);
+            holder.itemView.setAlpha(1.0f);
+            holder.tvTitle.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.text_primary));
         } else {
             holder.tvTitle.setAlpha(0.5f);
             holder.tvMessage.setAlpha(0.5f);

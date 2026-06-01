@@ -9,22 +9,22 @@
 
     <LinearLayout
         android:id="@+id/headerBar"
-        android:layout_width="405dp"
+        android:layout_width="match_parent"
         android:layout_height="62dp"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tvTitle"
-            android:layout_width="145dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:text="@string/discover"
             android:textColor="@color/text_primary"
-            android:textSize="26sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
 

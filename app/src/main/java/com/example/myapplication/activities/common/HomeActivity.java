@@ -66,38 +66,30 @@ public class HomeActivity extends AppCompatActivity {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         homeViewModel.getCategories().observe(this, categories -> {
-            categoryAdapter.setCategories(categories);
-            if (categories == null || categories.isEmpty()) {
-                tvEmptyCategories.setVisibility(View.VISIBLE);
-                rvCategories.setVisibility(View.GONE);
-            } else {
-                tvEmptyCategories.setVisibility(View.GONE);
-                rvCategories.setVisibility(View.VISIBLE);
+            java.util.List<com.example.myapplication.models.Category> updatedCategories = new java.util.ArrayList<>();
+            com.example.myapplication.models.Category allCategory = new com.example.myapplication.models.Category("", getString(R.string.all_courses), "all", null, null, null);
+            updatedCategories.add(allCategory);
+            if (categories != null) {
+                updatedCategories.addAll(categories);
             }
+            categoryAdapter.setCategories(updatedCategories);
+            tvEmptyCategories.setVisibility(View.GONE);
+            rvCategories.setVisibility(View.VISIBLE);
         });
 
-        // MODIFIED: Filter featured courses to only include those with "approved" status
+        // Show all courses without client-side status filtering
         homeViewModel.getFeaturedCourses().observe(this, courses -> {
-            java.util.List<Course> approvedCourses = new java.util.ArrayList<>();
+            java.util.List<Course> displayCourses = courses != null ? courses : new java.util.ArrayList<>();
+            courseAdapter.setCourses(displayCourses);
 
-            if (courses != null) {
-                for (Course course : courses) {
-                    if ("approved".equalsIgnoreCase(course.getStatus())) {
-                        approvedCourses.add(course);
-                    }
-                }
-            }
-
-            courseAdapter.setCourses(approvedCourses);
-
-            if (approvedCourses.isEmpty()) {
+            if (displayCourses.isEmpty()) {
                 tvEmptyFeaturedCourses.setVisibility(View.VISIBLE);
                 rvFeaturedCourses.setVisibility(View.GONE);
-                android.util.Log.d("HomeActivity", "No approved featured courses available to display.");
+                android.util.Log.d("HomeActivity", "No courses available to display.");
             } else {
                 tvEmptyFeaturedCourses.setVisibility(View.GONE);
                 rvFeaturedCourses.setVisibility(View.VISIBLE);
-                android.util.Log.d("HomeActivity", "Successfully loaded " + approvedCourses.size() + " approved featured courses.");
+                android.util.Log.d("HomeActivity", "Successfully loaded " + displayCourses.size() + " courses.");
             }
         });
 
@@ -118,12 +110,22 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        overridePendingTransition(0, 0);
         if (!sessionManager.isLoggedIn()) {
             redirectToLogin();
             return;
         }
         updateCartBadge();
         BottomNavigationHelper.updateNotificationBadge(this, bottomNav);
+        if (homeViewModel != null) {
+            homeViewModel.refreshData();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void redirectToLogin() {
@@ -164,9 +166,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupRecyclerViews() {
         categoryAdapter = new CategoryAdapter();
         categoryAdapter.setOnItemClickListener(category -> {
-            Intent intent = new Intent(this, com.example.myapplication.activities.student.SearchActivity.class);
-            intent.putExtra("category_name", category.getName());
-            startActivity(intent);
+            homeViewModel.fetchFeaturedCoursesByCategory(category.getId());
         });
         rvCategories.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvCategories.setAdapter(categoryAdapter);
@@ -177,7 +177,8 @@ public class HomeActivity extends AppCompatActivity {
             intent.putExtra("COURSE_ID", course.getId());
             startActivity(intent);
         });
-        rvFeaturedCourses.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvFeaturedCourses.setLayoutManager(new LinearLayoutManager(this));
+        rvFeaturedCourses.setNestedScrollingEnabled(false);
         rvFeaturedCourses.setAdapter(courseAdapter);
     }
 

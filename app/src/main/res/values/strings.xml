@@ -448,14 +448,14 @@
 
     <string name="admin_dashboard">Admin Dashboard</string>
     <string name="system_statistics">System Statistics</string>
-    <string name="users">Users</string>
-    <string name="courses">Courses</string>
-    <string name="revenue">Revenue</string>
-    <string name="pending">Pending</string>
+    <string name="users">Total Users</string>
+    <string name="courses">Active Courses</string>
+    <string name="revenue">Total Revenue</string>
+    <string name="pending">Pending Approvals</string>
     <string name="system_management">System Management</string>
     <string name="pending_course_approvals">Pending Course Approvals</string>
-    <string name="user_role_management">User &amp; Role Management</string>
-    <string name="content_reports_flags">Content Reports &amp; Flags</string>
+    <string name="user_role_management">User Management</string>
+    <string name="content_reports_flags">System Transactions</string>
     <string name="stats">Stats</string>
     <string name="approvals">Approvals</string>
     <string name="reports">Reports</string>
@@ -519,7 +519,8 @@
     <string name="price_zero_vnd">0 VND</string>
     <string name="lesson_count_with_duration_format">%1$d Lessons • %2$s</string>
     <string name="empty_categories">No categories available</string>
-    <string name="empty_featured_courses">No featured courses available</string>
+    <string name="empty_featured_courses">No courses available</string>
+    <string name="no_courses_enrolled">You haven\'t enrolled in any courses yet</string>
     <string name="tab_pending_approvals">Pending</string>
     <string name="tab_active_courses">Active</string>
 

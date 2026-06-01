@@ -73,7 +73,7 @@ public class AdminViewModel extends AndroidViewModel {
                         total += e.getPaidAmount();
                     }
                 }
-                totalRevenue.setValue(String.format(Locale.US, "$%.1fk", total / 1000.0));
+                totalRevenue.setValue(String.format(Locale.US, "%,.0f VND", total));
             }
             @Override public void onError(String message) { totalRevenue.setValue("Error"); }
         });

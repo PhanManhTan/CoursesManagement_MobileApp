@@ -9,7 +9,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:layout_above="@id/bottomNav">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -18,31 +19,20 @@
             android:padding="24dp"
             android:gravity="center_horizontal">
 
-            <!-- Header from Teammate with User's Back Icon style -->
+            <!-- Header from Teammate -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginBottom="16dp">
 
-                <ImageView
-                    android:id="@+id/btnBack"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/outline_arrow_back_24"
-                    app:tint="#FFFFFF"
-                    android:contentDescription="@string/back" />
-
                 <TextView
                     android:id="@+id/tvAccountTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     android:text="@string/my_account"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"/>
             </RelativeLayout>
@@ -100,10 +90,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_flat_card"
+                android:background="@drawable/bg_account_outline"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:layout_marginBottom="24dp">
+                android:padding="12dp"
+                android:layout_marginBottom="20dp">
 
                 <TextView
                     android:id="@+id/tvBioLabel"
@@ -113,53 +103,63 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_secondary"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="6dp"/>
 
                 <TextView
                     android:id="@+id/tvBio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="4"
                     android:text=""
                     tools:text="@string/loading"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="@color/text_primary"
-                    android:lineSpacingExtra="4dp"/>
+                    android:lineSpacingExtra="2dp"/>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/languageContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_flat_card"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_account_outline"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
 
-                <TextView
-                    android:id="@+id/tvLanguageLabel"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_language"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvLanguageHint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/choose_display_language"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvLanguageLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_language"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvLanguageHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/choose_display_language"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
                 <Spinner
                     android:id="@+id/spLanguage"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_spinner_rounded"
-                    android:paddingHorizontal="12dp"
+                    android:layout_width="112dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="12dp"
+                    android:background="@android:color/transparent"
+                    android:paddingHorizontal="0dp"
                     android:popupBackground="@color/bg_tertiary" />
             </LinearLayout>
 
@@ -182,5 +182,16 @@
                 android:textStyle="bold"/>
         </LinearLayout>
     </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_primary"
+        app:itemIconTint="#FFFFFF"
+        app:itemTextColor="#FFFFFF"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_nav_menu"/>
 
 </RelativeLayout>

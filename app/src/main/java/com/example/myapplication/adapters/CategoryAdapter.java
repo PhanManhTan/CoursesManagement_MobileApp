@@ -19,13 +19,15 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private OnItemClickListener listener;
     private List<Category> categories = new ArrayList<>();
+    private int selectedPosition = 0; // Default to index 0 ("All Courses")
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
     public void setCategories(List<Category> categories) {
-        this.categories = categories;
+        this.categories = categories != null ? categories : new ArrayList<>();
+        this.selectedPosition = 0; // Reset selected position when categories are refreshed
         notifyDataSetChanged();
     }
 
@@ -40,7 +42,35 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Category category = categories.get(position);
         holder.btnCategory.setText(category.getName());
+
+        // Highlight selected category button
+        if (position == selectedPosition) {
+            holder.btnCategory.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                    holder.itemView.getContext().getResources().getColor(R.color.accent_muted)
+                )
+            );
+            holder.btnCategory.setTextColor(android.graphics.Color.WHITE);
+        } else {
+            holder.btnCategory.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                    holder.itemView.getContext().getResources().getColor(R.color.bg_secondary)
+                )
+            );
+            holder.btnCategory.setTextColor(
+                holder.itemView.getContext().getResources().getColor(R.color.text_primary)
+            );
+        }
+
         holder.btnCategory.setOnClickListener(v -> {
+            int oldSelected = selectedPosition;
+            selectedPosition = holder.getAdapterPosition();
+            if (oldSelected != RecyclerView.NO_POSITION) {
+                notifyItemChanged(oldSelected);
+            }
+            if (selectedPosition != RecyclerView.NO_POSITION) {
+                notifyItemChanged(selectedPosition);
+            }
             if (listener != null) listener.onItemClick(category);
         });
     }
