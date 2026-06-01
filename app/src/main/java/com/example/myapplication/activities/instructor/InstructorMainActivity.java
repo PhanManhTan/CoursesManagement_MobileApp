@@ -695,6 +695,8 @@ public class InstructorMainActivity extends AppCompatActivity
 
     private void showAccount() {
         View root = inflateContent(R.layout.account_activity);
+        View innerNav = root.findViewById(R.id.bottomNav);
+        if (innerNav != null) innerNav.setVisibility(View.GONE);
         View btnBack = root.findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setVisibility(View.GONE);
 
@@ -813,8 +815,8 @@ public class InstructorMainActivity extends AppCompatActivity
 
         String[] labels = {getString(R.string.language_english), getString(R.string.language_vietnamese)};
         String[] codes = {LanguageManager.LANGUAGE_ENGLISH, LanguageManager.LANGUAGE_VIETNAMESE};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, labels);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
         spLanguage.setAdapter(adapter);
         spLanguage.setSelection(findLanguageIndex(codes, LanguageManager.getSavedLanguage(this)), false);
         spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

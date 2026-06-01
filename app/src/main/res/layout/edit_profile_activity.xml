@@ -9,6 +9,7 @@
     android:gravity="center_horizontal">
 
     <RelativeLayout
+        android:id="@+id/headerBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_marginBottom="8dp">
@@ -22,15 +23,17 @@
             android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/outline_arrow_back_24"
-            app:tint="@color/white"
+            app:tint="@color/text_primary"
             android:contentDescription="@string/back" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/btnBack"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
             android:text="@string/edit_profile"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"/>
     </RelativeLayout>

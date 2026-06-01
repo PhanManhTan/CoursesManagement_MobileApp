@@ -45,6 +45,7 @@ public class BottomNavigationHelper {
                 // Chỉ finish nếu không phải là HomeActivity để giữ Home làm gốc
                 if (!(activity instanceof HomeActivity)) {
                     activity.finish();
+                    activity.overridePendingTransition(0, 0);
                 }
                 return true;
             }

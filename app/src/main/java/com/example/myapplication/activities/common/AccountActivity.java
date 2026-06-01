@@ -78,9 +78,6 @@ public class AccountActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        ImageView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
-
         tvFullName = findViewById(R.id.tvFullName);
         tvEmail = findViewById(R.id.tvEmail);
         tvBio = findViewById(R.id.tvBio);
@@ -119,11 +116,18 @@ public class AccountActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        overridePendingTransition(0, 0);
         if (!sessionManager.isLoggedIn()) {
             redirectToLogin();
             return;
         }
         loadCurrentUser();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void loadCurrentUser() {
@@ -269,8 +273,8 @@ public class AccountActivity extends AppCompatActivity {
 
         String[] labels = {getString(R.string.language_english), getString(R.string.language_vietnamese)};
         String[] codes = {LanguageManager.LANGUAGE_ENGLISH, LanguageManager.LANGUAGE_VIETNAMESE};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, labels);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
         spLanguage.setAdapter(adapter);
         spLanguage.setSelection(findLanguageIndex(codes, LanguageManager.getSavedLanguage(this)), false);
         spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

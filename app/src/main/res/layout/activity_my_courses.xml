@@ -9,11 +9,13 @@
 
     <LinearLayout
         android:id="@+id/headerBar"
-        android:layout_width="match_parent"
-        android:layout_height="85dp"
+        android:layout_width="0dp"
+        android:layout_height="62dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -21,24 +23,52 @@
             android:layout_height="wrap_content"
             android:text="@string/my_courses_nav"
             android:textColor="@color/text_primary"
-            android:textSize="26sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <HorizontalScrollView
         android:id="@+id/filterScroll"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:scrollbars="none"
-        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerBar">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <Button android:id="@+id/btnFilterAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/all" android:textAllCaps="false" android:backgroundTint="@color/accent" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterOnGoing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ongoing" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary" android:layout_marginEnd="10dp"/>
-            <Button android:id="@+id/btnFilterCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/completed" android:textAllCaps="false" android:backgroundTint="@color/bg_secondary"/>
+
+            <Button
+                android:id="@+id/btnFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="@color/accent"
+                android:text="@string/all"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnFilterOnGoing"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="@color/bg_secondary"
+                android:text="@string/ongoing"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnFilterCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:backgroundTint="@color/bg_secondary"
+                android:text="@string/completed"
+                android:textAllCaps="false" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -46,10 +76,27 @@
         android:id="@+id/rvMyCourses"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="16dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintTop_toBottomOf="@id/filterScroll"
         tools:listitem="@layout/item_my_course" />
+
+    <TextView
+        android:id="@+id/tvEmptyMyCourses"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:gravity="center"
+        android:text="@string/no_courses_enrolled"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScroll" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"

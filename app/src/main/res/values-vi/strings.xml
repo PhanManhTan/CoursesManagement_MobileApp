@@ -448,14 +448,14 @@
 
     <string name="admin_dashboard">Bảng điều khiển quản trị</string>
     <string name="system_statistics">Thống kê hệ thống</string>
-    <string name="users">Người dùng</string>
-    <string name="courses">Khóa học</string>
-    <string name="revenue">Doanh thu</string>
-    <string name="pending">Chờ duyệt</string>
+    <string name="users">Tổng người dùng</string>
+    <string name="courses">Khóa học hoạt động</string>
+    <string name="revenue">Tổng doanh thu</string>
+    <string name="pending">Khóa học chờ duyệt</string>
     <string name="system_management">Quản lý hệ thống</string>
     <string name="pending_course_approvals">Khóa học chờ duyệt</string>
-    <string name="user_role_management">Quản lý người dùng &amp; vai trò</string>
-    <string name="content_reports_flags">Báo cáo &amp; gắn cờ nội dung</string>
+    <string name="user_role_management">Quản lý người dùng</string>
+    <string name="content_reports_flags">Giao dịch hệ thống</string>
     <string name="stats">Thống kê</string>
     <string name="approvals">Duyệt</string>
     <string name="reports">Báo cáo</string>
@@ -528,5 +528,6 @@
     <string name="enrollment_success_db_message">Bạn đã đăng ký thành công khóa học! Chúc bạn học tập tốt.</string>
     <string name="open_app_to_learn">Mở ứng dụng để bắt đầu học ngay!</string>
     <string name="empty_categories">Chưa có danh mục</string>
-    <string name="empty_featured_courses">Chưa có khóa học nổi bật</string>
+    <string name="empty_featured_courses">Không có khóa học nào</string>
+    <string name="no_courses_enrolled">Bạn chưa tham gia khóa học nào</string>
 </resources>

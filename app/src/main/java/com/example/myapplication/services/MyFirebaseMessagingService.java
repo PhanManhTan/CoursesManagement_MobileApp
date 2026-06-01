@@ -11,7 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.admin.AdminMainActivity;
+import com.example.myapplication.activities.common.NotificationActivity;
+import com.example.myapplication.data.repository.FcmRepository;
 import com.example.myapplication.utils.LanguageManager;
+import com.example.myapplication.utils.SessionManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -23,13 +26,16 @@ import java.util.Map;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FCM_Service";
-    private static final String CHANNEL_ID = "admin_notifications_channel";
+    private static final String CHANNEL_ID = "app_notifications_channel";
 
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        // Log token so developer can use it for manual testing/API registration
         Log.d(TAG, "New registration token generated: " + token);
+        String userId = new SessionManager(this).getUserId();
+        if (userId != null && !userId.isEmpty()) {
+            new FcmRepository(this).uploadToken(userId, token);
+        }
     }
 
     @Override
@@ -64,12 +70,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendLocalNotification(String title, String body, String type) {
-        Intent intent = new Intent(this, AdminMainActivity.class);
         if ("course_pending_approval".equalsIgnoreCase(type)) {
+            Intent intent = new Intent(this, AdminMainActivity.class);
             intent.putExtra("TARGET_TAB", "course_pending_approval");
+            showNotification(title, body, intent);
         } else if ("course_violation_report".equalsIgnoreCase(type)) {
+            Intent intent = new Intent(this, AdminMainActivity.class);
             intent.putExtra("TARGET_TAB", "course_violation_report");
+            showNotification(title, body, intent);
+        } else {
+            showNotification(title, body, new Intent(this, NotificationActivity.class));
         }
+    }
+
+    private void showNotification(String title, String body, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(

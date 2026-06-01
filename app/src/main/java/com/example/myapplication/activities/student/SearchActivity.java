@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
+    private static final String ALL_COURSES_ID = "";
 
     private LinearLayout categoryContainer;
     private LinearLayout searchResultsContainer;
@@ -117,11 +118,23 @@ public class SearchActivity extends AppCompatActivity {
                 categoryContainer.removeAllViews();
                 categoryButtons.clear();
 
-                if (categories == null || categories.isEmpty()) {
-                    return;
+                if (categories == null) {
+                    categories = new ArrayList<>();
                 }
 
                 Category matchedCategory = null;
+
+                // Prepend "All Courses" category button
+                View allBtnView = getLayoutInflater().inflate(R.layout.item_category, categoryContainer, false);
+                MaterialButton allBtn = (MaterialButton) allBtnView;
+                allBtn.setText(getString(R.string.all_courses));
+                allBtn.setTag(ALL_COURSES_ID);
+                allBtn.setOnClickListener(v -> {
+                    selectCategory(ALL_COURSES_ID);
+                    performSearch();
+                });
+                categoryButtons.add(allBtn);
+                categoryContainer.addView(allBtn);
 
                 for (Category category : categories) {
                     View btnView = getLayoutInflater().inflate(R.layout.item_category, categoryContainer, false);
@@ -129,7 +142,10 @@ public class SearchActivity extends AppCompatActivity {
                     btn.setText(category.getName());
                     btn.setTag(category.getId());
 
-                    btn.setOnClickListener(v -> selectCategory(category.getId()));
+                    btn.setOnClickListener(v -> {
+                        selectCategory(category.getId());
+                        performSearch();
+                    });
 
                     categoryButtons.add(btn);
                     categoryContainer.addView(btn);
@@ -142,7 +158,7 @@ public class SearchActivity extends AppCompatActivity {
                 if (matchedCategory != null) {
                     selectCategory(matchedCategory.getId());
                 } else {
-                    selectCategory(categories.get(0).getId());
+                    selectCategory(ALL_COURSES_ID);
                 }
 
                 performSearch();
@@ -188,48 +204,65 @@ public class SearchActivity extends AppCompatActivity {
         checkSubmitButtonState();
 
         if (lastSearchedQuery.isEmpty()) {
-            courseRepository.getByCategoryId(currentCategoryId, new CourseRepository.RepositoryCallback<List<Course>>() {
-                @Override
-                public void onSuccess(List<Course> courses) {
-                    displayCourses(courses);
-                }
+            if (currentCategoryId.equals(ALL_COURSES_ID)) {
+                courseRepository.getAll(new CourseRepository.RepositoryCallback<List<Course>>() {
+                    @Override
+                    public void onSuccess(List<Course> courses) {
+                        displayCourses(courses);
+                    }
 
-                @Override
-                public void onError(String message) {
-                    Toast.makeText(SearchActivity.this, R.string.failed_load_courses_plain, Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(SearchActivity.this, R.string.failed_load_courses_plain, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                courseRepository.getByCategoryId(currentCategoryId, new CourseRepository.RepositoryCallback<List<Course>>() {
+                    @Override
+                    public void onSuccess(List<Course> courses) {
+                        displayCourses(courses);
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(SearchActivity.this, R.string.failed_load_courses_plain, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         } else {
-            courseRepository.searchByCategoryAndTitle(currentCategoryId, lastSearchedQuery, new CourseRepository.RepositoryCallback<List<Course>>() {
-                @Override
-                public void onSuccess(List<Course> courses) {
-                    displayCourses(courses);
-                }
+            if (currentCategoryId.equals(ALL_COURSES_ID)) {
+                courseRepository.search(lastSearchedQuery, new CourseRepository.RepositoryCallback<List<Course>>() {
+                    @Override
+                    public void onSuccess(List<Course> courses) {
+                        displayCourses(courses);
+                    }
 
-                @Override
-                public void onError(String message) {
-                    Toast.makeText(SearchActivity.this, R.string.failed_search_courses, Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(SearchActivity.this, R.string.failed_search_courses, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                courseRepository.searchByCategoryAndTitle(currentCategoryId, lastSearchedQuery, new CourseRepository.RepositoryCallback<List<Course>>() {
+                    @Override
+                    public void onSuccess(List<Course> courses) {
+                        displayCourses(courses);
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(SearchActivity.this, R.string.failed_search_courses, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
     }
 
     private void displayCourses(List<Course> courses) {
         searchResultsContainer.removeAllViews();
 
-        // Filter the incoming courses to only process those with "approved" status
-        List<Course> approvedCourses = new ArrayList<>();
-        if (courses != null) {
-            for (Course course : courses) {
-                if ("approved".equalsIgnoreCase(course.getStatus())) {
-                    approvedCourses.add(course);
-                }
-            }
-        }
-
-        // Check against the filtered list rather than the original list
-        if (approvedCourses.isEmpty()) {
-            android.util.Log.d("SearchActivity", "No approved courses found for the given search criteria.");
+        if (courses == null || courses.isEmpty()) {
+            android.util.Log.d("SearchActivity", "No courses found for the given search criteria.");
             TextView tvEmpty = new TextView(SearchActivity.this);
             tvEmpty.setText(R.string.no_courses_found);
             tvEmpty.setPadding(32, 32, 32, 32);
@@ -239,9 +272,9 @@ public class SearchActivity extends AppCompatActivity {
             return;
         }
 
-        android.util.Log.d("SearchActivity", "Displaying " + approvedCourses.size() + " approved courses.");
+        android.util.Log.d("SearchActivity", "Displaying " + courses.size() + " courses.");
 
-        for (Course course : approvedCourses) {
+        for (Course course : courses) {
             View itemView = getLayoutInflater().inflate(R.layout.item_course_search, searchResultsContainer, false);
 
             TextView title = itemView.findViewById(R.id.tvCourseTitle);
@@ -285,5 +318,23 @@ public class SearchActivity extends AppCompatActivity {
 
             searchResultsContainer.addView(itemView);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        overridePendingTransition(0, 0);
+        if (etInput != null) {
+            etInput.setText("");
+        }
+        selectCategory(ALL_COURSES_ID);
+        performSearch();
     }
 }

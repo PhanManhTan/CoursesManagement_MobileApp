@@ -10,31 +10,33 @@
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="62dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:padding="2dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/outline_arrow_back_24"
-            app:tint="@color/white" />
+            app:tint="@color/text_primary" />
 
         <TextView
             android:id="@+id/tvEditorTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="@string/edit_lesson_title"
-            android:textAppearance="@style/TextAppearance.App.Subtitle" />
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/btnSaveLesson"

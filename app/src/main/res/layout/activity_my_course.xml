@@ -9,29 +9,31 @@
 
     <LinearLayout
         android:id="@+id/headerBar"
-        android:layout_width="430dp"
-        android:layout_height="65dp"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="-7dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/outline_arrow_back_24"
-            app:tint="#FFFFFF" />
+            app:tint="@color/text_primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/my_courses"
-            android:textColor="#FFFFFF"
-            android:textSize="26sp"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
 

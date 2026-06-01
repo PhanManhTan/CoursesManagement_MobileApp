@@ -10,26 +10,27 @@
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="62dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_home"
-            app:tint="@color/white" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/outline_arrow_back_24"
+            app:tint="@color/text_primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:text="@string/system_reports"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
@@ -59,7 +60,7 @@
                 android:id="@+id/tvTotalAnnualRevenue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$0.00"
+                android:text="0 VND"
                 android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -93,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-            android:text="@string/user_reports_flags"
+        android:text="@string/system_transactions"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
         android:textStyle="bold"
