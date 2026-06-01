@@ -12,8 +12,11 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +34,9 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.adapters.InstructorChapterAdapter;
 import com.example.myapplication.activities.auth.LoginActivity;
+import com.example.myapplication.data.repository.CategoryRepository;
 import com.example.myapplication.data.repository.SupabaseStorageRepository;
+import com.example.myapplication.models.Category;
 import com.example.myapplication.models.Chapter;
 import com.example.myapplication.models.ChapterWithLessons;
 import com.example.myapplication.models.Course;
@@ -56,6 +61,7 @@ public class EditCourseActivity extends AppCompatActivity {
     private EditText etTitle;
     private EditText etDescription;
     private EditText etPrice;
+    private Spinner spCategory;
     private ImageView ivThumbnailPreview;
     private TextView tvEditorTitle;
     private TextView tvChapterCount;
@@ -67,19 +73,24 @@ public class EditCourseActivity extends AppCompatActivity {
     private InstructorChapterAdapter chapterAdapter;
     private final List<ChapterWithLessons> chapterList = new ArrayList<>();
     private EditCourseViewModel viewModel;
+    private CategoryRepository categoryRepository;
     private SupabaseStorageRepository storageRepository;
     private ActivityResultLauncher<String> pickImageLauncher;
     private ActivityResultLauncher<Intent> editLessonLauncher;
     private String currentThumbnailUrl;
+    private String selectedCategoryId;
     private String loadedStructureCourseId;
     private int pendingChapterPosition = RecyclerView.NO_POSITION;
     private int pendingLessonPosition = RecyclerView.NO_POSITION;
     private int pendingUploadCount;
     private boolean isBindingData;
+    private boolean isBindingCategory;
     private boolean hasUnsavedChanges;
     private boolean isStructureLoading;
     private boolean isSaving;
     private SessionManager sessionManager;
+    private ArrayAdapter<String> categoryAdapter;
+    private final List<Category> categoryList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +107,9 @@ public class EditCourseActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupViewModel();
+        setupCategorySpinner();
         setupListeners();
+        loadCategories();
         loadInitialData();
     }
 
@@ -104,6 +117,7 @@ public class EditCourseActivity extends AppCompatActivity {
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         etPrice = findViewById(R.id.etPrice);
+        spCategory = findViewById(R.id.spCategory);
         ivThumbnailPreview = findViewById(R.id.ivThumbnailPreview);
         tvEditorTitle = findViewById(R.id.tvEditorTitle);
         tvChapterCount = findViewById(R.id.tvChapterCount);
@@ -112,6 +126,7 @@ public class EditCourseActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         courseDetailScroll = findViewById(R.id.courseDetailScroll);
         rvChapters = findViewById(R.id.rvChapters);
+        categoryRepository = new CategoryRepository(this);
         storageRepository = new SupabaseStorageRepository(this);
     }
 
@@ -121,6 +136,33 @@ public class EditCourseActivity extends AppCompatActivity {
         rvChapters.setItemAnimator(null);
         rvChapters.setNestedScrollingEnabled(false);
         rvChapters.setAdapter(chapterAdapter);
+    }
+
+    private void setupCategorySpinner() {
+        categoryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>());
+        categoryAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spCategory.setAdapter(categoryAdapter);
+        spCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isBindingCategory) {
+                    return;
+                }
+                selectedCategoryId = resolveCategoryId(position);
+                if (!isBindingData) {
+                    markDirty();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                if (isBindingCategory) {
+                    return;
+                }
+                selectedCategoryId = null;
+            }
+        });
+        renderCategoryOptions();
     }
 
     private InstructorChapterAdapter.OnChapterActionListener createChapterActionListener() {
@@ -225,6 +267,30 @@ public class EditCourseActivity extends AppCompatActivity {
         }
     }
 
+    private void loadCategories() {
+        categoryRepository.getAll(new CategoryRepository.RepositoryCallback<List<Category>>() {
+            @Override
+            public void onSuccess(List<Category> data) {
+                runIfActive(() -> {
+                    categoryList.clear();
+                    if (data != null) {
+                        categoryList.addAll(data);
+                    }
+                    renderCategoryOptions();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runIfActive(() -> Toast.makeText(
+                        EditCourseActivity.this,
+                        getString(R.string.error_loading_categories, ApiErrorFormatter.fromMessage(message)),
+                        Toast.LENGTH_LONG
+                ).show());
+            }
+        });
+    }
+
     private Course readCourseExtra() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return getIntent().getSerializableExtra(EXTRA_COURSE, Course.class);
@@ -240,6 +306,8 @@ public class EditCourseActivity extends AppCompatActivity {
         etTitle.setText(valueOrEmpty(course.getTitle()));
         etDescription.setText(valueOrEmpty(course.getDescription()));
         etPrice.setText(course.getPrice() > 0 ? String.format(Locale.US, "%.0f", course.getPrice()) : "");
+        selectedCategoryId = course.getCategoryId();
+        syncCategorySelection();
 
         currentThumbnailUrl = course.getThumbnailUrl();
         if (hasValue(currentThumbnailUrl)) {
@@ -260,6 +328,64 @@ public class EditCourseActivity extends AppCompatActivity {
             chapterList.clear();
             refreshChapterList();
         }
+    }
+
+    private void renderCategoryOptions() {
+        if (categoryAdapter == null) return;
+
+        isBindingCategory = true;
+        List<String> names = new ArrayList<>();
+        names.add(getString(R.string.select_category));
+        for (Category category : categoryList) {
+            names.add(getCategoryDisplayName(category));
+        }
+        categoryAdapter.clear();
+        categoryAdapter.addAll(names);
+        categoryAdapter.notifyDataSetChanged();
+        syncCategorySelection();
+        updateEditorLockState();
+    }
+
+    private void syncCategorySelection() {
+        if (spCategory == null || categoryAdapter == null) {
+            return;
+        }
+
+        int selectedPosition = 0;
+        if (hasValue(selectedCategoryId)) {
+            for (int i = 0; i < categoryList.size(); i++) {
+                Category category = categoryList.get(i);
+                if (category != null && selectedCategoryId.equals(category.getId())) {
+                    selectedPosition = i + 1;
+                    break;
+                }
+            }
+        }
+        spCategory.setSelection(selectedPosition, false);
+        spCategory.post(() -> isBindingCategory = false);
+    }
+
+    private String resolveCategoryId(int spinnerPosition) {
+        int categoryIndex = spinnerPosition - 1;
+        if (categoryIndex < 0 || categoryIndex >= categoryList.size()) {
+            return null;
+        }
+
+        Category category = categoryList.get(categoryIndex);
+        return category != null ? category.getId() : null;
+    }
+
+    private String getCategoryDisplayName(Category category) {
+        if (category == null) {
+            return getString(R.string.category);
+        }
+        if (hasValue(category.getName())) {
+            return category.getName();
+        }
+        if (hasValue(category.getSlug())) {
+            return category.getSlug();
+        }
+        return getString(R.string.category);
     }
 
     private void showChapterDialog(int chapterPosition) {
@@ -477,6 +603,13 @@ public class EditCourseActivity extends AppCompatActivity {
             etDescription.requestFocus();
             return;
         }
+        if (!hasValue(selectedCategoryId)) {
+            Toast.makeText(this, R.string.course_category_required, Toast.LENGTH_SHORT).show();
+            if (spCategory != null) {
+                spCategory.requestFocus();
+            }
+            return;
+        }
 
         double price;
         try {
@@ -502,7 +635,7 @@ public class EditCourseActivity extends AppCompatActivity {
         normalizeOrderIndexes();
         isSaving = true;
         updateEditorLockState();
-        viewModel.saveCourseStructure(title, description, price, currentThumbnailUrl, createChapterSnapshot());
+        viewModel.saveCourseStructure(title, description, price, currentThumbnailUrl, selectedCategoryId, createChapterSnapshot());
     }
 
     private void registerLaunchers() {
@@ -664,6 +797,9 @@ public class EditCourseActivity extends AppCompatActivity {
         }
         if (btnPickThumbnail != null) {
             btnPickThumbnail.setEnabled(canEdit);
+        }
+        if (spCategory != null) {
+            spCategory.setEnabled(canEdit && !categoryList.isEmpty());
         }
         if (chapterAdapter != null) {
             chapterAdapter.setActionsEnabled(canEdit);

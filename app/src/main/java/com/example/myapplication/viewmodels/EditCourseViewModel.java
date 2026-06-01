@@ -255,7 +255,7 @@ public class EditCourseViewModel extends AndroidViewModel {
     }
 
     public void saveCourseStructure(String title, String description, double price, String thumbnailUrl,
-                                    List<ChapterWithLessons> chapterList) {
+                                    String categoryId, List<ChapterWithLessons> chapterList) {
         if (Boolean.TRUE.equals(isSaving.getValue())) {
             return;
         }
@@ -279,6 +279,7 @@ public class EditCourseViewModel extends AndroidViewModel {
         current.setDescription(description);
         current.setPrice(price);
         current.setThumbnailUrl(thumbnailUrl);
+        current.setCategoryId(categoryId);
         saveSuccess.setValue(false);
 
         if (hasValue(current.getId()) && !"tmp".equals(current.getId())) {
@@ -355,6 +356,11 @@ public class EditCourseViewModel extends AndroidViewModel {
 
                 @Override
                 public void onError(String message) {
+                    if (isMissingChapterOnServer(message)) {
+                        chapter.setId(null);
+                        saveChapterDraft(chapter, orderIndex, callback);
+                        return;
+                    }
                     callback.onError(message);
                 }
             });
@@ -556,6 +562,49 @@ public class EditCourseViewModel extends AndroidViewModel {
         return true;
     }
 
+    private boolean applySavedChapterIdentity(Chapter target, Chapter savedChapter) {
+        if (target == null || savedChapter == null || !hasValue(savedChapter.getId())) {
+            return false;
+        }
+
+        target.setId(savedChapter.getId());
+        if (hasValue(savedChapter.getCourseId())) {
+            target.setCourseId(savedChapter.getCourseId());
+        }
+        if (hasValue(savedChapter.getTitle())) {
+            target.setTitle(savedChapter.getTitle());
+        }
+        if (savedChapter.getOrderIndex() > 0) {
+            target.setOrderIndex(savedChapter.getOrderIndex());
+        }
+        return true;
+    }
+
+    private boolean applySavedLessonIdentity(Lesson target, Lesson savedLesson) {
+        if (target == null || savedLesson == null || !hasValue(savedLesson.getId())) {
+            return false;
+        }
+
+        target.setId(savedLesson.getId());
+        if (hasValue(savedLesson.getChapterId())) {
+            target.setChapterId(savedLesson.getChapterId());
+        }
+        if (savedLesson.getOrderIndex() > 0) {
+            target.setOrderIndex(savedLesson.getOrderIndex());
+        }
+        return true;
+    }
+
+    private boolean isMissingChapterOnServer(String message) {
+        return hasValue(message)
+                && message.toLowerCase(Locale.US).contains("chapter not found on server");
+    }
+
+    private boolean isMissingLessonOnServer(String message) {
+        return hasValue(message)
+                && message.toLowerCase(Locale.US).contains("lesson not found on server");
+    }
+
     private void saveChapterStructure(Course savedCourse, List<ChapterWithLessons> chapterList) {
         if (savedCourse == null || !hasValue(savedCourse.getId())) {
             failSave("Course id is missing, cannot save chapters");
@@ -695,6 +744,11 @@ public class EditCourseViewModel extends AndroidViewModel {
 
                 @Override
                 public void onError(String message) {
+                    if (isMissingChapterOnServer(message)) {
+                        chapter.setId(null);
+                        saveChapterAt(savedCourse, chaptersToSave, index);
+                        return;
+                    }
                     failSave(message);
                 }
             });
@@ -702,7 +756,10 @@ public class EditCourseViewModel extends AndroidViewModel {
             chapterRepository.insertAndReturn(chapter, new ChapterRepository.RepositoryCallback<Chapter>() {
                 @Override
                 public void onSuccess(Chapter savedChapter) {
-                    chapter.setId(savedChapter.getId());
+                    if (!applySavedChapterIdentity(chapter, savedChapter)) {
+                        failSave("Chapter was created but no chapter id was returned");
+                        return;
+                    }
                     courseContentNotifier.notifyChapterAdded(savedCourse, chapter);
                     publishChapterDrafts(chaptersToSave);
                     saveLessonsForChapter(savedCourse, chapter, draft.getLessons(), 0,
@@ -747,6 +804,11 @@ public class EditCourseViewModel extends AndroidViewModel {
 
                 @Override
                 public void onError(String message) {
+                    if (isMissingLessonOnServer(message)) {
+                        lesson.setId(null);
+                        saveLessonsForChapter(savedCourse, chapter, chapterLessons, lessonIndex, onDraftChanged, onComplete);
+                        return;
+                    }
                     failSave(message);
                 }
             });
@@ -756,7 +818,10 @@ public class EditCourseViewModel extends AndroidViewModel {
         lessonRepository.insertAndReturn(lesson, new LessonRepository.RepositoryCallback<Lesson>() {
             @Override
             public void onSuccess(Lesson savedLesson) {
-                lesson.setId(savedLesson.getId());
+                if (!applySavedLessonIdentity(lesson, savedLesson)) {
+                    failSave("Lesson was created but no lesson id was returned");
+                    return;
+                }
                 onDraftChanged.run();
                 updateInsertedLessonContentAndQuizzes(lesson, () -> {
                     courseContentNotifier.notifyLessonAdded(savedCourse, lesson);
@@ -920,6 +985,11 @@ public class EditCourseViewModel extends AndroidViewModel {
 
                 @Override
                 public void onError(String message) {
+                    if (isMissingLessonOnServer(message)) {
+                        lesson.setId(null);
+                        saveLessonAt(savedCourse, chapter, lessonsToSave, index);
+                        return;
+                    }
                     failSave(message);
                 }
             });
@@ -927,7 +997,10 @@ public class EditCourseViewModel extends AndroidViewModel {
             lessonRepository.insertAndReturn(lesson, new LessonRepository.RepositoryCallback<Lesson>() {
                 @Override
                 public void onSuccess(Lesson savedLesson) {
-                    lesson.setId(savedLesson.getId());
+                    if (!applySavedLessonIdentity(lesson, savedLesson)) {
+                        failSave("Lesson was created but no lesson id was returned");
+                        return;
+                    }
                     updateInsertedLessonContentAndQuizzes(lesson, () -> {
                         courseContentNotifier.notifyLessonAdded(savedCourse, lesson);
                         saveLessonAt(savedCourse, chapter, lessonsToSave, index + 1);

@@ -2,6 +2,7 @@ package com.example.myapplication.activities.instructor;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -190,9 +191,11 @@ public class EditLessonActivity extends AppCompatActivity {
     private void setVideoFile(Uri uri) {
         String fileName = getDisplayName(uri);
         String localUri = uri.toString();
+        int durationSeconds = readVideoDurationSeconds(uri);
         lessonData.setLocalVideoName(fileName);
         lessonData.setLocalVideoUri(localUri);
         lessonData.setVideoUrl(localUri);
+        lessonData.setDurationSeconds(durationSeconds);
         renderVideoName();
         markDirty();
 
@@ -204,6 +207,7 @@ public class EditLessonActivity extends AppCompatActivity {
                     lessonData.setLocalVideoName(fileName);
                     lessonData.setLocalVideoUri(url);
                     lessonData.setVideoUrl(url);
+                    lessonData.setDurationSeconds(durationSeconds);
                     renderVideoName();
                     finishUpload();
                 });
@@ -214,6 +218,7 @@ public class EditLessonActivity extends AppCompatActivity {
                 runIfActive(() -> {
                     lessonData.setLocalVideoUri("");
                     lessonData.setVideoUrl("");
+                    lessonData.setDurationSeconds(0);
                     renderVideoName();
                     showUploadError(message);
                     finishUpload();
@@ -226,6 +231,7 @@ public class EditLessonActivity extends AppCompatActivity {
         lessonData.setLocalVideoName("");
         lessonData.setLocalVideoUri("");
         lessonData.setVideoUrl("");
+        lessonData.setDurationSeconds(0);
         renderVideoName();
         markDirty();
     }
@@ -869,6 +875,28 @@ public class EditLessonActivity extends AppCompatActivity {
         return hasValue(value)
                 && !value.startsWith("http://")
                 && !value.startsWith("https://");
+    }
+
+    private int readVideoDurationSeconds(Uri uri) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(this, uri);
+            String durationMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            if (!hasValue(durationMs)) {
+                return 0;
+            }
+
+            long millis = Long.parseLong(durationMs);
+            return millis > 0 ? (int) Math.max(1, (millis + 999) / 1000) : 0;
+        } catch (Exception e) {
+            Log.w(TAG, "Cannot read video duration", e);
+            return 0;
+        } finally {
+            try {
+                retriever.release();
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private String getDisplayName(Uri uri) {

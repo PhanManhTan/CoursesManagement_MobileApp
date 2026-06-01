@@ -112,14 +112,19 @@ public class ChapterRepository {
     }
 
     public void update(String id, Chapter chapter, RepositoryCallback<Void> callback) {
-        chapterApi.update("eq." + id, createWritePayload(chapter)).enqueue(new Callback<Void>() {
+        chapterApi.updateAndReturn("return=representation", "eq." + id, createWritePayload(chapter)).enqueue(new Callback<List<Chapter>>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) callback.onSuccess(null);
-                else callback.onError(getErrorMessage(response));
+            public void onResponse(Call<List<Chapter>> call, Response<List<Chapter>> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    callback.onSuccess(null);
+                } else if (response.isSuccessful()) {
+                    callback.onError("Chapter not found on server");
+                } else {
+                    callback.onError(getErrorMessage(response));
+                }
             }
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<List<Chapter>> call, Throwable t) {
                 callback.onError(t.getMessage());
             }
         });

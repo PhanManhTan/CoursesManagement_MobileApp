@@ -21,6 +21,7 @@ public class LessonEditorData implements Serializable {
     private String documentUrl;
     private String contentType;
     private int orderIndex;
+    private int durationSeconds;
     private String localVideoName;
     private String localVideoUri;
     private ArrayList<String> localFileNames = new ArrayList<>();
@@ -41,6 +42,7 @@ public class LessonEditorData implements Serializable {
         data.documentUrl = lesson.getDocumentUrl();
         data.contentType = lesson.getContentType();
         data.orderIndex = lesson.getOrderIndex();
+        data.durationSeconds = lesson.getDurationSeconds();
 
         Map<String, Object> content = getContentMap(lesson.getContent());
         data.description = getMapString(content, "description");
@@ -93,6 +95,7 @@ public class LessonEditorData implements Serializable {
         lesson.setDocumentUrl(documentUrl);
         lesson.setContentType(resolveContentType());
         lesson.setOrderIndex(orderIndex);
+        lesson.setDurationSeconds(durationSeconds);
 
         lesson.clearLocalVideoFile();
         if (hasValue(localVideoUri) || hasValue(videoUrl)) {
@@ -433,6 +436,14 @@ public class LessonEditorData implements Serializable {
 
     public void setOrderIndex(int orderIndex) {
         this.orderIndex = orderIndex;
+    }
+
+    public int getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(int durationSeconds) {
+        this.durationSeconds = Math.max(0, durationSeconds);
     }
 
     public String getLocalVideoName() {

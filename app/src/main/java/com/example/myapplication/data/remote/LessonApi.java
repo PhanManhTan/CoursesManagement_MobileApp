@@ -39,6 +39,13 @@ public interface LessonApi {
     @PATCH("lessons")
     Call<Void> updateById(@Query("id") String idFilter, @Body Map<String, Object> lesson);
 
+    @PATCH("lessons?select=*")
+    Call<List<Lesson>> updateByIdAndReturn(
+            @Header("Prefer") String prefer,
+            @Query("id") String idFilter,
+            @Body Map<String, Object> lesson
+    );
+
     // Delete Lesson by ID
     @DELETE("lessons")
     Call<Void> delete(@Query("id") String idFilter);

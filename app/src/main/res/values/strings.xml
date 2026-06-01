@@ -355,6 +355,9 @@
     <string name="course_title_required">Enter a course title before saving.</string>
     <string name="description_required">Enter a course description before saving.</string>
     <string name="invalid_price">Enter a valid price using numbers only.</string>
+    <string name="select_category">Select category</string>
+    <string name="course_category_required">Select a category before saving.</string>
+    <string name="error_loading_categories">Cannot load categories: %1$s</string>
     <string name="wait_uploads_finish">Upload is still in progress. Wait until it finishes before saving.</string>
     <string name="media_not_uploaded">Some selected media files have not uploaded successfully. Re-select the file or wait for upload to finish before saving.</string>
     <string name="cannot_open_image_picker">Cannot open image picker</string>

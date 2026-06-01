@@ -106,14 +106,19 @@ public class LessonRepository {
     }
 
     public void update(String id, Lesson lesson, RepositoryCallback<Void> callback) {
-        lessonApi.updateById("eq." + id, createWritePayload(lesson)).enqueue(new Callback<Void>() {
+        lessonApi.updateByIdAndReturn("return=representation", "eq." + id, createWritePayload(lesson)).enqueue(new Callback<List<Lesson>>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) callback.onSuccess(null);
-                else callback.onError(getErrorMessage(response));
+            public void onResponse(Call<List<Lesson>> call, Response<List<Lesson>> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    callback.onSuccess(null);
+                } else if (response.isSuccessful()) {
+                    callback.onError("Lesson not found on server");
+                } else {
+                    callback.onError(getErrorMessage(response));
+                }
             }
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<List<Lesson>> call, Throwable t) {
                 callback.onError(t.getMessage());
             }
         });
