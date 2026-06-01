@@ -303,7 +303,6 @@ public class SupabaseStorageRepository {
     }
 
     private void redirectToLogin() {
-        sessionManager.clear();
         new Handler(Looper.getMainLooper()).post(() -> {
             Toast.makeText(context, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(context, LoginActivity.class);

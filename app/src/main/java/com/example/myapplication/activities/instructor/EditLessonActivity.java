@@ -1077,7 +1077,6 @@ public class EditLessonActivity extends AppCompatActivity {
     }
 
     private void redirectToLogin() {
-        sessionManager.clear();
         Toast.makeText(this, R.string.session_expired_login_again, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -187,9 +187,10 @@ public class OtpVerifyActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
 
                     String accessToken = response.body().getAccessToken();
+                    String refreshToken = response.body().getRefreshToken();
 
                     // Sử dụng SessionManager để lưu token đồng bộ với RetrofitClient
-                    sessionManager.saveSession(accessToken, response.body().getUser().getId(), "student");
+                    sessionManager.saveSession(accessToken, refreshToken, response.body().getUser().getId(), "student");
 
                     Toast.makeText(OtpVerifyActivity.this, R.string.verified_success, Toast.LENGTH_SHORT).show();
 

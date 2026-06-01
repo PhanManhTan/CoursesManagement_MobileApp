@@ -12,6 +12,7 @@ public class SessionManager {
 
     private static final String PREF_NAME = "auth_prefs";
     private static final String KEY_TOKEN = "access_token";
+    private static final String KEY_REFRESH_TOKEN = "refresh_token";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_ROLE = "user_role";
     private static final String KEY_FULL_NAME = "profile_full_name";
@@ -32,6 +33,10 @@ public class SessionManager {
     }
 
     public void saveSession(String token, String userId, String role) {
+        saveSession(token, null, userId, role);
+    }
+
+    public void saveSession(String token, String refreshToken, String userId, String role) {
         String currentUserId = prefs.getString(KEY_USER_ID, null);
         boolean userChanged = hasValue(currentUserId) && !currentUserId.equals(userId);
 
@@ -45,11 +50,18 @@ public class SessionManager {
                     .remove(KEY_EMAIL)
                     .remove(KEY_BIO)
                     .remove(KEY_AVATAR_URL);
+            if (!hasValue(refreshToken)) {
+                editor.remove(KEY_REFRESH_TOKEN);
+            }
             cachedFullNameStatic = null;
             cachedEmailStatic = null;
             cachedBioStatic = null;
             cachedAvatarUrlStatic = null;
             isProfileLoadedStatic = false;
+        }
+
+        if (hasValue(refreshToken)) {
+            editor.putString(KEY_REFRESH_TOKEN, refreshToken);
         }
 
         editor.apply();
@@ -110,12 +122,11 @@ public class SessionManager {
     }
 
     public String getToken() {
-        String token = prefs.getString(KEY_TOKEN, null);
-        if (hasValue(token) && isTokenExpired(token)) {
-            clear();
-            return null;
-        }
-        return token;
+        return prefs.getString(KEY_TOKEN, null);
+    }
+
+    public String getRefreshToken() {
+        return prefs.getString(KEY_REFRESH_TOKEN, null);
     }
 
     public String getUserId() {
@@ -128,7 +139,7 @@ public class SessionManager {
 
     public boolean isLoggedIn() {
         String token = getToken();
-        return hasValue(token)
+        return (hasValue(token) || hasValue(getRefreshToken()))
                 && hasValue(getUserId())
                 && hasValue(getRole());
     }
@@ -146,7 +157,7 @@ public class SessionManager {
         return value != null && !value.trim().isEmpty();
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isAccessTokenExpired(String token) {
         try {
             String[] parts = token.split("\\.");
             if (parts.length < 2) {
