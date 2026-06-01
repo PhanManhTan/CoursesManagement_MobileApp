@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
 import com.example.myapplication.utils.LanguageManager;
-import com.example.myapplication.utils.VNPayUtils;
 
 public class VNPAYActivity extends AppCompatActivity {
     private WebView webView;
@@ -43,15 +42,24 @@ public class VNPAYActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 progressBar.setVisibility(View.GONE);
 
-                // Nếu URL bắt đầu bằng ReturnUrl ảo của chúng ta
-                if (url.startsWith(VNPayUtils.vnp_ReturnUrl)) {
+                // SỬA Ở ĐÂY: Chỉ cần URL chứa từ khóa kết quả của VNPay là xử lý luôn
+                if (url.contains("vnp_ResponseCode") && url.contains("vnp_TransactionNo")) {
                     Intent resultIntent = new Intent();
-                    if (url.contains("vnp_ResponseCode=00")) {
+                    resultIntent.putExtra("FULL_RETURN_URL", url);
+
+                    android.net.Uri uri = android.net.Uri.parse(url);
+                    String txnNo = uri.getQueryParameter("vnp_TransactionNo");
+                    if (txnNo != null) {
+                        resultIntent.putExtra("vnp_TransactionNo", txnNo);
+                    }
+
+                    // Kiểm tra nếu mã thành công là 00
+                    if (url.contains("vnp_ResponseCode=00") || url.contains("vnp_TransactionStatus=00")) {
                         setResult(Activity.RESULT_OK, resultIntent);
                     } else {
                         setResult(Activity.RESULT_CANCELED, resultIntent);
                     }
-                    finish(); // Đóng WebView, trở về Checkout
+                    finish();
                 }
             }
         });

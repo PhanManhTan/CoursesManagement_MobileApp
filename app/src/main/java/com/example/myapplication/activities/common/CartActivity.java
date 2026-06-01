@@ -2,7 +2,6 @@ package com.example.myapplication.activities.common;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,7 +38,7 @@ public class CartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.cart_activity);
+        setContentView(R.layout.activity_cart);
 
         initViews();
         initRepositories();
@@ -62,7 +61,7 @@ public class CartActivity extends AppCompatActivity {
             for (Cart item : cartItems) {
                 Course course = item.getCourse();
                 if (course != null) {
-                    total += (course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice());
+                    total += course.getDiscountPrice();
                 }
                 cartIds.add(item.getId());
                 courseIds.add(item.getCourseId());
@@ -160,7 +159,7 @@ public class CartActivity extends AppCompatActivity {
         for (Cart item : cartItems) {
             Course course = item.getCourse();
             if (course != null) {
-                total += (course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice());
+                total += course.getDiscountPrice();
             }
         }
         tvTotalPrice.setText(String.format("%,.0fđ", total));

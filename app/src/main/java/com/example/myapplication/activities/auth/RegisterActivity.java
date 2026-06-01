@@ -52,8 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         roleCodes = new String[]{"student", "instructor"};
         String[] roles = {getString(R.string.student_fallback), getString(R.string.instructor_fallback)};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, roles);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, roles);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
         spRole.setAdapter(adapter);
 
         btnRegister.setOnClickListener(v -> attemptRegister());
