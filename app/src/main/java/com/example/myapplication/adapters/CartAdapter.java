@@ -10,13 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
+import com.example.myapplication.data.repository.UserRepository;
 import com.example.myapplication.models.Cart;
 import com.example.myapplication.models.Course;
+import com.example.myapplication.models.User;
+
 import java.util.List;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
     private List<Cart> cartList;
     private OnItemClickListener listener;
+    private UserRepository userRepository;
 
     public interface OnItemClickListener {
         void onDeleteClick(Cart cart, int position);
@@ -34,6 +38,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart, parent, false);
+        if (userRepository == null) {
+            userRepository = new UserRepository(parent.getContext());
+        }
         return new CartViewHolder(view);
     }
 
@@ -44,8 +51,34 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         if (course != null) {
             holder.tvTitle.setText(course.getTitle());
-            holder.tvInstructor.setText(holder.itemView.getContext().getString(R.string.instructor_label_format, course.getInstructorId()));
-            holder.tvPrice.setText(String.format("%,.0fđ", course.getDiscountPrice() > 0 ? course.getDiscountPrice() : course.getPrice()));
+
+            // Hiển thị trạng thái đang tải tên giảng viên
+            holder.tvInstructor.setText(R.string.loading);
+            String instructorId = course.getInstructorId();
+            holder.tvInstructor.setTag(instructorId);
+
+            userRepository.getById(instructorId, new UserRepository.RepositoryCallback<User>() {
+                @Override
+                public void onSuccess(User user) {
+                    if (user != null && instructorId.equals(holder.tvInstructor.getTag())) {
+                        holder.tvInstructor.setText(holder.itemView.getContext().getString(
+                                R.string.instructor_label_format, user.getFullName()));
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (instructorId.equals(holder.tvInstructor.getTag())) {
+                        holder.tvInstructor.setText(R.string.unknown_instructor);
+                    }
+                }
+            });
+
+            // FIX: Luôn ưu tiên lấy discount_price làm giá bán chính thức.
+            // Ngay cả khi discount_price = 0 (khóa học miễn phí), nó vẫn sẽ lấy 0đ thay vì quay về giá gốc.
+            double displayPrice = course.getDiscountPrice();
+
+            holder.tvPrice.setText(String.format("%,.0fđ", displayPrice));
 
             if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
                 Glide.with(holder.itemView.getContext())
@@ -77,7 +110,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public static class CartViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvInstructor, tvPrice;
         ImageView ivThumb, btnDelete;
-        
+
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvCourseTitle);

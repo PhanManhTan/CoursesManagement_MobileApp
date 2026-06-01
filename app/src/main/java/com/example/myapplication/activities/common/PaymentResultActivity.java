@@ -2,6 +2,7 @@ package com.example.myapplication.activities.common;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -16,21 +17,23 @@ public class PaymentResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.payment_result_activity);
+        setContentView(R.layout.activity_payment_result);
 
+        View layoutTransaction = findViewById(R.id.layoutTransaction);
         TextView tvTransactionId = findViewById(R.id.tvTransactionId);
         Button btnBackToHome = findViewById(R.id.btnBackToHome);
 
-        // Giả sử bạn nhận được mã giao dịch từ Intent (khi xử lý Deep Link VNPay trả về)
-        String vnp_ResponseCode = getIntent().getStringExtra("vnp_ResponseCode");
-        String transactionId = getIntent().getStringExtra("vnp_TransactionNo");
+        // Nhận mã giao dịch thật từ CheckoutActivity
+        String transactionId = getIntent().getStringExtra("TRANSACTION_ID");
 
-        if (transactionId != null) {
+        if (transactionId != null && !transactionId.isEmpty()) {
             tvTransactionId.setText("#" + transactionId);
+            layoutTransaction.setVisibility(View.VISIBLE); // Hiển thị mã
+        } else {
+            layoutTransaction.setVisibility(View.GONE); // Ẩn đi nếu là khóa free
         }
 
         btnBackToHome.setOnClickListener(v -> {
-            // Quay về HomeActivity và xóa sạch các Activity trung gian (Cart, Checkout)
             Intent intent = new Intent(this, HomeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);

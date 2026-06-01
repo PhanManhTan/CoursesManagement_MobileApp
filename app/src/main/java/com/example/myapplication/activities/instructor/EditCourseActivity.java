@@ -139,8 +139,8 @@ public class EditCourseActivity extends AppCompatActivity {
     }
 
     private void setupCategorySpinner() {
-        categoryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, new ArrayList<>());
-        categoryAdapter.setDropDownViewResource(R.layout.spinner_item);
+        categoryAdapter = new ArrayAdapter<>(this, R.layout.item_spinner, new ArrayList<>());
+        categoryAdapter.setDropDownViewResource(R.layout.item_spinner);
         spCategory.setAdapter(categoryAdapter);
         spCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

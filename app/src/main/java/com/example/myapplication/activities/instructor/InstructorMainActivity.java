@@ -36,7 +36,6 @@ import com.example.myapplication.adapters.RecentActivityAdapter;
 import com.example.myapplication.data.repository.NotificationRepository;
 import com.example.myapplication.models.Notification;
 import com.example.myapplication.activities.auth.LoginActivity;
-import com.example.myapplication.activities.common.NotificationActivity;
 import com.example.myapplication.activities.common.EditProfileActivity;
 import com.example.myapplication.data.remote.RetrofitClient;
 import com.example.myapplication.data.repository.CourseRepository;
@@ -625,8 +624,8 @@ public class InstructorMainActivity extends AppCompatActivity
             ids.add(course.getId());
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
         spReviewCourseFilter.setOnItemClickListener(null);
         setupDropdownOpenBehavior(spReviewCourseFilter);
         spReviewCourseFilter.setAdapter(adapter);
@@ -1005,8 +1004,8 @@ public class InstructorMainActivity extends AppCompatActivity
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
         dropdown.setOnItemClickListener(null);
         setupDropdownOpenBehavior(dropdown);
         dropdown.setAdapter(adapter);
@@ -1079,8 +1078,8 @@ public class InstructorMainActivity extends AppCompatActivity
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
         dropdown.setOnItemClickListener(null);
         setupDropdownOpenBehavior(dropdown);
         dropdown.setAdapter(adapter);
