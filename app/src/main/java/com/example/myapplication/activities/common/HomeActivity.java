@@ -16,6 +16,7 @@ import com.example.myapplication.adapters.CourseAdapter;
 import com.example.myapplication.activities.auth.LoginActivity;
 import com.example.myapplication.data.repository.CartRepository;
 import com.example.myapplication.models.Cart;
+import com.example.myapplication.models.Course;
 import com.example.myapplication.utils.BottomNavigationHelper;
 import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
@@ -63,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
         setupRecyclerViews();
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+
         homeViewModel.getCategories().observe(this, categories -> {
             categoryAdapter.setCategories(categories);
             if (categories == null || categories.isEmpty()) {
@@ -73,14 +75,29 @@ public class HomeActivity extends AppCompatActivity {
                 rvCategories.setVisibility(View.VISIBLE);
             }
         });
+
+        // MODIFIED: Filter featured courses to only include those with "approved" status
         homeViewModel.getFeaturedCourses().observe(this, courses -> {
-            courseAdapter.setCourses(courses);
-            if (courses == null || courses.isEmpty()) {
+            java.util.List<Course> approvedCourses = new java.util.ArrayList<>();
+
+            if (courses != null) {
+                for (Course course : courses) {
+                    if ("approved".equalsIgnoreCase(course.getStatus())) {
+                        approvedCourses.add(course);
+                    }
+                }
+            }
+
+            courseAdapter.setCourses(approvedCourses);
+
+            if (approvedCourses.isEmpty()) {
                 tvEmptyFeaturedCourses.setVisibility(View.VISIBLE);
                 rvFeaturedCourses.setVisibility(View.GONE);
+                android.util.Log.d("HomeActivity", "No approved featured courses available to display.");
             } else {
                 tvEmptyFeaturedCourses.setVisibility(View.GONE);
                 rvFeaturedCourses.setVisibility(View.VISIBLE);
+                android.util.Log.d("HomeActivity", "Successfully loaded " + approvedCourses.size() + " approved featured courses.");
             }
         });
 

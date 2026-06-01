@@ -1,6 +1,7 @@
 package com.example.myapplication.data.repository;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.myapplication.data.remote.CourseApi;
 import com.example.myapplication.data.remote.RetrofitClient;
@@ -16,6 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CourseRepository {
+    private static final String TAG = "CourseRepository";
     private final CourseApi courseApi;
 
     public interface RepositoryCallback<T> {
@@ -27,63 +29,99 @@ public class CourseRepository {
         courseApi = RetrofitClient.getClient(context).create(CourseApi.class);
     }
 
-    // Get all Courses from remote
+    // MODIFIED: Fetch only approved courses for general display (e.g., Home Activity)
     public void getAll(RepositoryCallback<List<Course>> callback) {
-        courseApi.getAll().enqueue(new Callback<List<Course>>() {
+        Log.d(TAG, "Fetching all approved courses");
+        courseApi.getByStatus("eq.approved").enqueue(new Callback<List<Course>>() {
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "Successfully fetched approved courses");
                     callback.onSuccess(response.body());
                 } else {
+                    Log.e(TAG, "Failed to fetch approved courses: " + getErrorMessage(response));
                     callback.onError(getErrorMessage(response));
                 }
             }
 
             @Override
             public void onFailure(Call<List<Course>> call, Throwable t) {
+                Log.e(TAG, "Error fetching approved courses: " + t.getMessage());
                 callback.onError(t.getMessage());
             }
         });
     }
 
-    // Search courses by title
+    // MODIFIED: Search only approved courses by title
     public void search(String query, RepositoryCallback<List<Course>> callback) {
-        courseApi.search("ilike.*" + query + "*").enqueue(new Callback<List<Course>>() {
+        Log.d(TAG, "Searching approved courses with query: " + query);
+        courseApi.search("ilike.*" + query + "*", "eq.approved").enqueue(new Callback<List<Course>>() {
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "Successfully searched approved courses");
                     callback.onSuccess(response.body());
                 } else {
+                    Log.e(TAG, "Failed to search approved courses: " + getErrorMessage(response));
                     callback.onError(getErrorMessage(response));
                 }
             }
 
             @Override
             public void onFailure(Call<List<Course>> call, Throwable t) {
+                Log.e(TAG, "Error searching approved courses: " + t.getMessage());
                 callback.onError(t.getMessage());
             }
         });
     }
 
-    // Get courses by category ID
+    // MODIFIED: Get only approved courses by category ID
     public void getByCategoryId(String categoryId, RepositoryCallback<List<Course>> callback) {
-        courseApi.getByCategoryId("eq." + categoryId).enqueue(new Callback<List<Course>>() {
+        Log.d(TAG, "Fetching approved courses for category ID: " + categoryId);
+        courseApi.getByCategoryId("eq." + categoryId, "eq.approved").enqueue(new Callback<List<Course>>() {
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "Successfully fetched approved courses by category");
                     callback.onSuccess(response.body());
                 } else {
+                    Log.e(TAG, "Failed to fetch approved courses by category: " + getErrorMessage(response));
                     callback.onError(getErrorMessage(response));
                 }
             }
 
             @Override
             public void onFailure(Call<List<Course>> call, Throwable t) {
+                Log.e(TAG, "Error fetching approved courses by category: " + t.getMessage());
                 callback.onError(t.getMessage());
             }
         });
     }
 
+    // MODIFIED: Search only approved courses by category and title
+    public void searchByCategoryAndTitle(String categoryId, String query, RepositoryCallback<List<Course>> callback) {
+        Log.d(TAG, "Searching approved courses by category ID: " + categoryId + " and query: " + query);
+        courseApi.searchByCategoryAndTitle("eq." + categoryId, "ilike.*" + query + "*", "eq.approved").enqueue(new Callback<List<Course>>() {
+            @Override
+            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Successfully searched approved courses by category and title");
+                    callback.onSuccess(response.body());
+                } else {
+                    Log.e(TAG, "Failed to search approved courses by category and title: " + getErrorMessage(response));
+                    callback.onError(getErrorMessage(response));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Course>> call, Throwable t) {
+                Log.e(TAG, "Error searching approved courses by category and title: " + t.getMessage());
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    // UNMODIFIED: Instructor methods remain unchanged to allow them to see their unapproved courses
     public void getByInstructor(String instructorId, RepositoryCallback<List<Course>> callback) {
         courseApi.getByInstructor("eq." + instructorId).enqueue(new Callback<List<Course>>() {
             @Override
@@ -120,7 +158,6 @@ public class CourseRepository {
         });
     }
 
-    // Get Course by ID and handle Supabase List response
     public void getById(String id, RepositoryCallback<Course> callback) {
         courseApi.getById("eq." + id).enqueue(new Callback<List<Course>>() {
             @Override
@@ -308,23 +345,5 @@ public class CourseRepository {
         if (value != null && !value.isEmpty()) {
             payload.put(key, value);
         }
-    }
-
-    public void searchByCategoryAndTitle(String categoryId, String query, RepositoryCallback<List<Course>> callback) {
-        courseApi.searchByCategoryAndTitle("eq." + categoryId, "ilike.*" + query + "*").enqueue(new Callback<List<Course>>() {
-            @Override
-            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(response.body());
-                } else {
-                    callback.onError(getErrorMessage(response));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Course>> call, Throwable t) {
-                callback.onError(t.getMessage());
-            }
-        });
     }
 }

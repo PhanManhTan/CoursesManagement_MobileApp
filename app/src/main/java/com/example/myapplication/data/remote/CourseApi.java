@@ -17,9 +17,12 @@ public interface CourseApi {
     @GET("courses?select=*")
     Call<List<Course>> getAll();
 
-    // Search courses by title (using ilike)
+    // MODIFIED: Added statusFilter to search courses by title and status
     @GET("courses?select=*")
-    Call<List<Course>> search(@Query("title") String titleFilter);
+    Call<List<Course>> search(
+            @Query("title") String titleFilter,
+            @Query("status") String statusFilter
+    );
 
     // Get Course by ID
     @GET("courses?select=*")
@@ -39,9 +42,12 @@ public interface CourseApi {
     @GET("courses?select=*")
     Call<List<Course>> getByStatus(@Query("status") String statusFilter);
 
-    // Get Courses by Category
+    // MODIFIED: Added statusFilter to get courses by category and status
     @GET("courses?select=*")
-    Call<List<Course>> getByCategoryId(@Query("category_id") String categoryIdFilter);
+    Call<List<Course>> getByCategoryId(
+            @Query("category_id") String categoryIdFilter,
+            @Query("status") String statusFilter
+    );
 
     // Insert new Course
     @POST("courses")
@@ -73,10 +79,11 @@ public interface CourseApi {
             @Query("instructor_id") String instructorFilter
     );
 
+    // MODIFIED: Added statusFilter to search by category, title, and status
     @GET("courses?select=*")
     Call<List<Course>> searchByCategoryAndTitle(
             @Query("category_id") String categoryId,
-            @Query("title") String title
+            @Query("title") String title,
+            @Query("status") String statusFilter
     );
 }
-

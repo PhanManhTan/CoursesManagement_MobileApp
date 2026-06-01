@@ -217,7 +217,19 @@ public class SearchActivity extends AppCompatActivity {
     private void displayCourses(List<Course> courses) {
         searchResultsContainer.removeAllViews();
 
-        if (courses == null || courses.isEmpty()) {
+        // Filter the incoming courses to only process those with "approved" status
+        List<Course> approvedCourses = new ArrayList<>();
+        if (courses != null) {
+            for (Course course : courses) {
+                if ("approved".equalsIgnoreCase(course.getStatus())) {
+                    approvedCourses.add(course);
+                }
+            }
+        }
+
+        // Check against the filtered list rather than the original list
+        if (approvedCourses.isEmpty()) {
+            android.util.Log.d("SearchActivity", "No approved courses found for the given search criteria.");
             TextView tvEmpty = new TextView(SearchActivity.this);
             tvEmpty.setText(R.string.no_courses_found);
             tvEmpty.setPadding(32, 32, 32, 32);
@@ -227,7 +239,9 @@ public class SearchActivity extends AppCompatActivity {
             return;
         }
 
-        for (Course course : courses) {
+        android.util.Log.d("SearchActivity", "Displaying " + approvedCourses.size() + " approved courses.");
+
+        for (Course course : approvedCourses) {
             View itemView = getLayoutInflater().inflate(R.layout.item_course_search, searchResultsContainer, false);
 
             TextView title = itemView.findViewById(R.id.tvCourseTitle);
@@ -249,12 +263,16 @@ public class SearchActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String message) {
+                    android.util.Log.e("SearchActivity", "Failed to load instructor for course ID: " + course.getId());
                     instructor.setText(R.string.unknown_instructor);
                 }
             });
 
             if (course.getThumbnailUrl() != null && !course.getThumbnailUrl().isEmpty()) {
-                Glide.with(SearchActivity.this).load(course.getThumbnailUrl()).placeholder(R.drawable.image_courses).into(thumb);
+                Glide.with(SearchActivity.this)
+                        .load(course.getThumbnailUrl())
+                        .placeholder(R.drawable.image_courses)
+                        .into(thumb);
             } else {
                 thumb.setImageResource(R.drawable.image_courses);
             }
