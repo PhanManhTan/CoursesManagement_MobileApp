@@ -54,31 +54,36 @@
             android:textColor="@color/text_secondary"
             android:textSize="16sp" />
 
-        <View
+        <LinearLayout
+            android:id="@+id/layoutTransaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"> <View
             android:layout_width="100dp"
             android:layout_height="1dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"
             android:background="@color/bg_tertiary" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/transaction_id_upper"
-            android:textColor="@color/text_hint"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transaction_id_upper"
+                android:textColor="@color/text_hint"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvTransactionId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="#VNP12345678"
-            android:textColor="@color/accent_light"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
+            <TextView
+                android:id="@+id/tvTransactionId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/accent_light"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
     <Button

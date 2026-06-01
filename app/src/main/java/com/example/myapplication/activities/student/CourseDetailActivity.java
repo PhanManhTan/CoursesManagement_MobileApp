@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
 import com.example.myapplication.activities.common.CartActivity;
+import com.example.myapplication.activities.common.CheckoutActivity;
 import com.example.myapplication.adapters.ChapterAdapter;
 import com.example.myapplication.adapters.ReviewAdapter;
 import com.example.myapplication.data.repository.CartRepository;
@@ -36,6 +37,7 @@ import com.example.myapplication.utils.LanguageManager;
 import com.example.myapplication.utils.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CourseDetailActivity extends AppCompatActivity {
@@ -64,7 +66,7 @@ public class CourseDetailActivity extends AppCompatActivity {
     private String userId;
     private List<Cart> currentCartItems = new java.util.ArrayList<>();
     private boolean isEnrolled = false;
-
+    private Course currentCourse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +115,36 @@ public class CourseDetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         btnCartContainer.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
         btnAddToCart.setOnClickListener(v -> addToCart());
-        
+
         btnEnroll.setOnClickListener(v -> {
-            Toast.makeText(this, R.string.buy_feature_coming_soon, Toast.LENGTH_SHORT).show();
+            // Kiểm tra đăng nhập
+            if (userId == null) {
+                Toast.makeText(this, R.string.login_to_add_cart, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Kiểm tra nếu đã mua rồi
+            if (isEnrolled) {
+                Toast.makeText(this, "You have already enrolled in this course!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Kiểm tra dữ liệu khóa học đã load xong chưa
+            if (currentCourse == null) return;
+
+            // Lấy giá trị thanh toán cuối cùng (có giảm giá thì lấy giá giảm)
+            double priceToPay = currentCourse.getDiscountPrice();
+
+            ArrayList<String> courseIdsToCheckout = new ArrayList<>();
+            courseIdsToCheckout.add(currentCourse.getId());
+
+            ArrayList<String> emptyCartIds = new ArrayList<>(); // Danh sách giỏ hàng trống vì mua trực tiếp
+
+            // Chuyển hướng sang CheckoutActivity
+            Intent intent = new Intent(CourseDetailActivity.this, CheckoutActivity.class);
+            intent.putExtra("TOTAL_AMOUNT", priceToPay);
+            intent.putStringArrayListExtra("COURSE_IDS", courseIdsToCheckout);
+            intent.putStringArrayListExtra("CART_IDS", emptyCartIds); // Truyền mảng rỗng
+
+            startActivity(intent);
         });
     }
 
@@ -222,6 +251,8 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Course course) {
                 if (course != null) {
+                    currentCourse = course;
+
                     boolean isAdmin = "admin".equalsIgnoreCase(sessionManager.getRole());
                     boolean isOwner = course.getInstructorId() != null && course.getInstructorId().equals(userId);
                     

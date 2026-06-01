@@ -33,7 +33,7 @@ public class NotificationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.notification_activity);
+        setContentView(R.layout.activity_notification);
 
         sessionManager = new SessionManager(this);
         notificationRepository = new NotificationRepository(this);
