@@ -6,86 +6,386 @@
 [![Database](https://img.shields.io/badge/Backend-Supabase-blueviolet.svg)](https://supabase.com/)
 [![Payment](https://img.shields.io/badge/Payment-VNPAY-red.svg)](https://vnpay.vn/)
 
-Đây là ứng dụng di động quản lý khóa học và học trực tuyến (E-learning) được phát triển native trên nền tảng **Android (Java)**. Ứng dụng cung cấp giải pháp toàn diện cho việc học tập trực tuyến, kết nối giữa Học viên, Giảng viên và Quản trị viên trên một nền tảng đồng nhất.
+---
+
+# Courses Management Mobile App
+
+Ứng dụng Android quản lý khóa học và học trực tuyến, hỗ trợ 3 nhóm người dùng chính: **Student**, **Instructor** và **Admin**.
+Dự án được xây dựng bằng **Android Native Java**, kết nối dữ liệu qua **Supabase**, hỗ trợ xem video bài học, quản lý khóa học, giỏ hàng, thanh toán, thông báo và thống kê.
+
 
 ---
 
-## 🏛️ Kiến Trúc & Công Nghệ Sử Dụng
+## Giới thiệu
 
-Dự án được xây dựng dựa trên các tiêu chuẩn phát triển Android hiện đại:
+**Courses Management Mobile App** là ứng dụng mobile phục vụ hệ thống học trực tuyến. Ứng dụng cho phép học viên tìm kiếm, đăng ký và học các khóa học; giảng viên tạo và quản lý nội dung khóa học; quản trị viên theo dõi, kiểm duyệt và quản lý hệ thống.
 
-- **Kiến trúc MVVM (Model-View-ViewModel)**: Đảm bảo mã nguồn sạch sẽ, tách biệt logic nghiệp vụ khỏi giao diện người dùng (UI), dễ bảo trì và viết unit test. Sử dụng `LiveData` để cập nhật UI thời gian thực theo trạng thái dữ liệu.
-- **Mạng & API (Retrofit 2 & OkHttp 3)**: Kết nối và giao tiếp dữ liệu với Backend thông qua các endpoint RESTful APIs.
-- **Backend & Database (Supabase)**:
-  - **PostgreSQL Database**: Lưu trữ dữ liệu về tài khoản, thông tin khóa học, chương học, bài giảng, giỏ hàng, tiến trình học và các tương tác của người dùng.
-  - **Supabase Storage**: Lưu trữ đám mây và tải dữ liệu đa phương tiện (avatar người dùng, ảnh bìa khóa học, video bài giảng).
-  - **Supabase Edge Functions**: Triển khai hàm xử lý Cloud (Function `send-fcm`) dùng để trigger gửi thông báo đẩy tự động.
-- **Thông báo đẩy (Firebase Cloud Messaging - FCM)**: Nhận thông báo thời gian thực khi có sự kiện phát sinh (Ví dụ: thông báo có khóa học mới, mua hàng thành công, phản hồi bình luận).
-- **Cổng thanh toán (VNPAY)**: Tích hợp SDK thanh toán của VNPAY, cho phép người dùng thanh toán khóa học bằng thẻ ngân hàng hoặc ví điện tử nội địa một cách an toàn.
-- **Trình phát Video (Google ExoPlayer)**: Trình phát video chuyên nghiệp hỗ trợ stream các bài giảng video mượt mà, hỗ trợ kiểm soát trạng thái phát.
-- **Vẽ biểu đồ (MPAndroidChart)**: Trực quan hóa dữ liệu thống kê doanh thu và báo cáo lượng học viên cho Giảng viên và Admin.
-- **Quản lý hình ảnh (Glide)**: Tải, bộ nhớ đệm (caching) và tối ưu hóa hiển thị ảnh từ các URL lưu trữ.
+Ứng dụng hướng đến các chức năng chính của một nền tảng E-learning:
 
----
-
-## 👥 Các Phân Hệ & Tính Năng Chi Tiết
-
-Dự án phân chia chức năng theo 3 nhóm đối tượng người dùng chính:
-
-### 1. Phân hệ Học Viên (Student)
-- **Xác thực tài khoản**: Đăng ký, Đăng nhập, Quên mật khẩu, Xác thực mã OTP thông qua Email đăng ký.
-- **Khám phá khóa học**:
-  - Tìm kiếm khóa học theo từ khóa hoặc bộ lọc danh mục.
-  - Xem chi tiết khóa học: Đề cương chi tiết (Chương/Bài học), thông tin giảng viên hướng dẫn, đánh giá xếp hạng từ các học viên khác.
-- **Giỏ hàng & Thanh toán**:
-  - Thêm các khóa học yêu thích vào giỏ hàng.
-  - Tiến hành thanh toán trực tuyến qua cổng **VNPAY**, nhận phản hồi kết quả thanh toán ngay trên ứng dụng và kích hoạt khóa học tự động.
-- **Học tập trực quan**:
-  - Xem danh sách bài học và xem video bài giảng bằng **ExoPlayer**.
-  - Theo dõi tiến độ học tập cá nhân (đánh dấu bài học đã hoàn thành).
-  - Làm bài kiểm tra trắc nghiệm (Quiz) đánh giá năng lực cuối mỗi chương học.
-- **Tương tác xã hội**: Bình luận, trao đổi bài học trực tiếp với giảng viên/học viên khác; viết đánh giá và xếp hạng (Rating) cho khóa học đã mua.
-
-### 2. Phân hệ Giảng Viên (Instructor)
-- **Quản lý khóa học cá nhân**: Tạo khóa học mới, thiết lập mô tả, giá bán và hình ảnh đại diện.
-- **Thiết lập chương trình giảng dạy**:
-  - Thêm/Sửa/Xóa các chương học (Chapters).
-  - Thêm/Sửa/Xóa các bài giảng (Lessons) và tải trực tiếp video bài giảng lên **Supabase Storage** ngay từ thiết bị di động.
-- **Thống kê hiệu suất & Doanh thu**: Theo dõi tổng doanh thu, số lượng học viên đăng ký qua các biểu đồ cột và đường sinh động (**MPAndroidChart**).
-- **Quản lý hồ sơ**: Cập nhật thông tin tiểu sử, chuyên môn giảng dạy.
-
-### 3. Phân hệ Quản Trị Viên (Admin)
-- **Màn hình Dashboard**: Theo dõi số liệu toàn hệ thống về tổng số người dùng, số khóa học, doanh thu tổng.
-- **Quản lý & Phê duyệt**: Xem xét và duyệt các khóa học mới được tạo bởi giảng viên trước khi cho phép hiển thị công khai trên ứng dụng.
+* Xác thực tài khoản.
+* Tìm kiếm và xem chi tiết khóa học.
+* Quản lý giỏ hàng và thanh toán.
+* Xem video bài giảng.
+* Theo dõi tiến độ học tập.
+* Đánh giá, bình luận khóa học.
+* Quản lý khóa học cho giảng viên.
+* Quản lý người dùng, khóa học và báo cáo cho admin.
+* Gửi thông báo đẩy qua Firebase Cloud Messaging.
 
 ---
 
-## ⚙️ Hướng Dẫn Cấu Hình & Cài Đặt Dự Án
+## Tính năng chính
 
-### 1. Cấu hình biến môi trường (`local.properties`)
-Bạn cần tạo hoặc cập nhật file `local.properties` tại thư mục gốc của dự án Android Studio với nội dung như sau:
+### 1. Student
 
-```properties
-# Đường dẫn SDK Android (Tự động thiết lập bởi Android Studio)
-sdk.dir=C\:\\Users\\Tancoder\\AppData\\Local\\Android\\Sdk
+Nhóm người dùng **Student** dùng ứng dụng để tìm kiếm, mua và học các khóa học.
 
-# Cấu hình kết nối Supabase API
-SUPABASE_URL=https://<your-supabase-project-id>.supabase.co/rest/v1/
-SUPABASE_API_KEY=<your-supabase-anon-key>
-SUPABASE_STORAGE_BUCKET=course-media
+Các chức năng chính:
 
-# Cấu hình cổng thanh toán VNPAY (Sandbox)
-VNP_TMN_CODE=<your-vnpay-tmn-code>
-VNP_HASH_SECRET=<your-vnpay-hash-secret>
+* Đăng ký, đăng nhập, xác thực OTP.
+* Quên mật khẩu và đặt lại mật khẩu.
+* Xem danh sách khóa học.
+* Tìm kiếm khóa học theo từ khóa.
+* Xem chi tiết khóa học.
+* Xem danh sách chương và bài học.
+* Thêm khóa học vào giỏ hàng.
+* Thanh toán khóa học qua VNPAY.
+* Xem khóa học đã đăng ký.
+* Học bài giảng bằng video player.
+* Theo dõi tiến độ học.
+* Làm quiz.
+* Bình luận trong bài học.
+* Đánh giá và xếp hạng khóa học.
+* Nhận thông báo từ hệ thống.
+
+---
+
+### 2. Instructor
+
+Nhóm người dùng **Instructor** dùng ứng dụng để quản lý khóa học và theo dõi hiệu quả giảng dạy.
+
+Các chức năng chính:
+
+* Xem dashboard giảng viên.
+* Quản lý danh sách khóa học cá nhân.
+* Tạo, sửa thông tin khóa học.
+* Quản lý chương học.
+* Quản lý bài học.
+* Upload hoặc chỉnh sửa nội dung bài giảng.
+* Theo dõi học viên tham gia khóa học.
+* Xem thống kê doanh thu.
+* Xem báo cáo và biểu đồ thống kê.
+* Cập nhật hồ sơ cá nhân.
+
+---
+
+### 3. Admin
+
+Nhóm người dùng **Admin** dùng ứng dụng để quản trị toàn hệ thống.
+
+Các chức năng chính:
+
+* Xem dashboard tổng quan.
+* Quản lý người dùng.
+* Quản lý khóa học.
+* Phê duyệt khóa học của giảng viên.
+* Xem trước nội dung học tập.
+* Theo dõi báo cáo hệ thống.
+* Theo dõi doanh thu và thống kê.
+* Quản lý thông báo.
+
+---
+
+## Công nghệ sử dụng
+
+| Nhóm               | Công nghệ                                                           |
+| ------------------ | ------------------------------------------------------------------- |
+| Ngôn ngữ           | Java                                                                |
+| Nền tảng           | Android Native                                                      |
+| UI                 | XML Layout, Material Components, RecyclerView, CardView, ViewPager2 |
+| Kiến trúc          | MVVM, Repository Pattern                                            |
+| State/UI Data      | ViewModel, LiveData                                                 |
+| API Client         | Retrofit 2, OkHttp Logging Interceptor                              |
+| Database / Backend | Supabase, PostgreSQL                                                |
+| Storage            | Supabase Storage                                                    |
+| Cloud Function     | Supabase Edge Functions                                             |
+| Push Notification  | Firebase Cloud Messaging                                            |
+| Video Player       | ExoPlayer                                                           |
+| Image Loading      | Glide                                                               |
+| Chart              | MPAndroidChart                                                      |
+| Payment            | VNPAY                                                               |
+| Build Tool         | Gradle Kotlin DSL                                                   |
+
+---
+
+## Kiến trúc dự án
+
+Dự án được tổ chức theo hướng tách lớp để dễ bảo trì:
+
+```text
+UI Layer
+Activity, Adapter, XML Layout
+
+ViewModel Layer
+Xử lý trạng thái giao diện và gọi repository
+
+Repository Layer
+Đóng vai trò trung gian giữa ViewModel và API
+
+Remote/API Layer
+Retrofit interface, Supabase REST API, Edge Function API
+
+Model Layer
+Các class dữ liệu như User, Course, Lesson, Chapter, Review, Cart, Report
 ```
 
-### 2. Cấu hình Firebase Cloud Messaging (`google-services.json`)
-- Tạo dự án trên **Firebase Console**.
-- Thêm ứng dụng Android với Package Name là `com.example.myapplication`.
-- Tải file `google-services.json` xuống và đặt vào thư mục `app/` của dự án (`app/google-services.json`).
+Luồng xử lý cơ bản:
 
-### 3. Xây dựng và chạy dự án (Build & Run)
-1. Mở thư mục dự án bằng **Android Studio**.
-2. Đợi Android Studio hoàn thành quá trình đồng bộ hóa Gradle (`Sync Project with Gradle Files`).
-3. Kết nối thiết bị Android thật (bật chế độ USB Debugging) hoặc khởi động máy ảo Emulator (yêu cầu API Level >= 28).
-4. Nhấn nút **Run 'app'** (phím tắt `Shift + F10`) để biên dịch và cài đặt ứng dụng lên thiết bị.
+```text
+Activity
+   ↓
+ViewModel
+   ↓
+Repository
+   ↓
+Retrofit API
+   ↓
+Supabase / Edge Function
+```
+
+---
+
+## Cấu trúc thư mục
+
+```text
+CoursesManagement_MobileApp/
+├── app/
+│   ├── build.gradle.kts
+│   └── src/
+│       ├── androidTest/
+│       ├── test/
+│       └── main/
+│           ├── AndroidManifest.xml
+│           ├── java/com/example/myapplication/
+│           │   ├── activities/
+│           │   │   ├── admin/
+│           │   │   ├── auth/
+│           │   │   ├── common/
+│           │   │   ├── instructor/
+│           │   │   └── student/
+│           │   ├── adapters/
+│           │   ├── data/
+│           │   │   ├── remote/
+│           │   │   └── repository/
+│           │   ├── models/
+│           │   ├── services/
+│           │   ├── utils/
+│           │   ├── viewmodels/
+│           │   └── CoursesApplication.java
+│           └── res/
+├── supabase/
+├── gradle/
+├── build.gradle.kts
+├── settings.gradle.kts
+├── gradlew
+├── gradlew.bat
+└── README.md
+```
+
+---
+
+## Yêu cầu môi trường
+
+Trước khi chạy dự án, cần chuẩn bị:
+
+* Android Studio.
+* JDK 11 hoặc phiên bản tương thích.
+* Android SDK API 35.
+* Thiết bị Android thật hoặc Emulator.
+* Min SDK: API 28.
+* Tài khoản Supabase.
+* Tài khoản Firebase.
+* Thông tin cấu hình VNPAY sandbox nếu muốn test thanh toán.
+
+---
+
+## Cấu hình dự án
+
+### 1. Clone source code
+
+```bash
+git clone https://github.com/PhanManhTan/CoursesManagement_MobileApp.git
+cd CoursesManagement_MobileApp
+```
+
+---
+
+### 2. Mở project bằng Android Studio
+
+Mở thư mục project bằng Android Studio, sau đó chờ Gradle sync hoàn tất.
+
+---
+
+### 3. Cấu hình `local.properties`
+
+Tạo hoặc cập nhật file `local.properties` ở thư mục gốc của project.
+
+Ví dụ:
+
+```properties
+sdk.dir=C\:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
+
+SUPABASE_URL=https://your-project-id.supabase.co/rest/v1/
+SUPABASE_API_KEY=your-supabase-anon-key
+SUPABASE_STORAGE_BUCKET=course-media
+
+VNP_TMN_CODE=your-vnpay-tmn-code
+VNP_HASH_SECRET=your-vnpay-hash-secret
+```
+
+Trong đó:
+
+| Biến                      | Ý nghĩa                             |
+| ------------------------- | ----------------------------------- |
+| `SUPABASE_URL`            | URL REST API của Supabase project   |
+| `SUPABASE_API_KEY`        | Supabase anon/public key            |
+| `SUPABASE_STORAGE_BUCKET` | Bucket lưu media khóa học           |
+| `VNP_TMN_CODE`            | Mã merchant VNPAY                   |
+| `VNP_HASH_SECRET`         | Secret key dùng để ký request VNPAY |
+
+---
+
+### 4. Cấu hình Firebase
+
+Để dùng Firebase Cloud Messaging:
+
+1. Tạo project trên Firebase Console.
+2. Thêm Android app với package name:
+
+```text
+com.example.myapplication
+```
+
+3. Tải file:
+
+```text
+google-services.json
+```
+
+4. Đặt file vào thư mục:
+
+```text
+app/google-services.json
+```
+
+---
+
+### 5. Cấu hình Supabase
+
+Dự án sử dụng Supabase cho các phần chính:
+
+* Lưu thông tin người dùng.
+* Lưu danh mục khóa học.
+* Lưu khóa học, chương học, bài học.
+* Lưu giỏ hàng.
+* Lưu tiến độ học tập.
+* Lưu đánh giá và bình luận.
+* Lưu thông báo.
+* Lưu dữ liệu báo cáo.
+* Lưu media bằng Supabase Storage.
+* Gọi Edge Function để xử lý một số tác vụ server-side.
+
+Cần đảm bảo Supabase project đã có đầy đủ bảng, policy và storage bucket phù hợp với source code.
+
+---
+
+## Chạy ứng dụng
+
+Sau khi cấu hình xong:
+
+1. Mở project trong Android Studio.
+2. Chọn thiết bị Android hoặc Emulator.
+3. Nhấn **Run** hoặc dùng phím tắt:
+
+```text
+Shift + F10
+```
+
+Có thể build bằng terminal:
+
+```bash
+./gradlew assembleDebug
+```
+
+Trên Windows:
+
+```bash
+gradlew.bat assembleDebug
+```
+
+File APK debug sẽ được tạo tại:
+
+```text
+app/build/outputs/apk/debug/
+```
+
+---
+
+## Một số màn hình chính
+
+### Auth
+
+* Splash
+* Onboarding
+* Login
+* Register
+* OTP Verify
+* Forgot Password
+* Set New Password
+
+### Student
+
+* Home
+* Search Course
+* Course List
+* Course Detail
+* My Courses
+* Learning
+* Review
+
+### Instructor
+
+* Instructor Main
+* Instructor Dashboard
+* Course List
+* Edit Course
+* Edit Lesson
+* Profile Instructor
+
+### Admin
+
+* Admin Main
+* Admin Learning Preview
+
+### Common
+
+* Account
+* Edit Profile
+* Cart
+* Checkout
+* VNPAY Payment
+* Payment Result
+* Notification
+
+---
+
+Dự án được thực hiện bởi **Nhóm 11 — Lớp NT118.Q21**.
+
+| STT | Họ và tên       | MSSV     | GitHub                                            |
+| --: | --------------- | -------- | ------------------------------------------------- |
+|   1 | Phan Mạnh Tân   | 23521404 | [PhanManhTan](https://github.com/PhanManhTan)     |
+|   2 | Nguyễn Văn Sơn  | 23521357 | [noseyug](https://github.com/noseyug)             |
+|   3 | Huỳnh Minh Quí  | 23521298 | [HMQui](https://github.com/HMQui)                 |
+|   4 | Huỳnh Hoàng Huy | 23520606 | [HuynhHHuy](https://github.com/HuynhHHuy)         |
+|   5 | Phạm Minh Quang | 23521290 | [mquangpham575](https://github.com/mquangpham575) |
+
