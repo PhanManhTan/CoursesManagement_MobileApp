@@ -142,7 +142,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         btnPayNow.setOnClickListener(v -> {
             if (totalAmount <= 0) {
-                processSuccessfulPayment(null); // Mua miễn phí thì truyền null (không có mã giao dịch)
+                handleFreeEnrollment();
             } else {
                 verifyPricesAndPay();
             }
@@ -326,5 +326,59 @@ public class CheckoutActivity extends AppCompatActivity {
         }
         startActivity(intent);
         finish();
+    }
+    private void handleFreeEnrollment() {
+        String userId = sessionManager.getUserId();
+        if (userId == null || courseIds == null || courseIds.isEmpty()) {
+            Toast.makeText(this, R.string.payment_data_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.processing_enrollment));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        java.util.concurrent.atomic.AtomicInteger pendingCount = new java.util.concurrent.atomic.AtomicInteger(courseIds.size());
+
+        for (String courseId : courseIds) {
+            Enrollment enrollment = new Enrollment();
+            enrollment.setUserId(userId);
+            enrollment.setCourseId(courseId);
+
+            enrollment.setPaidAmount(0.0);
+
+            enrollmentRepository.insert(enrollment, new EnrollmentRepository.RepositoryCallback<Void>() {
+                @Override
+                public void onSuccess(Void data) {
+                    if (pendingCount.decrementAndGet() == 0) {
+                        progressDialog.dismiss();
+                        runOnUiThread(() -> clearCartAndCompleteFreePayment());
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (pendingCount.decrementAndGet() == 0) {
+                        progressDialog.dismiss();
+                    }
+                    runOnUiThread(() -> {
+                        Toast.makeText(CheckoutActivity.this, "Đăng ký thất bại: " + message, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        }
+    }
+
+    private void clearCartAndCompleteFreePayment() {
+        if (cartIds != null && !cartIds.isEmpty()) {
+            for (String cartId : cartIds) {
+                cartRepository.removeFromCart(cartId, new CartRepository.RepositoryCallback<Void>() {
+                    @Override public void onSuccess(Void d) {}
+                    @Override public void onError(String e) {}
+                });
+            }
+        }
+        processSuccessfulPayment(null);
     }
 }
