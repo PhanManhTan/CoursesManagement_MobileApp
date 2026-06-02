@@ -115,7 +115,7 @@ public class CheckoutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_checkout);
+        setContentView(R.layout.activity_common_checkout);
 
         requestNotificationPermission();
 
@@ -273,7 +273,7 @@ public class CheckoutActivity extends AppCompatActivity {
             public void onResponse(retrofit2.Call<com.example.myapplication.models.PaymentResponse> call, retrofit2.Response<com.example.myapplication.models.PaymentResponse> response) {
                 if(response.isSuccessful() && response.body() != null) {
                     String paymentUrl = response.body().getPaymentUrl();
-                    Intent intent = new Intent(CheckoutActivity.this, VNPAYActivity.class);
+                    Intent intent = new Intent(CheckoutActivity.this, VnPayActivity.class);
                     intent.putExtra("VNPAY_URL", paymentUrl);
                     vnPayLauncher.launch(intent);
                 } else {
@@ -299,6 +299,7 @@ public class CheckoutActivity extends AppCompatActivity {
         }
 
         Toast.makeText(this, totalAmount <= 0 ? getString(R.string.processing_enrollment) : getString(R.string.processing_order), Toast.LENGTH_LONG).show();
+        clearPurchasedCartItems();
 
         // Vẫn giữ lại phần tạo Notification để báo cho người dùng biết giao dịch đang được xử lý
         String statusTitle = totalAmount <= 0 ? getString(R.string.enrollment_successful_notif) : getString(R.string.payment_successful_notif);
@@ -370,7 +371,7 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
-    private void clearCartAndCompleteFreePayment() {
+    private void clearPurchasedCartItems() {
         if (cartIds != null && !cartIds.isEmpty()) {
             for (String cartId : cartIds) {
                 cartRepository.removeFromCart(cartId, new CartRepository.RepositoryCallback<Void>() {
@@ -379,6 +380,10 @@ public class CheckoutActivity extends AppCompatActivity {
                 });
             }
         }
+    }
+
+    private void clearCartAndCompleteFreePayment() {
+        clearPurchasedCartItems();
         processSuccessfulPayment(null);
     }
 }

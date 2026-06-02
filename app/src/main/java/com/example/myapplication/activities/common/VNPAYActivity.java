@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.utils.LanguageManager;
 
-public class VNPAYActivity extends AppCompatActivity {
+public class VnPayActivity extends AppCompatActivity {
     private WebView webView;
     private ProgressBar progressBar;
 
@@ -22,7 +22,7 @@ public class VNPAYActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vnpay);
+        setContentView(R.layout.activity_common_vnpay);
 
         webView = findViewById(R.id.webViewVNPAY);
         progressBar = findViewById(R.id.progressBar);

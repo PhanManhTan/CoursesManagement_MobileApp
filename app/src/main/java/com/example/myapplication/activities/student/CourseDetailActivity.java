@@ -72,7 +72,7 @@ public class CourseDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_course_detail);
+        setContentView(R.layout.activity_student_course_detail);
 
         sessionManager = new SessionManager(this);
         courseId = getIntent().getStringExtra("COURSE_ID");

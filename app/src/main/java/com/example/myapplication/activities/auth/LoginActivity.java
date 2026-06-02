@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_auth_login);
 
         RetrofitClient.setAuthErrorListener(null);
         sessionManager = new SessionManager(this);

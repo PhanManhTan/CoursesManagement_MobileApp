@@ -210,6 +210,7 @@ public class RetrofitClient {
         Log.w(TAG, reason);
         AuthErrorListener listener = authErrorListener;
         new Handler(Looper.getMainLooper()).post(() -> {
+            new SessionManager(context).clear();
             if (listener != null) {
                 listener.onAuthError();
                 return;

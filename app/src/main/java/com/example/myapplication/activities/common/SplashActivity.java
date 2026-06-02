@@ -28,7 +28,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_common_splash);
 
         sessionManager = new SessionManager(this);
         progressBar = findViewById(R.id.progressBar);
@@ -72,6 +72,10 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         String normalizedRole = role.trim().toLowerCase();
+        if ("password_recovery".equals(normalizedRole)) {
+            sessionManager.clear();
+            return new Intent(SplashActivity.this, LoginActivity.class);
+        }
         if ("admin".equals(normalizedRole)) {
             return new Intent(SplashActivity.this, AdminMainActivity.class);
         } else if ("instructor".equals(normalizedRole)) {

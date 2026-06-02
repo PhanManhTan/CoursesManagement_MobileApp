@@ -33,7 +33,7 @@ public class NotificationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification);
+        setContentView(R.layout.activity_common_notification);
 
         sessionManager = new SessionManager(this);
         notificationRepository = new NotificationRepository(this);
@@ -55,7 +55,9 @@ public class NotificationActivity extends AppCompatActivity {
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
-            public void handleOnBackPressed() { }
+            public void handleOnBackPressed() {
+                bottomNav.setSelectedItemId(R.id.nav_home);
+            }
         });
 
         loadNotifications();

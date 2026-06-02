@@ -10,13 +10,13 @@ import com.example.myapplication.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserManageViewModel extends AndroidViewModel {
+public class UserManagementViewModel extends AndroidViewModel {
     private final UserRepository repository;
     private final MutableLiveData<List<User>> users = new MutableLiveData<>();
     private List<User> allUsersList = new ArrayList<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
-    public UserManageViewModel(@NonNull Application application) {
+    public UserManagementViewModel(@NonNull Application application) {
         super(application);
         repository = new UserRepository(application);
         fetchUsers();

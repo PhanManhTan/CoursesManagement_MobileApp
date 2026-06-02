@@ -72,7 +72,7 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     @NonNull
     @Override
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_quiz_question, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_learning_quiz_question, parent, false);
         return new QuizViewHolder(view);
     }
 

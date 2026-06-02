@@ -52,7 +52,7 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Di
     @NonNull
     @Override
     public DiscussionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_discussion, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_learning_discussion, parent, false);
         return new DiscussionViewHolder(view);
     }
 

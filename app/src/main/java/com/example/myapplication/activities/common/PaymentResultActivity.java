@@ -17,7 +17,7 @@ public class PaymentResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_payment_result);
+        setContentView(R.layout.activity_common_payment_result);
 
         View layoutTransaction = findViewById(R.id.layoutTransaction);
         TextView tvTransactionId = findViewById(R.id.tvTransactionId);

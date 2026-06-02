@@ -43,7 +43,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_home, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_student_course_home, parent, false);
 
         if (reviewRepository == null) {
             reviewRepository = new ReviewRepository(parent.getContext());

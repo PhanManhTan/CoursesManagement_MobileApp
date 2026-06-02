@@ -40,7 +40,7 @@ public class MyCoursesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_courses);
+        setContentView(R.layout.activity_student_my_courses);
 
         sessionManager = new SessionManager(this);
         enrollmentRepository = new EnrollmentRepository(this);
@@ -51,12 +51,13 @@ public class MyCoursesActivity extends AppCompatActivity {
 
         loadMyCourses();
 
-        bottomNav.setSelectedItemId(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_courses);
         BottomNavigationHelper.setupBottomNavigation(this, bottomNav);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                bottomNav.setSelectedItemId(R.id.nav_home);
             }
         });
     }

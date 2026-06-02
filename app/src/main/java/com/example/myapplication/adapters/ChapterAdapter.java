@@ -41,7 +41,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     @NonNull
     @Override
     public ChapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chapter, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_learning_chapter, parent, false);
         return new ChapterViewHolder(view);
     }
 
@@ -91,7 +91,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                 }
 
                 for (Lesson lesson : lessons) {
-                    View lessonView = LayoutInflater.from(context).inflate(R.layout.item_lesson, container, false);
+                    View lessonView = LayoutInflater.from(context).inflate(R.layout.item_course_detail_lesson, container, false);
                     TextView tvTitle = lessonView.findViewById(R.id.tvLessonTitle);
                     TextView tvTime = lessonView.findViewById(R.id.tvLessonDuration);
 

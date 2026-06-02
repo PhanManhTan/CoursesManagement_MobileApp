@@ -27,7 +27,7 @@ public class OnboardingAdapter extends RecyclerView.Adapter<OnboardingAdapter.On
     @Override
     public OnboardingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_onboarding_page, parent, false);
+                .inflate(R.layout.fragment_auth_onboarding_page, parent, false);
         return new OnboardingViewHolder(view);
     }
 

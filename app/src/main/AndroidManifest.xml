@@ -39,7 +39,6 @@
         <activity android:name=".activities.common.HomeActivity" android:exported="false" android:windowSoftInputMode="adjustPan" />
 
         <!-- ── Student Activities ── -->
-        <activity android:name="com.example.myapplication.activities.student.CourseListActivity" android:exported="false" />
         <activity android:name=".activities.student.CourseDetailActivity" android:exported="false" />
         <activity android:name=".activities.student.LearningActivity" android:exported="false" />
         <activity android:name=".activities.student.MyCoursesActivity" android:exported="false" android:windowSoftInputMode="adjustPan" />
@@ -48,8 +47,6 @@
 
         <!-- ── Instructor Activities ── -->
         <activity android:name=".activities.instructor.InstructorMainActivity" android:exported="false" android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activities.instructor.InstructorDashboardActivity" android:exported="false" />
-        <activity android:name="com.example.myapplication.activities.instructor.CourseListActivity" android:exported="false" />
         <activity android:name=".activities.instructor.EditCourseActivity" android:exported="false" />
         <activity android:name=".activities.instructor.EditLessonActivity" android:exported="false" />
 
@@ -68,7 +65,7 @@
         <activity android:name=".activities.common.EditProfileActivity" android:exported="false" />
         <activity android:name=".activities.common.NotificationActivity" android:exported="false" android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activities.common.PaymentResultActivity" android:exported="false" />
-        <activity android:name=".activities.common.VNPAYActivity" android:exported="false" />
+        <activity android:name=".activities.common.VnPayActivity" android:exported="false" />
         <!-- Firebase Cloud Messaging Service -->
         <service
             android:name=".services.MyFirebaseMessagingService"

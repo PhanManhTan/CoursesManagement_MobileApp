@@ -37,7 +37,7 @@ public class OnboardingActivity extends AppCompatActivity {
         LanguageManager.applySavedLanguage(this);
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_onboarding);
+        setContentView(R.layout.activity_auth_onboarding);
 
         viewPager = findViewById(R.id.viewPager);
         btnNext = findViewById(R.id.btnNext);

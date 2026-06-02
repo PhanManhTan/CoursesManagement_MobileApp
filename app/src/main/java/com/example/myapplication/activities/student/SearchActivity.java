@@ -59,7 +59,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_student_search);
 
         initViews();
         initRepositories();
@@ -78,6 +78,7 @@ public class SearchActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                bottomNav.setSelectedItemId(R.id.nav_home);
             }
         });
     }
@@ -125,7 +126,7 @@ public class SearchActivity extends AppCompatActivity {
                 Category matchedCategory = null;
 
                 // Prepend "All Courses" category button
-                View allBtnView = getLayoutInflater().inflate(R.layout.item_category, categoryContainer, false);
+                View allBtnView = getLayoutInflater().inflate(R.layout.item_common_category, categoryContainer, false);
                 MaterialButton allBtn = (MaterialButton) allBtnView;
                 allBtn.setText(getString(R.string.all_courses));
                 allBtn.setTag(ALL_COURSES_ID);
@@ -137,7 +138,7 @@ public class SearchActivity extends AppCompatActivity {
                 categoryContainer.addView(allBtn);
 
                 for (Category category : categories) {
-                    View btnView = getLayoutInflater().inflate(R.layout.item_category, categoryContainer, false);
+                    View btnView = getLayoutInflater().inflate(R.layout.item_common_category, categoryContainer, false);
                     MaterialButton btn = (MaterialButton) btnView;
                     btn.setText(category.getName());
                     btn.setTag(category.getId());
@@ -284,7 +285,7 @@ public class SearchActivity extends AppCompatActivity {
         android.util.Log.d("SearchActivity", "Displaying " + visibleCourses.size() + " courses.");
 
         for (Course course : visibleCourses) {
-            View itemView = getLayoutInflater().inflate(R.layout.item_course_search, searchResultsContainer, false);
+            View itemView = getLayoutInflater().inflate(R.layout.item_student_course_search, searchResultsContainer, false);
 
             TextView title = itemView.findViewById(R.id.tvCourseTitle);
             TextView instructor = itemView.findViewById(R.id.tvInstructor);

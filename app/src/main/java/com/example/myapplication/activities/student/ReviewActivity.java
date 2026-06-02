@@ -34,7 +34,7 @@ public class ReviewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_review);
+        setContentView(R.layout.activity_student_review);
 
         courseId = getIntent().getStringExtra("COURSE_ID");
         sessionManager = new SessionManager(this);

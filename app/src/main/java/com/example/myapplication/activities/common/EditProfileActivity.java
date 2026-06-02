@@ -33,7 +33,7 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+        setContentView(R.layout.activity_common_edit_profile);
 
         userRepository = new UserRepository(this);
         sessionManager = new SessionManager(this);

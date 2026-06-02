@@ -38,7 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_auth_register);
 
         authApi = RetrofitClient.getClient(this).create(AuthApi.class);
 
@@ -52,8 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         roleCodes = new String[]{"student", "instructor"};
         String[] roles = {getString(R.string.student_fallback), getString(R.string.instructor_fallback)};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, roles);
-        adapter.setDropDownViewResource(R.layout.item_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner, roles);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner);
         spRole.setAdapter(adapter);
 
         btnRegister.setOnClickListener(v -> attemptRegister());

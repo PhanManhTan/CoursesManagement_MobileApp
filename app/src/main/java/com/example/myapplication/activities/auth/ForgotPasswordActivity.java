@@ -33,7 +33,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forget_password);
+        setContentView(R.layout.activity_auth_forgot_password);
 
         etEmail = findViewById(R.id.etEmail);
         btnSendOtp = findViewById(R.id.btnSendOtp);

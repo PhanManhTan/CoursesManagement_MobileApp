@@ -137,7 +137,7 @@
         android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/layoutBottomArea"
         app:layout_constraintTop_toBottomOf="@id/btnAddDiscussion"
-        tools:listitem="@layout/item_lesson_learning"
+        tools:listitem="@layout/item_learning_lesson"
         tools:itemCount="5"/>
 
     <LinearLayout

@@ -38,7 +38,7 @@ public class CartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+        setContentView(R.layout.activity_common_cart);
 
         initViews();
         initRepositories();

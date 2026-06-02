@@ -103,7 +103,7 @@ public class EditCourseActivity extends AppCompatActivity {
             return;
         }
         registerLaunchers();
-        setContentView(R.layout.activity_instructor_course_detail);
+        setContentView(R.layout.activity_instructor_edit_course);
 
         initViews();
         setupRecyclerView();
@@ -141,8 +141,8 @@ public class EditCourseActivity extends AppCompatActivity {
     }
 
     private void setupCategorySpinner() {
-        categoryAdapter = new ArrayAdapter<>(this, R.layout.item_spinner, new ArrayList<>());
-        categoryAdapter.setDropDownViewResource(R.layout.item_spinner);
+        categoryAdapter = new ArrayAdapter<>(this, R.layout.item_common_spinner, new ArrayList<>());
+        categoryAdapter.setDropDownViewResource(R.layout.item_common_spinner);
         spCategory.setAdapter(categoryAdapter);
         spCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

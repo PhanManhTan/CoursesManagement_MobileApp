@@ -45,7 +45,7 @@ import com.example.myapplication.utils.SessionManager;
 import com.example.myapplication.viewmodels.AdminViewModel;
 import com.example.myapplication.viewmodels.CourseApprovalViewModel;
 import com.example.myapplication.viewmodels.ReportViewModel;
-import com.example.myapplication.viewmodels.UserManageViewModel;
+import com.example.myapplication.viewmodels.UserManagementViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -59,7 +59,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
     // ViewModels
     private AdminViewModel adminViewModel;
-    private UserManageViewModel userManageViewModel;
+    private UserManagementViewModel userManageViewModel;
     private CourseApprovalViewModel courseApprovalViewModel;
     private ReportViewModel reportViewModel;
 
@@ -251,7 +251,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
     // ─── [2] Tab: User Manage ───
     private void showUserManage() {
-        View root = inflateContent(R.layout.activity_user_manage);
+        View root = inflateContent(R.layout.activity_admin_user_manage);
 
         View innerNav = root.findViewById(R.id.bottomNav);
         if (innerNav != null) innerNav.setVisibility(View.GONE);
@@ -266,7 +266,7 @@ public class AdminMainActivity extends AppCompatActivity {
         UserAdapter adapter = new UserAdapter();
         rvUsers.setAdapter(adapter);
 
-        userManageViewModel = new ViewModelProvider(this).get(UserManageViewModel.class);
+        userManageViewModel = new ViewModelProvider(this).get(UserManagementViewModel.class);
         adapter.setListener(user -> {
             String currentUserId = sessionManager.getUserId();
             if (user.getId() != null && user.getId().equals(currentUserId)) {
@@ -294,8 +294,8 @@ public class AdminMainActivity extends AppCompatActivity {
         if (spFilterRole != null) {
             String[] roles = {getString(R.string.all), getString(R.string.student), getString(R.string.instructor_fallback)};
             String[] roleValues = {"All", "Student", "Instructor"};
-            ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, roles);
-            roleAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
+            ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(this, R.layout.item_common_spinner_compact, roles);
+            roleAdapter.setDropDownViewResource(R.layout.item_common_spinner_dropdown_compact);
             spFilterRole.setAdapter(roleAdapter);
             spFilterRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -311,7 +311,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
     // ─── [3] Tab: Course Approval ───
     private void showCourseApproval() {
-        View root = inflateContent(R.layout.activity_course_approval);
+        View root = inflateContent(R.layout.activity_admin_course_approval);
 
         View innerNav = root.findViewById(R.id.bottomNav);
         if (innerNav != null) innerNav.setVisibility(View.GONE);
@@ -392,7 +392,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
     // ─── [4] Tab: Reports ───
     private void showReports() {
-        View root = inflateContent(R.layout.activity_report);
+        View root = inflateContent(R.layout.activity_admin_report);
 
         View innerNav = root.findViewById(R.id.bottomNav);
         if (innerNav != null) innerNav.setVisibility(View.GONE);
@@ -431,7 +431,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
     // ─── [5] Tab: Account ───
     private void showAccount() {
-        View root = inflateContent(R.layout.account_activity);
+        View root = inflateContent(R.layout.activity_common_account);
 
         View innerNav = root.findViewById(R.id.bottomNav);
         if (innerNav != null) innerNav.setVisibility(View.GONE);
@@ -508,8 +508,8 @@ public class AdminMainActivity extends AppCompatActivity {
 
         String[] labels = {getString(R.string.language_english), getString(R.string.language_vietnamese)};
         String[] codes = {LanguageManager.LANGUAGE_ENGLISH, LanguageManager.LANGUAGE_VIETNAMESE};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner_compact, labels);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner_dropdown_compact);
         spLanguage.setAdapter(adapter);
         spLanguage.setSelection(findLanguageIndex(codes, LanguageManager.getSavedLanguage(this)), false);
         spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

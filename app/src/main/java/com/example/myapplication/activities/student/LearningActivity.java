@@ -1,7 +1,5 @@
 package com.example.myapplication.activities.student;
 
-import static com.google.android.material.internal.ViewUtils.showKeyboard;
-
 import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Rect;
@@ -30,6 +28,7 @@ import com.example.myapplication.adapters.LearningChapterAdapter;
 import com.example.myapplication.adapters.QuizAdapter;
 import com.example.myapplication.data.repository.ChapterRepository;
 import com.example.myapplication.data.repository.CommentRepository;
+import com.example.myapplication.data.repository.EnrollmentRepository;
 import com.example.myapplication.data.repository.LessonProgressRepository;
 import com.example.myapplication.data.repository.LessonRepository;
 import com.example.myapplication.data.repository.QuizRepository;
@@ -85,6 +84,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
     private ChapterRepository chapterRepository;
     private LessonRepository lessonRepository;
+    private EnrollmentRepository enrollmentRepository;
     private LessonProgressRepository progressRepository;
     private CommentRepository commentRepository;
     private QuizRepository quizRepository;
@@ -94,7 +94,7 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_learning);
+        setContentView(R.layout.activity_common_course_learning);
 
         vvCourse = findViewById(R.id.vvCourse);
         rvContent = findViewById(R.id.rvContent);
@@ -223,11 +223,36 @@ public class LearningActivity extends AppCompatActivity implements LearningChapt
 
         chapterRepository = new ChapterRepository(this);
         lessonRepository = new LessonRepository(this);
+        enrollmentRepository = new EnrollmentRepository(this);
         progressRepository = new LessonProgressRepository(this);
         commentRepository = new CommentRepository(this);
         quizRepository = new QuizRepository(this);
 
-        loadLearningData();
+        verifyEnrollmentAndLoad();
+    }
+
+    private void verifyEnrollmentAndLoad() {
+        enrollmentRepository.checkEnrollment(userId, courseId, new EnrollmentRepository.RepositoryCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean enrolled) {
+                runOnUiThread(() -> {
+                    if (Boolean.TRUE.equals(enrolled)) {
+                        loadLearningData();
+                    } else {
+                        Toast.makeText(LearningActivity.this, R.string.enrollment_required_to_learn, Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    Toast.makeText(LearningActivity.this, getString(R.string.error_with_message, message), Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }
+        });
     }
 
     private void loadFileUi() {

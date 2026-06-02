@@ -83,7 +83,7 @@ public class EditLessonActivity extends AppCompatActivity {
             return;
         }
         registerFilePickers();
-        setContentView(R.layout.activity_edit_lesson);
+        setContentView(R.layout.activity_instructor_edit_lesson);
 
         lessonData = readLessonData();
         storageRepository = new SupabaseStorageRepository(this);
@@ -615,7 +615,7 @@ public class EditLessonActivity extends AppCompatActivity {
         if (llQuizContainer == null) return;
 
         ViewGroup row = (ViewGroup) getLayoutInflater()
-                .inflate(R.layout.item_intructor_quizz_question, llQuizContainer, false);
+                .inflate(R.layout.item_instructor_quiz_question, llQuizContainer, false);
         bindQuizView(row, quiz);
         setupQuizView(row);
         llQuizContainer.addView(row);

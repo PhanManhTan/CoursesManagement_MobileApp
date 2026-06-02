@@ -154,6 +154,7 @@
     <string name="failed_post_comment">Không thể gửi bình luận</string>
     <string name="reply_to_format">Trả lời %1$s...</string>
     <string name="course_has_no_content">Khóa học chưa có nội dung</string>
+    <string name="enrollment_required_to_learn">Bạn cần đăng ký khóa học này trước khi vào học.</string>
     <string name="no_video_for_lesson">Bài học này chưa có video</string>
     <string name="current_lesson_format">%1$s • %2$s</string>
     <string name="write_review">Viết đánh giá</string>
@@ -358,6 +359,7 @@
     <string name="course_title_required">Nhập tên khóa học trước khi lưu.</string>
     <string name="description_required">Nhập mô tả khóa học trước khi lưu.</string>
     <string name="invalid_price">Nhập giá hợp lệ, chỉ dùng chữ số.</string>
+    <string name="invalid_discount_percent">Nhập phần trăm giảm giá hợp lệ (0-100).</string>
     <string name="select_category">Chọn danh mục</string>
     <string name="course_category_required">Chọn danh mục trước khi lưu.</string>
     <string name="error_loading_categories">Không thể tải danh mục: %1$s</string>

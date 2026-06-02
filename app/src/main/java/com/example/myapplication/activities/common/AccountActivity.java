@@ -64,7 +64,7 @@ public class AccountActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.account_activity);
+        setContentView(R.layout.activity_common_account);
 
         userRepository = new UserRepository(this);
         storageRepository = new SupabaseStorageRepository(this);
@@ -273,8 +273,8 @@ public class AccountActivity extends AppCompatActivity {
 
         String[] labels = {getString(R.string.language_english), getString(R.string.language_vietnamese)};
         String[] codes = {LanguageManager.LANGUAGE_ENGLISH, LanguageManager.LANGUAGE_VIETNAMESE};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner_compact, labels);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner_dropdown_compact);
         spLanguage.setAdapter(adapter);
         spLanguage.setSelection(findLanguageIndex(codes, LanguageManager.getSavedLanguage(this)), false);
         spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

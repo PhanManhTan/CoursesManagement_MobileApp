@@ -34,7 +34,7 @@ public class SetNewPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_set_new_password);
+        setContentView(R.layout.activity_auth_set_new_password);
 
         sessionManager = new SessionManager(this);
         userEmail = getIntent().getStringExtra(EXTRA_EMAIL);
@@ -47,9 +47,11 @@ public class SetNewPasswordActivity extends AppCompatActivity {
         btnResetPassword.setOnClickListener(v -> attemptReset());
 
         tvBackToLogin.setOnClickListener(v -> {
+            sessionManager.clear();
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            finish();
         });
     }
 

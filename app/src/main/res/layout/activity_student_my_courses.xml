@@ -81,7 +81,7 @@
         android:paddingBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintTop_toBottomOf="@id/filterScroll"
-        tools:listitem="@layout/item_my_course" />
+        tools:listitem="@layout/item_student_my_course" />
 
     <TextView
         android:id="@+id/tvEmptyMyCourses"

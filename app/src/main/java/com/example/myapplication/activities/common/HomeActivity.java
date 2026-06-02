@@ -42,7 +42,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_common_home);
 
         sessionManager = new SessionManager(this);
         if (!sessionManager.isLoggedIn()) {

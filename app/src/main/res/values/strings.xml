@@ -156,6 +156,7 @@
     <string name="failed_post_comment">Failed to post comment</string>
     <string name="reply_to_format">Reply to %1$s...</string>
     <string name="course_has_no_content">Course has no content</string>
+    <string name="enrollment_required_to_learn">You must enroll in this course before learning.</string>
     <string name="no_video_for_lesson">No video available for this lesson</string>
     <string name="current_lesson_format">%1$s • %2$s</string>
     <string name="write_review">Write a Review</string>

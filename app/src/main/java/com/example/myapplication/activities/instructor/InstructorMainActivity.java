@@ -373,7 +373,7 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void showCourses() {
-        View root = inflateContent(R.layout.activity_instructor_course_list);
+        View root = inflateContent(R.layout.activity_instructor_courses);
         TabLayout tabLayout = root.findViewById(R.id.tabLayout);
         View courseListContainer = root.findViewById(R.id.courseListContainer);
         View reviewsContainer = root.findViewById(R.id.reviewsContainer);
@@ -455,7 +455,7 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void showStudents() {
-        View root = inflateContent(R.layout.activity_student_list);
+        View root = inflateContent(R.layout.activity_instructor_students);
         View btnBack = root.findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setVisibility(View.GONE);
 
@@ -503,7 +503,7 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void showRevenue() {
-        View root = inflateContent(R.layout.activity_revenue);
+        View root = inflateContent(R.layout.activity_instructor_revenue);
         View btnBack = root.findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setVisibility(View.GONE);
 
@@ -655,8 +655,8 @@ public class InstructorMainActivity extends AppCompatActivity
             ids.add(course.getId());
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
-        adapter.setDropDownViewResource(R.layout.item_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner, labels);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner);
         spReviewCourseFilter.setOnItemClickListener(null);
         setupDropdownOpenBehavior(spReviewCourseFilter);
         spReviewCourseFilter.setAdapter(adapter);
@@ -724,7 +724,7 @@ public class InstructorMainActivity extends AppCompatActivity
     }
 
     private void showAccount() {
-        View root = inflateContent(R.layout.account_activity);
+        View root = inflateContent(R.layout.activity_common_account);
         View innerNav = root.findViewById(R.id.bottomNav);
         if (innerNav != null) innerNav.setVisibility(View.GONE);
         View btnBack = root.findViewById(R.id.btnBack);
@@ -845,8 +845,8 @@ public class InstructorMainActivity extends AppCompatActivity
 
         String[] labels = {getString(R.string.language_english), getString(R.string.language_vietnamese)};
         String[] codes = {LanguageManager.LANGUAGE_ENGLISH, LanguageManager.LANGUAGE_VIETNAMESE};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_compact, labels);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_compact);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner_compact, labels);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner_dropdown_compact);
         spLanguage.setAdapter(adapter);
         spLanguage.setSelection(findLanguageIndex(codes, LanguageManager.getSavedLanguage(this)), false);
         spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1035,8 +1035,8 @@ public class InstructorMainActivity extends AppCompatActivity
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
-        adapter.setDropDownViewResource(R.layout.item_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner, labels);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner);
         dropdown.setOnItemClickListener(null);
         setupDropdownOpenBehavior(dropdown);
         dropdown.setAdapter(adapter);
@@ -1109,8 +1109,8 @@ public class InstructorMainActivity extends AppCompatActivity
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, labels);
-        adapter.setDropDownViewResource(R.layout.item_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_common_spinner, labels);
+        adapter.setDropDownViewResource(R.layout.item_common_spinner);
         dropdown.setOnItemClickListener(null);
         setupDropdownOpenBehavior(dropdown);
         dropdown.setAdapter(adapter);

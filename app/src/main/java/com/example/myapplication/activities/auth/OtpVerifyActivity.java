@@ -49,7 +49,7 @@ public class OtpVerifyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_otp_verify);
+        setContentView(R.layout.activity_auth_otp_verify);
 
         sessionManager = new SessionManager(this);
         userEmail = getIntent().getStringExtra(EXTRA_EMAIL);
@@ -189,17 +189,17 @@ public class OtpVerifyActivity extends AppCompatActivity {
                     String accessToken = response.body().getAccessToken();
                     String refreshToken = response.body().getRefreshToken();
 
-                    // Sử dụng SessionManager để lưu token đồng bộ với RetrofitClient
-                    sessionManager.saveSession(accessToken, refreshToken, response.body().getUser().getId(), "student");
-
                     Toast.makeText(OtpVerifyActivity.this, R.string.verified_success, Toast.LENGTH_SHORT).show();
 
                     if (MODE_FORGOT.equals(mode)) {
+                        // Password reset needs the recovery token for updatePassword, but it is not a normal login session.
+                        sessionManager.saveSession(accessToken, refreshToken, response.body().getUser().getId(), "password_recovery");
                         Intent intent = new Intent(OtpVerifyActivity.this, SetNewPasswordActivity.class);
                         intent.putExtra(SetNewPasswordActivity.EXTRA_EMAIL, userEmail);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
+                        sessionManager.clear();
                         Intent intent = new Intent(OtpVerifyActivity.this, LoginActivity.class);
                         intent.putExtra(EXTRA_EMAIL, userEmail);
                         intent.putExtra(EXTRA_FROM_REGISTER_OTP, true);

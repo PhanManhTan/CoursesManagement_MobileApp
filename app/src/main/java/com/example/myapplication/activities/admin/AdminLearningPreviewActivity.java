@@ -76,7 +76,7 @@ public class AdminLearningPreviewActivity extends AppCompatActivity implements L
     protected void onCreate(Bundle savedInstanceState) {
         LanguageManager.applySavedLanguage(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_learning);
+        setContentView(R.layout.activity_common_course_learning);
 
         sessionManager = new SessionManager(this);
         if (!"admin".equalsIgnoreCase(sessionManager.getRole())) {

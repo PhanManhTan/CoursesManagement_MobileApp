@@ -46,7 +46,7 @@ public class CourseApprovalAdapter extends RecyclerView.Adapter<CourseApprovalAd
     @NonNull
     @Override
     public CourseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_approval, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_course_approval, parent, false);
         if (userRepository == null) {
             userRepository = new UserRepository(parent.getContext());
         }
